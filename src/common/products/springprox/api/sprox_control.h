@@ -1,0 +1,72 @@
+/*
+  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+  ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED
+  TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+  PARTICULAR PURPOSE.
+
+  SpringProx API
+  --------------
+
+  Copyright (c) 2015 SpringCard SAS, FRANCE - www.springcard.com
+
+  sprox_control.h
+  ---------------
+  Control codes
+
+*/
+#ifndef SPROX_CONTROL_H
+#define SPROX_CONTROL_H
+
+#define SPROX_CONTROL_SERIAL_CCID       0x01
+
+#define SPROX_CONTROL_ANTENNA_TYPE      0x08
+#define SPROX_CONTROL_ANTENNA_SELECT    0x09
+
+#define SPROX_CONTROL_RF                0x0A
+#define SPROX_CONTROL_BAUDRATE          0x0B
+#define SPROX_CONTROL_MODE              0x0C
+
+#define SPROX_CONTROL_CONFIG_WRITE      0x0D
+#define SPROX_CONTROL_CONFIG_PUSH       0x8D
+#define SPROX_CONTROL_CONFIG_READ       0x0E
+#define SPROX_CONTROL_RESET             0x8E
+
+#define SPROX_CONTROL_CONST             0x0F
+
+#define SPROX_CONTROL_I2C_READ          0x12
+#define SPROX_CONTROL_I2C_WRITE         0x13
+
+#define SPROX_CONTROL_GET_TAMPERS       0x17
+                                          
+#define SPROX_CONTROL_HARD_TEST         0x18
+#define SPROX_CONTROL_RF_TEST           0x19
+
+#define SPROX_CONTROL_USB_PWRD          0x1A
+#define SPROX_CONTROL_SUSPEND_I         0x1B
+#define SPROX_CONTROL_BUZZER            0x1C
+#define SPROX_CONTROL_MODE_I            0x1D
+#define SPROX_CONTROL_LEDS              0x1E
+#define SPROX_CONTROL_GPIOS             0x1F
+
+#define SPROX_CONTROL_GLOBAL_STRING     0x20
+#define SPROX_CONTROL_SLOT_STRING       0x21
+#define SPROX_CONTROL_CCID_SLOT_STOP    0x22
+#define SPROX_CONTROL_CCID_SLOT_START   0x23
+
+#define SPROX_CONTROL_MIF_LASTKEY       0x33
+
+#define SPROX_CONTROL_SC_INSERT_REMOVE  0x40
+#define SPROX_CONTROL_GCR_SLOT_CFG      0x41
+
+#define SPROX_CONTROL_SEQUENCE_INDEX    0x90
+#define SPROX_CONTROL_LED_RGB           0x91
+#define SPROX_CONTROL_LEDS_EX           0x92
+#define SPROX_CONTROL_LIGHT             0x97
+#define SPROX_CONTROL_SEQUENCE_STRING   0x98
+
+#define SPROX_CONTROL_CALYPSO           0xC0
+#define SPROX_CONTROL_NOR_TELBIP        0xC9
+#define SPROX_CONTROL_TRACE             0xCD
+
+#endif
+
