@@ -308,12 +308,14 @@ done:
 
 static void usage(void)
 {
-	printf("Usage: %s [-x <XML FILENAME>] [-s] [-t] [-d <COMM DEVICE] [-v]\n\n", PROGRAM_NAME);
-	printf("If -a <AID> is set, the software uses this Application IDentifier instead of '1TIC.ICA'.\n\n");
-	printf("If -x <XML FILENAME> is set, the software writes the output into the specified file.\n\n");
-	printf("If -s (silent) is set, the software does not display the XML output.\n\n");
-	printf("If -t (transaction) is set, the software starts a transaction with the card.\n\n");
-	printf("If the comm. name is not specified, the default device is taken from Registry or from /etc/springprox.cfg\n\n");
+	printf("Usage: %s [-x <XML FILENAME>] [-a <AID>] [-d <COMM DEVICE]\n", PROGRAM_NAME);
+	printf(" -x <XML FILENAME> writes the output into the specified file.\n");
+	printf(" -a <AID>  uses this Application IDentifier instead of '1TIC.ICA'.\n");
+	printf("OPTIONS:\n");
+	printf(" -s : (silent)      the software does not display the XML output.\n");
+	printf(" -t : (transaction) the software starts a transaction with the card.\n");
+	printf(" -v : verbose (trace library functions)\n");
+	printf("If the comm. name is not specified, the default device is taken from Registry or from /etc/springprox.cfg\n");
 }
 
 static BOOL parse_args(int argc, char** argv)

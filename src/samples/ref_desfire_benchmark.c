@@ -224,14 +224,16 @@ done:
 
 static void usage(void)
 {
-	printf("Usage: %s [BAUDRATE] [-i] [-c <CID>] [-d <COMM DEVICE] [-v]\n\n", PROGRAM_NAME);
-	printf("Choose the baudrates:\n");
+	printf("Usage: %s [BAUDRATES] [OPTIONS] [-d <COMM DEVICE] [-v]\n", PROGRAM_NAME);
+	printf("BAUDRATES:\n");
 	printf(" -dr0, -dr1, -dr2 or -dr3 for PCD->PICC baudrate\n");
 	printf(" -ds0, -ds1, -ds2 or -ds3 for PICC->PCD baudrate\n");
-	printf("Default is -dr0 -ds0 (106kbit/s both directions)\n\n");
-	printf("If -i (iso) is set, ISO/IEC 7816-4 wrapping is used.\n\n");
-	printf("If -c (cid) is set, the corresponding CID is used.\n\n");
-	printf("If the comm. name is not specified, the default device is taken from Registry or from /etc/springprox.cfg\n\n");
+	printf("Default is -dr0 -ds0 (106kbit/s both directions)\n");
+	printf("OPTIONS:\n");
+	printf(" -i : (iso)   ISO/IEC 7816-4 wrapping is used.\n");
+	printf(" -c <CID>     sets the CID for T=CL\n");
+	printf(" -v : verbose (trace library functions)\n");
+	printf("If the name of COMM DEVICE is not specified, default is taken from Registry or from /etc/springprox.cfg\n");
 }
 
 static BOOL parse_args(int argc, char** argv)

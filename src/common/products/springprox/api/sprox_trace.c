@@ -70,7 +70,7 @@ void SPROX_Trace(BYTE level, const char* fmt, ...)
 	}
 	else
 	{
-		if (!strlen(trace_file)) return FALSE;
+		if (!strlen(trace_file)) return;
 		if (!_tcsncmp(trace_file, _T("DLG"), 3))
 		{
 			/* Output to message box */

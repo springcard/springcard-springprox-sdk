@@ -178,18 +178,20 @@ done:
 
 void usage(void)
 {
-	printf("Usage: %s [PROTOCOL] [BAUDRATE] [-d <COMM DEVICE] [-v]\n\n", PROGRAM_NAME);
-	printf("Choose the protocol, either:\n");
+	printf("Usage: %s [PROTOCOLS] [BAUDRATES] [OPTIONS] [-d <COMM DEVICE]\n", PROGRAM_NAME);
+	printf("Write PROTOCOLS as follow:\n");
 	printf(" -A : for ISO 14443-A\n");
 	printf(" -B : for ISO 14443-B\n");
 	printf(" -I : for Innovatron (old Calypso cards)\n");
 	printf(" -* : for all\n");
-	printf("If no protocol is specified, all protocols are tried (same as -*)\n\n");
-	printf("Choose the baudrates:\n");
+	printf("If PROTOCOLS is empty, all protocols are tried (same as -*)\n");
+	printf("BAUDRATES:\n");
 	printf(" -dr0, -dr1, -dr2 or -dr3 for PCD->PICC baudrate\n");
 	printf(" -ds0, -ds1, -ds2 or -ds3 for PICC->PCD baudrate\n");
-	printf("Default is -dr0 -ds0 (106kbit/s both directions)\n\n");
-	printf("If the comm. name is not specified, the default device is taken from Registry or from /etc/springprox.cfg\n\n");
+	printf("Default is -dr0 -ds0 (106kbit/s both directions)\n");
+	printf("OPTIONS:\n");
+	printf(" -v : verbose (trace library functions)\n");
+	printf("If the name of COMM DEVICE is not specified, default is taken from Registry or from /etc/springprox.cfg\n");
 }
 
 BOOL parse_args(int argc, char** argv)

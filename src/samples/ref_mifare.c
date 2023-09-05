@@ -300,11 +300,14 @@ done:
 
 static void usage(void)
 {
-	printf("Usage: %s [-q] [-f] [-b] [-d <COMM DEVICE] [-v]\n\n", PROGRAM_NAME);
-	printf("If -q (quick) is set, the software tests only the sectors 0 and 1, not all sectors on the card.\n\n");
-	printf("If -f (full) is set, the software formats the card and passes in all functions.\n\n");
-	printf("If -b (bench) is set, the software measures the timings.\n\n");
-	printf("If the comm. name is not specified, the default device is taken from Registry or from /etc/springprox.cfg\n\n");
+	printf("Usage: %s [-OPTIONS] [-d <COMM DEVICE]\n", PROGRAM_NAME);
+	printf("OPTIONS:\n");
+	printf(" -q : (quick) the software tests only the sectors 0 and 1, not all sectors on the card.\n");
+	printf(" -f : (full)  the software formats the card and passes in all functions.\n");
+	printf(" -b : (bench) , the software measures the timings.\n");
+	printf(" -v : verbose (trace library functions)\n");
+	printf("If the name of COMM DEVICE is not specified, default is taken from Registry or from /etc/springprox.cfg\n");
+
 }
 
 static BOOL parse_args(int argc, char** argv)

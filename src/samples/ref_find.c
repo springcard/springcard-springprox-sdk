@@ -260,7 +260,7 @@ int main(int argc, char** argv)
 						}
 						else
 						{
-							printf("a Mifare UltraLight\n");
+							printf("a Mifare UltraLight or an NFC Forum Type 2 Tag\n");
 						}
 					}
 				}
@@ -290,9 +290,13 @@ int main(int argc, char** argv)
 			/* The UID starts with the vendor name (ISO 7816-6) */
 			/* ------------------------------------------------ */
 
+			if (uid_len != 8)
+			{
+				printf("Strange! Length of ISO/IEC 15693 UID shall be 8\n");
+			}
 			if (uid[0] != 0xE0)
 			{
-				printf("Strange! UID doesn't start with E0\n");
+				printf("Strange! ISO/IEC 15693 UID shall start with E0\n");
 			}
 
 			switch (uid[1])
@@ -398,8 +402,8 @@ done:
 
 void usage(void)
 {
-	printf("usage: %s [PROTOCOL LIST] [-1] [-d <COMM. DEVICE>] [-v]\n\n", PROGRAM_NAME);
-	printf("Write PROTOCOL LIST as follow:\n");
+	printf("usage: %s [PROTOCOLS] [OPTIONS] [-d <COMM DEVICE>]\n\n", PROGRAM_NAME);
+	printf("Write PROTOCOLS as follow:\n");
 	printf(" -* : all protocols supported by the device\n");
 	printf(" -P : for ISO/IEC 14443 A and B\n");
 	printf(" -A : for ISO 14443-A only\n");
@@ -409,9 +413,11 @@ void usage(void)
 	printf(" -F : for Felica\n");
 	printf(" -P : for Inside PicoTag (also HID iClass)\n");
 	printf(" -M : for other memory cards (ST SR..., ASK CTS)\n");
-	printf("If PROTOCOL LIST is empty, all protocols are tried (same as -*)\n\n");
-	printf("If -1 is set, the software exits as soon as a card is found.\n\n");
-	printf("If the comm. name is not specified, the default device is taken from Registry or from /etc/springprox.cfg\n\n");
+	printf("If PROTOCOLS is empty, all protocols are tried (same as -*)\n");
+	printf("OPTIONS:\n");
+	printf(" -1 : run only once (exit when first card is found)\n");
+	printf(" -v : verbose (trace library functions)\n");
+	printf("If the name of COMM DEVICE is not specified, default is taken from Registry or from /etc/springprox.cfg\n");
 }
 
 static BOOL parse_args(int argc, char** argv)

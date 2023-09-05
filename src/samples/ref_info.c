@@ -137,7 +137,10 @@ done:
 
 void usage(void)
 {
-	printf("usage: %s [-d <COMM. DEVICE>] [-v]\n\n", PROGRAM_NAME);
+	printf("Usage: %s [OPTIONS] [-d <COMM DEVICE]\n", PROGRAM_NAME);
+	printf("OPTIONS:\n");
+	printf(" -v : verbose (trace library functions)\n");
+	printf("If the name of COMM DEVICE is not specified, default is taken from Registry or from /etc/springprox.cfg\n");
 }
 
 static BOOL parse_args(int argc, char** argv)
