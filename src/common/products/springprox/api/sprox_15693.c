@@ -469,6 +469,16 @@ SPROX_API_FUNC(Iso15693_WriteMultipleBlocks) (SPROX_PARAM  BYTE snr[8], BYTE add
   return Iso15693_WriteProc(SPROX_PARAM_P  FALSE, snr, addr, count, data, datalen);
 }
 
+SPROX_API_FUNC(Iso15693_WriteBlock) (SPROX_PARAM  BYTE snr[8], BYTE addr, const BYTE data[], WORD datalen)
+{
+    SWORD rc;
+    rc = Iso15693_WriteProc(SPROX_PARAM_P  FALSE, snr, addr, 0, data, datalen);
+    if (rc != MI_OK)
+        Iso15693_WriteProc(SPROX_PARAM_P  TRUE, snr, addr, 0, data, datalen);
+    return rc;
+}
+
+
 /**f* SpringProx.API/SPROX_Iso15693_ExtendedWriteSingleBlock
  *
  * NAME
