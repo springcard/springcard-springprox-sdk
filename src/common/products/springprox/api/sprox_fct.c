@@ -734,7 +734,7 @@ SPROX_API_FUNC(ReaderGetFirmware) (SPROX_PARAM  TCHAR firmware[], WORD len)
 			" %X.%02X [%d]", sprox_ctx->sprox_info.ver[0], sprox_ctx->sprox_info.ver[1], sprox_ctx->sprox_info.ver[2]);
 		strlcat(buffer, temp, sizeof(buffer));
 	}
-	l = (WORD) strlen(buffer);
+	l = (WORD)strlen(buffer);
 
 	if (l < len) l = len - 1;
 	for (i = 0; i <= l; i++)
@@ -1102,7 +1102,7 @@ SPROX_API_FUNC(ReaderLpcd) (SPROX_PARAM  BYTE action, BYTE* buffer, int buffer_s
 }
 
 
-SPROX_API_FUNC(ReaderFdt) (SPROX_PARAM  SIZE_T* Fdt)
+SPROX_API_FUNC(ReaderFdt) (SPROX_PARAM  DWORD* Fdt)
 {
 	WORD    buflen = SPROX_FRAME_CONTENT_SIZE;
 	BYTE    recv_buffer[SPROX_FRAME_CONTENT_SIZE];
@@ -1114,10 +1114,10 @@ SPROX_API_FUNC(ReaderFdt) (SPROX_PARAM  SIZE_T* Fdt)
 
 	if (Fdt != NULL)
 	{
-		*Fdt = (SIZE_T)(recv_buffer[3] << 24);
-		*Fdt += (SIZE_T)(recv_buffer[2] << 16);
-		*Fdt += (SIZE_T)(recv_buffer[1] << 8);
-		*Fdt += (SIZE_T)(recv_buffer[0]);
+		*Fdt = (DWORD)(recv_buffer[3] << 24);
+		*Fdt += (DWORD)(recv_buffer[2] << 16);
+		*Fdt += (DWORD)(recv_buffer[1] << 8);
+		*Fdt += (DWORD)(recv_buffer[0]);
 	}
 
 	return rc;

@@ -35,10 +35,10 @@
 #define SPROX_CARD_FUNC_ISO_OUTPUT   0x21
 #define SPROX_CARD_FUNC_ISO_INPUT    0x22
 
-/*
- * MSO FUNCTIONS (SAGEM fingerprint reader)
- * ---------------------------------------
- */
+ /*
+  * MSO FUNCTIONS (SAGEM fingerprint reader)
+  * ---------------------------------------
+  */
 
 #define SPROX_MSO_EXCHANGE           0x15
 #define SPROX_MSO_FUNCTION           0x16
@@ -46,10 +46,10 @@
 #define SPROX_MSO_FUNC_OPEN          0x01
 #define SPROX_MSO_FUNC_CLOSE         0x02
 
-/*
- * CSB-3 COMPLIANT FUNCTIONS
- * -------------------------
- */
+  /*
+   * CSB-3 COMPLIANT FUNCTIONS
+   * -------------------------
+   */
 #define SPROX_CSB_READ_EXT              0x36
 #define SPROX_CSB_WRITE_EXT             0x37
 #define SPROX_CSB_GET_SECURITY_STATUS   0x38
@@ -72,7 +72,7 @@
 #define SPROX_CSB_RESET                 0x4E
 #define SPROX_CSB_GET_INFOS             0x4F
 #define SPROX_CSB_GET_CAPABILITIES      0x50
-//#define CSB_CLR_CONTROL_BIT           0x51
+   //#define CSB_CLR_CONTROL_BIT           0x51
 #define SPROX_CSB_CONFIG                0x52
 //#define CSB_CHECK_WRITE               0x53
 //#define CSB_SET_PORT                  0x54
@@ -90,10 +90,10 @@
 #define SPROX_CONTROL                   0x58
 #include "sprox_control.h"
 
-/*
- * FIND
- * ----
- */
+ /*
+  * FIND
+  * ----
+  */
 #define SPROX_FIND                      0x60
 
 #define SPROX_FIND_INFO                 0x61
@@ -106,17 +106,17 @@
 #define SPROX_LPCD                      0x63
 
 
-/*
- * Echo and repeat please
- * ----------------------
- */
+  /*
+   * Echo and repeat please
+   * ----------------------
+   */
 #define SPROX_ECHO                      0x7F
 #define SPROX_REPEAT_PLEASE             0x80
 
-/*
- * T=CL functions
- * --------------
- */
+   /*
+	* T=CL functions
+	* --------------
+	*/
 
 #define SPROX_TCL_FUNC                  0x81
 #define SPROX_TCL_EXCHANGE              0x82
@@ -143,10 +143,10 @@
 #define SPROX_ICCD_FUNC                 0x85
 #define SPROX_ICCD_APDU                 0x86
 
-/*
- * Pegoda compatibility
- * --------------------
- */
+	/*
+	 * Pegoda compatibility
+	 * --------------------
+	 */
 
 #define SPROX_PICCCOMMONREQUEST         0x8A
 #define SPROX_PICCCASCSELECT            0x8B
@@ -186,23 +186,23 @@
 #define SPROX_PCDREADEFDT               0xFE
 
 
-/*
- * Communication protocol defines
- * ------------------------------
- */
+	 /*
+	  * Communication protocol defines
+	  * ------------------------------
+	  */
 
-/* Buffer size */
+	  /* Buffer size */
 #ifdef BUILD_SPROX_FIRMWARE
-  #define SPROX_FRAME_CONTENT_SIZE     (256+20)
+#define SPROX_FRAME_CONTENT_SIZE     (256+20)
 #endif
 #ifdef WIN32
-  #define SPROX_FRAME_CONTENT_SIZE     (1024+20)
+#define SPROX_FRAME_CONTENT_SIZE     (1024+20)
 #endif
 #ifdef __linux__
-  #define SPROX_FRAME_CONTENT_SIZE     (1024+20)
+#define SPROX_FRAME_CONTENT_SIZE     (1024+20)
 #endif
 #ifndef SPROX_FRAME_CONTENT_SIZE
-  #define SPROX_FRAME_CONTENT_SIZE     (256+20)
+#define SPROX_FRAME_CONTENT_SIZE     (256+20)
 #endif
 
 #define ASCII_SOH  0x01               /* Start of header  */

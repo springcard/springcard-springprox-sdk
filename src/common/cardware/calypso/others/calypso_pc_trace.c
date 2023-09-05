@@ -82,7 +82,7 @@ CALYPSO_LIB void CALYPSO_API CalypsoSetTraceLevel(BYTE level)
 CALYPSO_LIB void CALYPSO_API CalypsoSetTraceFile(const char* filename)
 {
 	if (filename != NULL)
-		strcpy_s(trace_file, MAX_PATH, filename);
+		strlcpy(trace_file, filename, MAX_PATH);
 	else
 		trace_file[0] = '\0';
 }
@@ -92,40 +92,39 @@ static BOOL CalypsoTraceBegin(BYTE level)
 	char l;
 
 	if (!(calypso_trace & level)) return FALSE;
-	if (trace_file == NULL)
+	if (!strlen(trace_file)) return FALSE;
+	if (!strcmp(trace_file, "CON") || !strcmp(trace_file, "stdout"))
 	{
 		/* Output to console */
 		trace_fp = stdout;
 	}
+	else if (!strcmp(trace_file, "ERR") || !strcmp(trace_file, "stderr"))
+	{
+		/* Output to console */
+		trace_fp = stderr;
+	}
 	else
 	{
-		if (!strlen(trace_file)) return FALSE;
-		if (!strcmp(trace_file, "CON") || !strcmp(trace_file, "stdout"))
-		{
-			/* Output to console */
-			trace_fp = stdout;
-		}
-		else if (!strcmp(trace_file, "ERR") || !strcmp(trace_file, "stderr"))
-		{
-			/* Output to console */
-			trace_fp = stderr;
-		}
-		else
-		{
-			/* Output to file */
-			errno_t err = fopen_s(&trace_fp, trace_file, "at+");
-			if (err)
-				return FALSE;
-		}
+		/* Output to file */
+#ifdef WIN32
+		int err = fopen_s(&trace_fp, trace_file, "at+");
+		if (err)
+			return FALSE;
+#else
+		trace_fp = fopen(trace_file, "at+");
+		if (trace_fp == NULL)
+			return FALSE;
+#endif
+
 	}
 
 	switch (level & 0xF0)
 	{
-		case 0: l = ' '; break;
-		case TR_CARD: l = 'C'; break;
-		case TR_SAM: l = 'S'; break;
-		case TR_TRANS: l = 'T'; break;
-		default: l = '?'; break;
+	case 0: l = ' '; break;
+	case TR_CARD: l = 'C'; break;
+	case TR_SAM: l = 'S'; break;
+	case TR_TRANS: l = 'T'; break;
+	default: l = '?'; break;
 	}
 
 	fprintf(trace_fp, "# %01X %c ", level & 0x0F, l);

@@ -35,11 +35,11 @@ static void  ResetInterval(void);
  **/
 CALYPSO_LIB DWORD CALYPSO_API CalypsoBench(BOOL reset)
 {
-  DWORD r;
-  r = ReadInterval();
-  if (reset)
-    ResetInterval();
-  return r;
+	DWORD r;
+	r = ReadInterval();
+	if (reset)
+		ResetInterval();
+	return r;
 }
 
 #ifdef WIN32
@@ -48,21 +48,21 @@ static LARGE_INTEGER Before = { 0 };
 
 void ResetInterval(void)
 {
-  QueryPerformanceCounter(&Before);
+	QueryPerformanceCounter(&Before);
 }
 
 DWORD ReadInterval(void)
 {
-  DWORD r;
-  LARGE_INTEGER Now, Freq;
+	DWORD r;
+	LARGE_INTEGER Now, Freq;
 
-  QueryPerformanceCounter(&Now);
+	QueryPerformanceCounter(&Now);
 
-  QueryPerformanceFrequency(&Freq);
-  Freq.QuadPart /= 1000;
+	QueryPerformanceFrequency(&Freq);
+	Freq.QuadPart /= 1000;
 
-  r = (DWORD) ( (Now.QuadPart - Before.QuadPart) / Freq.QuadPart );
-  return r;
+	r = (DWORD)((Now.QuadPart - Before.QuadPart) / Freq.QuadPart);
+	return r;
 }
 
 #endif
@@ -76,25 +76,25 @@ static struct timeval Before;
 
 void ResetInterval(void)
 {
-  struct timezone TZ;
+	struct timezone TZ;
 
-  gettimeofday(&Before, &TZ);
+	gettimeofday(&Before, &TZ);
 }
 
 DWORD ReadInterval(void)
 {
-  DWORD r;
-  struct timeval  Now;
-  struct timezone TZ;
+	DWORD r;
+	struct timeval  Now;
+	struct timezone TZ;
 
-  gettimeofday(&Now, &TZ);
+	gettimeofday(&Now, &TZ);
 
-  r  = Now.tv_sec * 1000;
-  r += Now.tv_usec / 1000;
-  r -= Before.tv_sec * 1000;
-  r -= Before.tv_usec / 1000;
+	r = Now.tv_sec * 1000;
+	r += Now.tv_usec / 1000;
+	r -= Before.tv_sec * 1000;
+	r -= Before.tv_usec / 1000;
 
-  return r;
+	return r;
 }
 
 #endif

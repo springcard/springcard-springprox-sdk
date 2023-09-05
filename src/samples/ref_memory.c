@@ -41,8 +41,6 @@ static BOOL parse_args(int argc, char** argv);
 static void usage(void);
 
 static void dump_iso15693(const BYTE uid[8]);
-static void dump_st_sr(void);
-static void dump_ask_cts(void);
 static void dump_mif_ul(void);
 
 int main(int argc, char** argv)
@@ -73,7 +71,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	rc = SPROX_GetLibraryA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_GetLibrary(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("Failed to get API version\n");
@@ -85,7 +83,7 @@ int main(int argc, char** argv)
 	/* Open the reader */
 	/* --------------- */
 
-	rc = SPROX_ReaderOpenA(szCommDevice);
+	rc = SPROX_ReaderOpen(szCommDevice);
 	if (rc != MI_OK)
 	{
 		printf("Reader not found\n");
@@ -94,11 +92,11 @@ int main(int argc, char** argv)
 
 	/* Display reader's information */
 	printf("Reader found\n");
-	rc = SPROX_ReaderGetDeviceA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetDevice(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader found on %s\n", s_buffer);
 
-	rc = SPROX_ReaderGetFirmwareA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetFirmware(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader firmware is %s\n", s_buffer);
 
@@ -114,10 +112,10 @@ int main(int argc, char** argv)
 	{
 		rc = MI_OK;
 		/* Not too often... */
-		if (_kbhit())
-			break;
 #ifdef WIN32
 		Sleep(50);
+		if (_kbhit())
+			break;		
 #endif
 #ifdef __linux
 		usleep(5000);

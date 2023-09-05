@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	rc = SPROX_GetLibraryA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_GetLibrary(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("Failed to get API version\n");
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	if (rc == MI_OK)
 		printf("Reader found on %s\n", s_buffer);
 
-	rc = SPROX_ReaderGetFirmwareA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetFirmware(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader firmware is %s\n", s_buffer);
 
@@ -320,6 +320,7 @@ int gettimeofday(struct timeval* p, void* tz)
 {
 	ULARGE_INTEGER ul; // As specified on MSDN.
 	FILETIME ft;
+	(void)tz;
 
 	// Returns a 64-bit value representing the number of
 	// 100-nanosecond intervals since January 1, 1601 (UTC).
@@ -605,8 +606,8 @@ static BOOL sprox_desfire_benchmark(void)
 	rc = SPROX_Desfire_FormatPICC();
 	CHECK_RC();
 
-	printf("Read : %dB received in %ldms (%fkbit/s)\n", nBytes, clock_to_ms(&t_read), clock_bitrate(&t_read, nBytes));
-	printf("Write: %dB sent in %ldms (%fkbit/s)\n", nBytes, clock_to_ms(&t_write), clock_bitrate(&t_write, nBytes));
+	printf("Read : %ldB received in %ldms (%fkbit/s)\n", nBytes, clock_to_ms(&t_read), clock_bitrate(&t_read, nBytes));
+	printf("Write: %ldB sent in %ldms (%fkbit/s)\n", nBytes, clock_to_ms(&t_write), clock_bitrate(&t_write, nBytes));
 
 #ifdef __linux__
 	{

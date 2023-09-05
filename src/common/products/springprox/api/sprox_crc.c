@@ -8,35 +8,35 @@
  *
  **/
 
-/*
+ /*
 
-  SpringProx API
-  --------------
+   SpringProx API
+   --------------
 
-  Copyright (c) 2000-2008 SpringCard SAS, FRANCE - www.springcard.com
+   Copyright (c) 2000-2008 SpringCard SAS, FRANCE - www.springcard.com
 
-  THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-  ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED
-  TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-  PARTICULAR PURPOSE.
+   THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
+   ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED
+   TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
+   PARTICULAR PURPOSE.
 
-  History
-  -------
-  
-  JDA 30/10/2003 : added to the SpringProx library
-  
-*/
+   History
+   -------
+
+   JDA 30/10/2003 : added to the SpringProx library
+
+ */
 
 #ifndef _BUILD_SPRINGPROX_EX_DLL
 
 #include "sprox_api_i.h"
 
-static WORD UpdateCrc(BYTE ch, WORD * lpwCrc)
+static WORD UpdateCrc(BYTE ch, WORD* lpwCrc)
 {
-  ch = (ch ^ (BYTE) ((*lpwCrc) & 0x00FF));
-  ch = (ch ^ (ch << 4));
-  *lpwCrc = (*lpwCrc >> 8) ^ ((WORD) ch << 8) ^ ((WORD) ch << 3) ^ ((WORD) ch >> 4);
-  return (*lpwCrc);
+	ch = (ch ^ (BYTE)((*lpwCrc) & 0x00FF));
+	ch = (ch ^ (ch << 4));
+	*lpwCrc = (*lpwCrc >> 8) ^ ((WORD)ch << 8) ^ ((WORD)ch << 3) ^ ((WORD)ch >> 4);
+	return (*lpwCrc);
 }
 
 /**f* SpringProx.API/SPROX_ComputeIso14443ACrc
@@ -60,25 +60,25 @@ static WORD UpdateCrc(BYTE ch, WORD * lpwCrc)
  **/
 SPRINGPROX_LIB WORD SPRINGPROX_API SPROX_ComputeIso14443ACrc(BYTE crc[2], const BYTE buffer[], WORD size)
 {
-  BYTE  chBlock;
-  WORD  wCrc;
-  BYTE *p = (BYTE *) buffer;
-  
-  wCrc = 0x6363;                /* ITU-V.41 */
+	BYTE  chBlock;
+	WORD  wCrc;
+	BYTE* p = (BYTE*)buffer;
 
-  do
-  {
-    chBlock = *p++;
-    UpdateCrc(chBlock, &wCrc);
-  } while (--size);
+	wCrc = 0x6363;                /* ITU-V.41 */
 
-  if (crc != NULL)
-  {
-    crc[0] = (BYTE) (wCrc & 0xFF);
-    crc[1] = (BYTE) ((wCrc >> 8) & 0xFF);
-  }
+	do
+	{
+		chBlock = *p++;
+		UpdateCrc(chBlock, &wCrc);
+	} while (--size);
 
-  return wCrc;
+	if (crc != NULL)
+	{
+		crc[0] = (BYTE)(wCrc & 0xFF);
+		crc[1] = (BYTE)((wCrc >> 8) & 0xFF);
+	}
+
+	return wCrc;
 }
 
 /**f* SpringProx.API/SPROX_ComputeIso14443BCrc
@@ -102,27 +102,27 @@ SPRINGPROX_LIB WORD SPRINGPROX_API SPROX_ComputeIso14443ACrc(BYTE crc[2], const 
  **/
 SPRINGPROX_LIB WORD SPRINGPROX_API SPROX_ComputeIso14443BCrc(BYTE crc[2], const BYTE buffer[], WORD size)
 {
-  BYTE chBlock;
-  WORD wCrc;
-  BYTE *p = (BYTE *) buffer;  
+	BYTE chBlock;
+	WORD wCrc;
+	BYTE* p = (BYTE*)buffer;
 
-  wCrc = 0xFFFF;                /* ISO/IEC 13239 (formerly ISO/IEC 3309) */
+	wCrc = 0xFFFF;                /* ISO/IEC 13239 (formerly ISO/IEC 3309) */
 
-  do
-  {
-    chBlock = *p++;
-    UpdateCrc(chBlock, &wCrc);
-  } while (--size);
+	do
+	{
+		chBlock = *p++;
+		UpdateCrc(chBlock, &wCrc);
+	} while (--size);
 
-  wCrc = ~wCrc;                 /* ISO/IEC 13239 (formerly ISO/IEC 3309) */
+	wCrc = ~wCrc;                 /* ISO/IEC 13239 (formerly ISO/IEC 3309) */
 
-  if (crc != NULL)
-  {
-    crc[0] = (BYTE) (wCrc & 0xFF);
-    crc[1] = (BYTE) ((wCrc >> 8) & 0xFF);
-  }
+	if (crc != NULL)
+	{
+		crc[0] = (BYTE)(wCrc & 0xFF);
+		crc[1] = (BYTE)((wCrc >> 8) & 0xFF);
+	}
 
-  return wCrc;
+	return wCrc;
 }
 
 #endif

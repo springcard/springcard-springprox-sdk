@@ -81,6 +81,11 @@
 #ifndef LINUX
 #define LINUX
 #endif
+#ifdef __MISSING_STRL
+#include "../../../lib-c/utils/strl.h"
+#else
+#include <bsd/string.h>
+#endif
 #endif
 
 /* We are building the library */
@@ -279,6 +284,7 @@ BOOL SerialControl_Power(SPROX_CTX_ST* sprox_ctx, BOOL power_up);
 SWORD SPROX_ReaderConnect(SPROX_CTX_ST* sprox_ctx);
 SWORD SPROX_ReaderConnectAt(SPROX_CTX_ST* sprox_ctx, DWORD baudrate);
 SWORD SPROX_ReaderConnectTCP(SPROX_CTX_ST* sprox_ctx, const TCHAR* conn_string);
+
 void LoadSettings(void);
 BOOL LoadDefaultDevice(void);
 BOOL LoadDefaultDevice_HW_WinCE(void);

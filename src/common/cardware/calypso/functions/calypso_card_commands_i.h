@@ -2,12 +2,12 @@
 #define __CALYPSO_CARD_COMMANDS_I_H__
 
 #ifdef CALYPSO_TRACE
-  #define RETURN(n)   if (rc) CalypsoTraceRC(TR_DEBUG|TR_TRACE|TR_CARD, n " err.", rc); return rc
+#define RETURN(n)   if (rc) CalypsoTraceRC(TR_DEBUG|TR_TRACE|TR_CARD, n " err.", rc); return rc
 #else
-  #define RETURN(n)   return rc
+#define RETURN(n)   return rc
 #endif
 
-CALYPSO_RC CalypsoCardSetSW(CALYPSO_CTX_ST *ctx, CALYPSO_SZ recv_len);
-CALYPSO_RC CalypsoCardGetResponse(CALYPSO_CTX_ST *ctx, CALYPSO_SZ *recv_len);
+CALYPSO_RC CalypsoCardSetSW(CALYPSO_CTX_ST* ctx, CALYPSO_SZ recv_len);
+CALYPSO_RC CalypsoCardGetResponse(CALYPSO_CTX_ST* ctx, CALYPSO_SZ* recv_len);
 
 #endif

@@ -29,9 +29,9 @@ static TDES_CTX_ST random_cipher_ctx;
 ANSI X9.31 ALGORITHM:
 Given
 
-    * D, a 64-bit representation of the current date-time
-    * S, a secret 64-bit seed that will be updated by this process
-    * K, a secret (Triple DES) key
+	* D, a 64-bit representation of the current date-time
+	* S, a secret 64-bit seed that will be updated by this process
+	* K, a secret (Triple DES) key
 
 Step 1. Compute the 64-bit block X = G(S, K, D) as follows:
 
@@ -47,112 +47,114 @@ Step 2. Return X and set S = S' for the next cycle.
 void GetRandomBytes(SPROX_PARAM  BYTE rnd[], DWORD size)
 {
 	BYTE I[8], X[8];
-  DWORD i;
+	DWORD i;
 #if (defined(WIN32) && defined(WINCE))
-  SYSTEMTIME sys_time;
+	SYSTEMTIME sys_time;
 #endif
-  //SPROX_DESFIRE_GET_CTX_V();
+	//SPROX_DESFIRE_GET_CTX_V();
 
-  if (rnd == NULL) return;
+	if (rnd == NULL) return;
 
 	/* Init context is still not done */
 	if (!random_inited)
 	{
 		Randomize();
-	  random_inited = TRUE;
+		random_inited = TRUE;
 	}
 
-  /* Assign D */
+	/* Assign D */
 #ifdef WIN32
-  #ifdef WINCE
-  GetSystemTime(&sys_time);
-  SystemTimeToFileTime(&sys_time , (FILETIME *) I);
-  #else
-  GetSystemTimeAsFileTime((FILETIME *) I);
-  #endif
+#ifdef WINCE
+	GetSystemTime(&sys_time);
+	SystemTimeToFileTime(&sys_time, (FILETIME*)I);
 #else
-	gettimeofday((struct timeval *) I, NULL);
+	GetSystemTimeAsFileTime((FILETIME*)I);
+#endif
+#else
+	gettimeofday((struct timeval*)I, NULL);
 #endif
 
-  while (size)
-  {
-	  /* I = E(D, K) */
-    TDES_Encrypt(&random_cipher_ctx, I);
+	while (size)
+	{
+		/* I = E(D, K) */
+		TDES_Encrypt(&random_cipher_ctx, I);
 
-	  /* X = E(I XOR S, K) */
-    for (i=0; i<8; i++)
-      X[i] = I[i] ^ random_seed[i];
-    TDES_Encrypt(&random_cipher_ctx, X);
+		/* X = E(I XOR S, K) */
+		for (i = 0; i < 8; i++)
+			X[i] = I[i] ^ random_seed[i];
+		TDES_Encrypt(&random_cipher_ctx, X);
 
-    /* return X */
-    if (size >= 8)
-    {
-      memcpy(rnd, X, 8);
-      rnd  += 8;
-      size -= 8;
-    } else
-    {
-      memcpy(rnd, X, size);
-      size = 0;
-    }
+		/* return X */
+		if (size >= 8)
+		{
+			memcpy(rnd, X, 8);
+			rnd += 8;
+			size -= 8;
+		}
+		else
+		{
+			memcpy(rnd, X, size);
+			size = 0;
+		}
 
-	  /* S' = E(X XOR I, K) */
-    for (i=0; i<8; i++)
-      random_seed[i] = I[i] ^ X[i];
+		/* S' = E(X XOR I, K) */
+		for (i = 0; i < 8; i++)
+			random_seed[i] = I[i] ^ X[i];
 
-    TDES_Encrypt(&random_cipher_ctx, random_seed);
-  }
+		TDES_Encrypt(&random_cipher_ctx, random_seed);
+	}
 }
 
 
 
 #ifdef WIN32
-  #include <wincrypt.h>
-  #include <windows.h>
+#include <wincrypt.h>
+#include <windows.h>
 #else
-  #include <unistd.h>
-  #include <sys/time.h>
-  #include <sys/types.h>
+#include <unistd.h>
+#include <sys/time.h>
+#include <sys/types.h>
 #endif
 
 
 static void Randomize(void)
 {
-  BYTE key[16];
+	BYTE key[16];
 
 #ifdef WIN32
-  HINSTANCE pid;
-  #ifdef WINCE
-  SYSTEMTIME sys_time;
-  GetSystemTime(&sys_time);
-  SystemTimeToFileTime(&sys_time , (FILETIME *) &key[0]);
-  #else
-  GetSystemTimeAsFileTime((FILETIME *) &key[0]);
-  #endif
-  pid = GetModuleHandle(NULL);
-  memcpy(&key[8],  &pid, 4);
-  memcpy(&key[12], &pid, 4);
+	HINSTANCE pid;
+#ifdef WINCE
+	SYSTEMTIME sys_time;
+	GetSystemTime(&sys_time);
+	SystemTimeToFileTime(&sys_time, (FILETIME*)&key[0]);
+#else
+	GetSystemTimeAsFileTime((FILETIME*)&key[0]);
+#endif
+	pid = GetModuleHandle(NULL);
+	memcpy(&key[8], &pid, 4);
+	memcpy(&key[12], &pid, 4);
 #endif
 
 #ifdef __linux__
-  FILE *fp = fopen("/dev/urandom", "rb");
-  if (fp != NULL)
-  {
-  	fread(key, sizeof(key), 1, fp);
-  	fclose(fp);
-  } else
-  {
-	  pid_t pid;
-		gettimeofday((struct timeval *) &key[0], NULL);
-	  pid = getpid();
-	  memcpy(&key[8],  &pid, 4);
-	  memcpy(&key[12], &pid, 4);
+	FILE* fp = fopen("/dev/urandom", "rb");
+	if (fp != NULL)
+	{
+		fread(key, sizeof(key), 1, fp);
+		fclose(fp);
+	}
+	else
+	{
+		pid_t pid;
+		gettimeofday((struct timeval*)&key[0], NULL);
+		pid = getpid();
+		memcpy(&key[8], &pid, 4);
+		memcpy(&key[12], &pid, 4);
 	}
 #endif
 
-  TDES_Init(&random_cipher_ctx, &key[0], &key[8], &key[0]);
+	TDES_Init(&random_cipher_ctx, &key[0], &key[8], &key[0]);
 
-  memcpy(random_seed, "SpringCard", 8);
+	memcpy(random_seed, "SpringCard", 8);
 
-  TDES_Encrypt(&random_cipher_ctx, random_seed);
+	TDES_Encrypt(&random_cipher_ctx, random_seed);
 }

@@ -58,147 +58,151 @@ SPROX_API_FUNC_T(const TCHAR*, GetErrorMessage) (SWORD status)
 	static TCHAR msg[256];
 	switch (status)
 	{
-		case MI_OK:
-			return _T("Success");
-		case MI_NOTAGERR:
-			return _T("No answer (no card / card is mute)");
-		case MI_CRCERR:
-			return _T("Invalid CRC in card's response");
-		case MI_EMPTY:
-			return _T("No frame received (NFC mode)");
-		case MI_AUTHERR:
-			return _T("Card: Authentication failed or access denied");
-		case MI_PARITYERR:
-			return _T("Invalid parity bit(s) in card's response");
-		case MI_CODEERR:
-			return _T("NACK or status indicating error");
-		case MI_SERNRERR:
-			return _T("Wrong LRC in card's serial number");
-		case MI_LOCKED:
-			return _T("Card or block locked");
-		case MI_NOTAUTHERR:
-			return _T("Card: Authentication must be performed first");
-		case MI_BITCOUNTERR:
-			return _T("Wrong number of bits in card's answer");
-		case MI_BYTECOUNTERR:
-			return _T("Wrong number of bytes in card's answer");
-		case MI_VALUEERR:
-			return _T("Card: Counter is invalid");
-		case MI_TRANSERR:
-			return _T("Card: Transaction error");
-		case MI_WRITEERR:
-			return _T("Card: Write failed");
-		case MI_INCRERR:
-			return _T("Card: Counter increase failed");
-		case MI_DECRERR:
-			return _T("Card: Counter decrease failed");
-		case MI_READERR:
-			return _T("Card: Read failed");
-		case MI_OVFLERR:
-			return _T("RC: FIFO overflow");
-		case MI_POLLING:
-			return _T("Polling mode pending");
-		case MI_FRAMINGERR:
-			return _T("Invalid framing in card's response");
-		case MI_ACCESSERR:
-			return _T("Card: Access error (bad address or denied)");
-		case MI_UNKNOWN_COMMAND:
-			return _T("RC: Unknown command");
-		case MI_COLLERR:
-			return _T("A collision has occurred");
-		case MI_COMMAND_FAILED:
-			return _T("Command execution failed");
-		case MI_INTERFACEERR:
-			return _T("Hardware error");
-		case MI_ACCESSTIMEOUT:
-			return _T("RC: timeout");
-		case MI_NOBITWISEANTICOLL:
-			return _T("More than one card found, but at least one does not support anticollision");
-		case MI_EXTERNAL_FIELD:
-			return _T("An external RF field has been detected");
-		case MI_QUIT:
-			return _T("Polling terminated (timeout or break)");
-		case MI_CODINGERR:
-			return _T("Bogus status in card's response");
-		case MI_CUSTERR:
-			return _T("Card: Vendor specific error");
-		case MI_CMDSUPERR:
-			return _T("Card: Command not supported");
-		case MI_CMDFMTERR:
-			return _T("Card: Format of command invalid");
-		case MI_CMDOPTERR:
-			return _T("Card: Option(s) of command invalid");
-		case MI_OTHERERR:
-			return _T("Card: other error");
-		case MI_WRONG_MODE:
-			return _T("Command not available in this mode");
-		case MI_WRONG_PARAMETER:
-			return _T("Wrong parameter for the command");
-		case MI_CID_NOT_ACTIVE:
-			return _T("No active card with this CID");
-		case MI_BAD_ATS_LENGTH:
-			return _T("Length error in card's ATS");
-		case MI_ATTRIB_ERROR:
-			return _T("Error in card's response to ATTRIB");
-		case MI_BAD_ATS_FORMAT:
-			return _T("Format error in card's ATS");
-		case MI_TCL_PROTOCOL:
-			return _T("Fatal protocol error in card's response");
-		case MI_TCL_TOO_MANY_RETRIES:
-			return _T("Too many errors while communicating with the card");
-		case MI_BAD_PPS_FORMAT:
-			return _T("Format error in card's PPS response");
-		case MI_PPS_ERROR:
-			return _T("Other error in card's PPS response");
-		case MI_CID_NOT_SUPPORTED:
-			return _T("The card doesn't support CID");
-		case MI_CID_ALREADY_ACTIVE:
-			return _T("A card is already active with this CID");
-		case MI_UNKNOWN_FUNCTION:
-			return _T("Command not supported by the coupler");
-		case MI_INTERNAL_ERROR:
-			return _T("Internal error in the coupler");
-		case MI_BUFFER_OVERFLOW:
-			return _T("Internal buffer overflow");
-		case MI_WRONG_LENGTH:
-			return _T("Wrong data length for the command");
-		case MI_TIME_EXTENSION:
-			return _T("More time needed to process the command");
-		case MI_CARD_NOT_TCL:
-			return _T("Library: The found card doesn't support ISO 14443-4");
-		case MI_RESPONSE_OVERFLOW:
-			return _T("Library: Coupler's response is longer than application's buffer");
-		case MI_RESPONSE_INVALID:
-			return _T("Library: Coupler's response is not formated as required");
-		case MI_COMMAND_OVERFLOW:
-			return _T("Library: Coupler's command is longer than allowed");
-		case MI_FUNCTION_NOT_AVAILABLE:
-			return _T("Library: The coupler doesn't support this function");
-		case MI_SER_LENGTH_ERR:
-			return _T("Library: Wrong length in Coupler's response");
-		case MI_SER_CHECKSUM_ERR:
-			return _T("Library: Wrong checksum in Coupler's response");
-		case MI_SER_PROTO_ERR:
-			return _T("Library: Protocol error in Coupler's response");
-		case MI_SER_PROTO_NAK:
-			return _T("Library: The coupler has sent a NACK");
-		case MI_SER_ACCESS_ERR:
-			return _T("Library: Access to the communication device failed");
-		case MI_SER_TIMEOUT_ERR:
-			return _T("Library: Coupler communication timeout");
-		case MI_SER_NORESP_ERR:
-			return _T("Library: No response from coupler");
-		case MI_LIB_CALL_ERROR:
-			return _T("Library: Invalid function call");
-		case MI_OUT_OF_MEMORY_ERROR:
-			return _T("Library: Memory allocation failed");
-		case MI_LIB_INTERNAL_ERROR:
-			return _T("Library: An internal error has occured");
-		case MI_INVALID_READER_CONTEXT:
-			return _T("Library: the sprox_ctx parameter is invalid");
+	case MI_OK:
+		return _T("Success");
+	case MI_NOTAGERR:
+		return _T("No answer (no card / card is mute)");
+	case MI_CRCERR:
+		return _T("Invalid CRC in card's response");
+	case MI_EMPTY:
+		return _T("No frame received (NFC mode)");
+	case MI_AUTHERR:
+		return _T("Card: Authentication failed or access denied");
+	case MI_PARITYERR:
+		return _T("Invalid parity bit(s) in card's response");
+	case MI_CODEERR:
+		return _T("NACK or status indicating error");
+	case MI_SERNRERR:
+		return _T("Wrong LRC in card's serial number");
+	case MI_LOCKED:
+		return _T("Card or block locked");
+	case MI_NOTAUTHERR:
+		return _T("Card: Authentication must be performed first");
+	case MI_BITCOUNTERR:
+		return _T("Wrong number of bits in card's answer");
+	case MI_BYTECOUNTERR:
+		return _T("Wrong number of bytes in card's answer");
+	case MI_VALUEERR:
+		return _T("Card: Counter is invalid");
+	case MI_TRANSERR:
+		return _T("Card: Transaction error");
+	case MI_WRITEERR:
+		return _T("Card: Write failed");
+	case MI_INCRERR:
+		return _T("Card: Counter increase failed");
+	case MI_DECRERR:
+		return _T("Card: Counter decrease failed");
+	case MI_READERR:
+		return _T("Card: Read failed");
+	case MI_OVFLERR:
+		return _T("RC: FIFO overflow");
+	case MI_POLLING:
+		return _T("Polling mode pending");
+	case MI_FRAMINGERR:
+		return _T("Invalid framing in card's response");
+	case MI_ACCESSERR:
+		return _T("Card: Access error (bad address or denied)");
+	case MI_UNKNOWN_COMMAND:
+		return _T("RC: Unknown command");
+	case MI_COLLERR:
+		return _T("A collision has occurred");
+	case MI_COMMAND_FAILED:
+		return _T("Command execution failed");
+	case MI_INTERFACEERR:
+		return _T("Hardware error");
+	case MI_ACCESSTIMEOUT:
+		return _T("RC: timeout");
+	case MI_NOBITWISEANTICOLL:
+		return _T("More than one card found, but at least one does not support anticollision");
+	case MI_EXTERNAL_FIELD:
+		return _T("An external RF field has been detected");
+	case MI_QUIT:
+		return _T("Polling terminated (timeout or break)");
+	case MI_CODINGERR:
+		return _T("Bogus status in card's response");
+	case MI_CUSTERR:
+		return _T("Card: Vendor specific error");
+	case MI_CMDSUPERR:
+		return _T("Card: Command not supported");
+	case MI_CMDFMTERR:
+		return _T("Card: Format of command invalid");
+	case MI_CMDOPTERR:
+		return _T("Card: Option(s) of command invalid");
+	case MI_OTHERERR:
+		return _T("Card: other error");
+	case MI_WRONG_MODE:
+		return _T("Command not available in this mode");
+	case MI_WRONG_PARAMETER:
+		return _T("Wrong parameter for the command");
+	case MI_CID_NOT_ACTIVE:
+		return _T("No active card with this CID");
+	case MI_BAD_ATS_LENGTH:
+		return _T("Length error in card's ATS");
+	case MI_ATTRIB_ERROR:
+		return _T("Error in card's response to ATTRIB");
+	case MI_BAD_ATS_FORMAT:
+		return _T("Format error in card's ATS");
+	case MI_TCL_PROTOCOL:
+		return _T("Fatal protocol error in card's response");
+	case MI_TCL_TOO_MANY_RETRIES:
+		return _T("Too many errors while communicating with the card");
+	case MI_BAD_PPS_FORMAT:
+		return _T("Format error in card's PPS response");
+	case MI_PPS_ERROR:
+		return _T("Other error in card's PPS response");
+	case MI_CID_NOT_SUPPORTED:
+		return _T("The card doesn't support CID");
+	case MI_CID_ALREADY_ACTIVE:
+		return _T("A card is already active with this CID");
+	case MI_UNKNOWN_FUNCTION:
+		return _T("Command not supported by the coupler");
+	case MI_INTERNAL_ERROR:
+		return _T("Internal error in the coupler");
+	case MI_BUFFER_OVERFLOW:
+		return _T("Internal buffer overflow");
+	case MI_WRONG_LENGTH:
+		return _T("Wrong data length for the command");
+	case MI_TIME_EXTENSION:
+		return _T("More time needed to process the command");
+	case MI_CARD_NOT_TCL:
+		return _T("Library: The found card doesn't support ISO 14443-4");
+	case MI_RESPONSE_OVERFLOW:
+		return _T("Library: Coupler's response is longer than application's buffer");
+	case MI_RESPONSE_INVALID:
+		return _T("Library: Coupler's response is not formated as required");
+	case MI_COMMAND_OVERFLOW:
+		return _T("Library: Coupler's command is longer than allowed");
+	case MI_FUNCTION_NOT_AVAILABLE:
+		return _T("Library: The coupler doesn't support this function");
+	case MI_SER_LENGTH_ERR:
+		return _T("Library: Wrong length in Coupler's response");
+	case MI_SER_CHECKSUM_ERR:
+		return _T("Library: Wrong checksum in Coupler's response");
+	case MI_SER_PROTO_ERR:
+		return _T("Library: Protocol error in Coupler's response");
+	case MI_SER_PROTO_NAK:
+		return _T("Library: The coupler has sent a NACK");
+	case MI_SER_ACCESS_ERR:
+		return _T("Library: Access to the communication device failed");
+	case MI_SER_TIMEOUT_ERR:
+		return _T("Library: Coupler communication timeout");
+	case MI_SER_NORESP_ERR:
+		return _T("Library: No response from coupler");
+	case MI_LIB_CALL_ERROR:
+		return _T("Library: Invalid function call");
+	case MI_OUT_OF_MEMORY_ERROR:
+		return _T("Library: Memory allocation failed");
+	case MI_LIB_INTERNAL_ERROR:
+		return _T("Library: An internal error has occured");
+	case MI_INVALID_READER_CONTEXT:
+		return _T("Library: the sprox_ctx parameter is invalid");
 	}
 
-	_stprintf_s(msg, sizeof(msg)/sizeof(TCHAR), _T("Error %d"), status);
+#ifdef WIN32
+	_stprintf_s(msg, sizeof(msg) / sizeof(TCHAR), _T("Error %d"), status);
+#else
+	snprintf(msg, sizeof(msg) / sizeof(TCHAR), _T("Error %d"), status);
+#endif
 	return msg;
 }
 
@@ -285,7 +289,7 @@ SPROX_API_FUNC(ArrayToStringW) (wchar_t* string, const BYTE* buffer, WORD size)
 	for (i = 0; i < size; i++)
 	{
 		swprintf(tmp, 3, L"%02X", buffer[i]);
-		wcscat_s(string, 2*size+1, tmp); /* Assume the target buffer is large enough */
+		wcscat_s(string, 2 * size + 1, tmp); /* Assume the target buffer is large enough */
 	}
 	return MI_OK;
 }
@@ -300,7 +304,7 @@ SPROX_API_FUNC(ArrayToStringA) (char* string, const BYTE* buffer, WORD size)
 	for (i = 0; i < size; i++)
 	{
 		snprintf(tmp, 3, "%02X", buffer[i]);
-		strlcat(string, tmp, 2*size+1); /* Assume the target buffer is large enough */
+		strlcat(string, tmp, 2 * size + 1); /* Assume the target buffer is large enough */
 	}
 	return MI_OK;
 }

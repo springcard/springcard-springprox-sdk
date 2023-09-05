@@ -19,8 +19,8 @@
 
 typedef struct
 {
-  SPROX_INSTANCE        sprox_ctx;
-  SPROX_MIFPLUS_CTX_ST  *mifplus_ctx;
+	SPROX_INSTANCE        sprox_ctx;
+	SPROX_MIFPLUS_CTX_ST* mifplus_ctx;
 
 } INSTANCE_ST;
 
@@ -53,7 +53,7 @@ INSTANCE_ST instances[MAX_INSTANCES] = { 0 };
  *
  * RETURNS
  *   MI_OK : library attached
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  * SEE ALSO
  *   [Legacy]DetachLibrary
@@ -61,29 +61,29 @@ INSTANCE_ST instances[MAX_INSTANCES] = { 0 };
  **/
 SPROX_MIFPLUS_LIB SWORD SPROX_MIFPLUS_API SPROXx_AttachMifPlusLibrary(SPROX_INSTANCE rInst)
 {
-  BYTE i;
-  
-  for (i=0; i<MAX_INSTANCES; i++)
-    if (instances[i].sprox_ctx == rInst)
-      goto take_this_one;
-  
-  for (i=0; i<MAX_INSTANCES; i++)
-    if (instances[i].sprox_ctx == NULL)
-      goto take_this_one;
-  
-  return MI_LIB_INTERNAL_ERROR;
-  
+	BYTE i;
+
+	for (i = 0; i < MAX_INSTANCES; i++)
+		if (instances[i].sprox_ctx == rInst)
+			goto take_this_one;
+
+	for (i = 0; i < MAX_INSTANCES; i++)
+		if (instances[i].sprox_ctx == NULL)
+			goto take_this_one;
+
+	return MI_LIB_INTERNAL_ERROR;
+
 take_this_one:
 
-  instances[i].mifplus_ctx = malloc(sizeof(SPROX_MIFPLUS_CTX_ST));
-  if (instances[i].mifplus_ctx == NULL)
-    return MI_OUT_OF_MEMORY_ERROR;   
-  instances[i].sprox_ctx = rInst;
-  
-  memset(instances[i].mifplus_ctx, 0, sizeof(SPROX_MIFPLUS_CTX_ST));
-  instances[i].mifplus_ctx->cid = 0xFF;
-  
-  return MI_OK;
+	instances[i].mifplus_ctx = malloc(sizeof(SPROX_MIFPLUS_CTX_ST));
+	if (instances[i].mifplus_ctx == NULL)
+		return MI_OUT_OF_MEMORY_ERROR;
+	instances[i].sprox_ctx = rInst;
+
+	memset(instances[i].mifplus_ctx, 0, sizeof(SPROX_MIFPLUS_CTX_ST));
+	instances[i].mifplus_ctx->cid = 0xFF;
+
+	return MI_OK;
 }
 
 /**f* MifPlusAPI/[Legacy]DetachLibrary
@@ -111,7 +111,7 @@ take_this_one:
  *
  * RETURNS
  *   MI_OK : library attached
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  * SEE ALSO
  *   [Legacy]AttachLibrary
@@ -119,32 +119,32 @@ take_this_one:
  **/
 SPROX_MIFPLUS_LIB SWORD SPROX_MIFPLUS_API SPROXx_DetachMifPlusLibrary(SPROX_INSTANCE rInst)
 {
-  BYTE i;
-  
-  for (i=0; i<MAX_INSTANCES; i++)
-  {
-    if (instances[i].sprox_ctx == rInst)
-    {
-      if (instances[i].mifplus_ctx != NULL)
-        free(instances[i].mifplus_ctx);
-      instances[i].mifplus_ctx = NULL;
-      instances[i].sprox_ctx = NULL;
-      return MI_OK;
-    }
-  }
+	BYTE i;
 
-  return MI_INVALID_READER_CONTEXT;  
+	for (i = 0; i < MAX_INSTANCES; i++)
+	{
+		if (instances[i].sprox_ctx == rInst)
+		{
+			if (instances[i].mifplus_ctx != NULL)
+				free(instances[i].mifplus_ctx);
+			instances[i].mifplus_ctx = NULL;
+			instances[i].sprox_ctx = NULL;
+			return MI_OK;
+		}
+	}
+
+	return MI_INVALID_READER_CONTEXT;
 }
 
-SPROX_MIFPLUS_CTX_ST *mifplus_get_ctx(SPROX_INSTANCE rInst)
+SPROX_MIFPLUS_CTX_ST* mifplus_get_ctx(SPROX_INSTANCE rInst)
 {
-  BYTE i;
-  
-  for (i=0; i<MAX_INSTANCES; i++)
-    if (instances[i].sprox_ctx == rInst)
-      return instances[i].mifplus_ctx;
+	BYTE i;
 
-  return NULL;  
+	for (i = 0; i < MAX_INSTANCES; i++)
+		if (instances[i].sprox_ctx == rInst)
+			return instances[i].mifplus_ctx;
+
+	return NULL;
 }
 
 #endif

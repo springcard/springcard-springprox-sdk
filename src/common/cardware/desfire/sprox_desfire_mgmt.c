@@ -13,65 +13,65 @@
  **/
 #include "sprox_desfire_i.h"
 
-/**f* DesfireAPI/GetFreeMemory
- *
- * NAME
- *   GetFreeMemory
- *
- * DESCRIPTION
- *   Reads out the number of available bytes on the PICC
- *
- * SYNOPSIS
- *
- *   [[sprox_desfire.dll]]
- *   SWORD SPROX_Desfire_GetFreeMemory(DWORD *pdwFreeBytes);
- *
- *   [[sprox_desfire_ex.dll]]
- *   SWORD SPROXx_Desfire_GetFreeMemory(SPROX_INSTANCE rInst,
- *                                      DWORD *pdwFreeBytes);
- *
- *   [[pcsc_desfire.dll]]
- *   LONG  SCardDesfire_GetFreeMemory(SCARDHANDLE hCard,
- *                                    DWORD *pdwFreeBytes);
- *
- * INPUTS
- *   DWORD *pdwFreeBytes : number of free bytes on the PICC
- *
- * RETURNS
- *   DF_OPERATION_OK : operation succeeded
- *   Other code if internal or communication error has occured.
- *
- * NOTES
- *   This command can be issued without valid authentication.
- *
- **/
-SPROX_API_FUNC(Desfire_GetFreeMemory) (SPROX_PARAM  DWORD *pdwFreeBytes)
+ /**f* DesfireAPI/GetFreeMemory
+  *
+  * NAME
+  *   GetFreeMemory
+  *
+  * DESCRIPTION
+  *   Reads out the number of available bytes on the PICC
+  *
+  * SYNOPSIS
+  *
+  *   [[sprox_desfire.dll]]
+  *   SWORD SPROX_Desfire_GetFreeMemory(DWORD *pdwFreeBytes);
+  *
+  *   [[sprox_desfire_ex.dll]]
+  *   SWORD SPROXx_Desfire_GetFreeMemory(SPROX_INSTANCE rInst,
+  *                                      DWORD *pdwFreeBytes);
+  *
+  *   [[pcsc_desfire.dll]]
+  *   LONG  SCardDesfire_GetFreeMemory(SCARDHANDLE hCard,
+  *                                    DWORD *pdwFreeBytes);
+  *
+  * INPUTS
+  *   DWORD *pdwFreeBytes : number of free bytes on the PICC
+  *
+  * RETURNS
+  *   DF_OPERATION_OK : operation succeeded
+  *   Other code if internal or communication error has occured.
+  *
+  * NOTES
+  *   This command can be issued without valid authentication.
+  *
+  **/
+SPROX_API_FUNC(Desfire_GetFreeMemory) (SPROX_PARAM  DWORD* pdwFreeBytes)
 {
-  SPROX_RC   status;
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_RC   status;
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Create the info block containing the command code and the key number argument. */
-  ctx->xfer_buffer[INF + 0] = DF_GET_FREE_MEMORY;
-  ctx->xfer_length = 1;
+	/* Create the info block containing the command code and the key number argument. */
+	ctx->xfer_buffer[INF + 0] = DF_GET_FREE_MEMORY;
+	ctx->xfer_length = 1;
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  /* The returned info block must contain 4 bytes, the status code and the requested */
-  /* information.                                                                    */
-  status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  4, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
-  if (status != DF_OPERATION_OK)
-    return status;
+	/* Communicate the info block to the card and check the operation's return status. */
+	/* The returned info block must contain 4 bytes, the status code and the requested */
+	/* information.                                                                    */
+	status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  4, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
+	if (status != DF_OPERATION_OK)
+		return status;
 
-  /* Get the actual value. */
-  if (pdwFreeBytes != NULL)
-  {
-    *pdwFreeBytes  = 0;
-    *pdwFreeBytes += ctx->xfer_buffer[INF + 3]; *pdwFreeBytes <<= 8;
-    *pdwFreeBytes += ctx->xfer_buffer[INF + 2]; *pdwFreeBytes <<= 8;
-    *pdwFreeBytes += ctx->xfer_buffer[INF + 1];
-  }
+	/* Get the actual value. */
+	if (pdwFreeBytes != NULL)
+	{
+		*pdwFreeBytes = 0;
+		*pdwFreeBytes += ctx->xfer_buffer[INF + 3]; *pdwFreeBytes <<= 8;
+		*pdwFreeBytes += ctx->xfer_buffer[INF + 2]; *pdwFreeBytes <<= 8;
+		*pdwFreeBytes += ctx->xfer_buffer[INF + 1];
+	}
 
-  /* Success. */
-  return DF_OPERATION_OK;
+	/* Success. */
+	return DF_OPERATION_OK;
 }
 
 /**f* DesfireAPI/GetCardUID
@@ -106,56 +106,57 @@ SPROX_API_FUNC(Desfire_GetFreeMemory) (SPROX_PARAM  DWORD *pdwFreeBytes)
  **/
 SPROX_API_FUNC(Desfire_GetCardUID) (SPROX_PARAM  BYTE uid[7])
 {
-  SPROX_RC   status;
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_RC   status;
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Create the info block containing the command code and the key number argument. */
-  ctx->xfer_buffer[INF + 0] = DF_GET_CARD_UID;
-  ctx->xfer_length = 1;
+	/* Create the info block containing the command code and the key number argument. */
+	ctx->xfer_buffer[INF + 0] = DF_GET_CARD_UID;
+	ctx->xfer_length = 1;
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  /* The returned info block must contain 4 bytes, the status code and the requested */
-  /* information.                                                                    */
-  status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  17, COMPUTE_COMMAND_CMAC | WANTS_OPERATION_OK);
-  if (status != DF_OPERATION_OK)
-    return status;
+	/* Communicate the info block to the card and check the operation's return status. */
+	/* The returned info block must contain 4 bytes, the status code and the requested */
+	/* information.                                                                    */
+	status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  17, COMPUTE_COMMAND_CMAC | WANTS_OPERATION_OK);
+	if (status != DF_OPERATION_OK)
+		return status;
 
 #ifdef SPROX_DESFIRE_WITH_SAM
-  if (ctx->sam_session_active)
-  {
-    BYTE pbOut[30];
-    DWORD dwOutLength = sizeof(pbOut);
-    BOOL bSkipStatus = FALSE;
-    if ((ctx->session_type == KEY_LEGACY_3DES) || (ctx->session_type == KEY_LEGACY_DES))
-     bSkipStatus = TRUE;
+	if (ctx->sam_session_active)
+	{
+		BYTE pbOut[30];
+		DWORD dwOutLength = sizeof(pbOut);
+		BOOL bSkipStatus = FALSE;
+		if ((ctx->session_type == KEY_LEGACY_3DES) || (ctx->session_type == KEY_LEGACY_DES))
+			bSkipStatus = TRUE;
 
-    status = SAM_DecipherData(ctx->sam_context.hSam, ctx->xfer_buffer[0], 7, &ctx->xfer_buffer[1], ctx->xfer_length-1, bSkipStatus, pbOut, &dwOutLength);
-    if (status != DF_OPERATION_OK)
-      return status;
+		status = SAM_DecipherData(ctx->sam_context.hSam, ctx->xfer_buffer[0], 7, &ctx->xfer_buffer[1], ctx->xfer_length - 1, bSkipStatus, pbOut, &dwOutLength);
+		if (status != DF_OPERATION_OK)
+			return status;
 
-     /* Get the actual value. */
-    if (uid != NULL)
-      memcpy(uid, pbOut, 7);
+		/* Get the actual value. */
+		if (uid != NULL)
+			memcpy(uid, pbOut, 7);
 
-  } else
+	}
+	else
 #endif
-  {
-    /* at first we have to decipher the recv_buffer */
-    ctx->xfer_length -= 1;
+	{
+		/* at first we have to decipher the recv_buffer */
+		ctx->xfer_length -= 1;
 
-    Desfire_CipherRecv(SPROX_PARAM_P  &ctx->xfer_buffer[1], &ctx->xfer_length);
+		Desfire_CipherRecv(SPROX_PARAM_P & ctx->xfer_buffer[1], &ctx->xfer_length);
 
-   /* Get the actual value. */
-    if (uid != NULL)
-      memcpy(uid, &ctx->xfer_buffer[1], 7);
+		/* Get the actual value. */
+		if (uid != NULL)
+			memcpy(uid, &ctx->xfer_buffer[1], 7);
 
-  }
-
-
+	}
 
 
-  /* Success. */
-  return DF_OPERATION_OK;
+
+
+	/* Success. */
+	return DF_OPERATION_OK;
 
 }
 
@@ -191,14 +192,14 @@ SPROX_API_FUNC(Desfire_GetCardUID) (SPROX_PARAM  BYTE uid[7])
  **/
 SPROX_API_FUNC(Desfire_FormatPICC) (SPROX_PARAM_V)
 {
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Create the info block containing the command code. */
-  ctx->xfer_buffer[INF + 0] = DF_FORMAT_PICC;
-  ctx->xfer_length = 1;
+	/* Create the info block containing the command code. */
+	ctx->xfer_buffer[INF + 0] = DF_FORMAT_PICC;
+	ctx->xfer_length = 1;
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
+	/* Communicate the info block to the card and check the operation's return status. */
+	return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
 }
 
 /**f* DesfireAPI/CreateApplication
@@ -249,21 +250,21 @@ SPROX_API_FUNC(Desfire_FormatPICC) (SPROX_PARAM_V)
  **/
 SPROX_API_FUNC(Desfire_CreateApplication) (SPROX_PARAM  DWORD aid, BYTE key_setting_1, BYTE key_setting_2)
 {
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Create the info block containing the command code and the given parameters. */
-  ctx->xfer_length = 0;
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_CREATE_APPLICATION;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
-  aid >>= 8;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
-  aid >>= 8;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
-  ctx->xfer_buffer[ctx->xfer_length++] = key_setting_1;
-  ctx->xfer_buffer[ctx->xfer_length++] = key_setting_2;
+	/* Create the info block containing the command code and the given parameters. */
+	ctx->xfer_length = 0;
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_CREATE_APPLICATION;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
+	aid >>= 8;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
+	aid >>= 8;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
+	ctx->xfer_buffer[ctx->xfer_length++] = key_setting_1;
+	ctx->xfer_buffer[ctx->xfer_length++] = key_setting_2;
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
+	/* Communicate the info block to the card and check the operation's return status. */
+	return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
 }
 
 /**f* DesfireAPI/CreateIsoApplication
@@ -325,37 +326,40 @@ SPROX_API_FUNC(Desfire_CreateApplication) (SPROX_PARAM  DWORD aid, BYTE key_sett
  *   SelectApplication
  *
  **/
-SPROX_API_FUNC(Desfire_CreateIsoApplication) (SPROX_PARAM  DWORD aid, BYTE key_setting_1, BYTE key_setting_2, WORD iso_df_id, const BYTE iso_df_name[16], BYTE iso_df_namelen)
+SPROX_API_FUNC(Desfire_CreateIsoApplication) (SPROX_PARAM  DWORD aid, BYTE key_setting_1, BYTE key_setting_2, WORD iso_df_id, const BYTE iso_df_name[], BYTE iso_df_namelen)
 {
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_DESFIRE_GET_CTX();
 
-  ctx->xfer_length = 0;
+	ctx->xfer_length = 0;
 
-  /* Create the info block containing the command code and the given parameters. */
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_CREATE_APPLICATION;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
-  aid >>= 8;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
-  aid >>= 8;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
-  ctx->xfer_buffer[ctx->xfer_length++] = key_setting_1;
-  ctx->xfer_buffer[ctx->xfer_length++] = key_setting_2;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (iso_df_id); // JDA
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (iso_df_id >> 8); // JDA
+	/* Create the info block containing the command code and the given parameters. */
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_CREATE_APPLICATION;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
+	aid >>= 8;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
+	aid >>= 8;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
+	ctx->xfer_buffer[ctx->xfer_length++] = key_setting_1;
+	ctx->xfer_buffer[ctx->xfer_length++] = key_setting_2;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(iso_df_id); // JDA
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(iso_df_id >> 8); // JDA
 
-  if (iso_df_name != NULL)
-  {
-    if (iso_df_namelen == 0)
-      iso_df_namelen = strlen((char*)iso_df_name);
-    if (iso_df_namelen > 16)
-      return DFCARD_LIB_CALL_ERROR;
+	if (iso_df_name != NULL)
+	{
+		if (iso_df_namelen == 0)
+		{
+			size_t l = strlen((char*)iso_df_name);
+			if (iso_df_namelen > 16)
+				return DFCARD_LIB_CALL_ERROR;
+			iso_df_namelen = (BYTE)l;
+		}
 
-    memcpy(&ctx->xfer_buffer[ctx->xfer_length], iso_df_name, iso_df_namelen);
-    ctx->xfer_length += iso_df_namelen;
-  }
+		memcpy(&ctx->xfer_buffer[ctx->xfer_length], iso_df_name, iso_df_namelen);
+		ctx->xfer_length += iso_df_namelen;
+	}
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
+	/* Communicate the info block to the card and check the operation's return status. */
+	return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
 }
 
 /**f* DesfireAPI/DeleteApplication
@@ -394,27 +398,27 @@ SPROX_API_FUNC(Desfire_CreateIsoApplication) (SPROX_PARAM  DWORD aid, BYTE key_s
  **/
 SPROX_API_FUNC(Desfire_DeleteApplication) (SPROX_PARAM  DWORD aid)
 {
-  SPROX_RC status;
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_RC status;
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Create the info block containing the command code and the given parameters. */
-  ctx->xfer_length = 0;
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_DELETE_APPLICATION;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF); aid >>= 8;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF); aid >>= 8;
-  ctx->xfer_buffer[ctx->xfer_length++] = (BYTE) (aid & 0x000000FF);
+	/* Create the info block containing the command code and the given parameters. */
+	ctx->xfer_length = 0;
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_DELETE_APPLICATION;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF); aid >>= 8;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF); aid >>= 8;
+	ctx->xfer_buffer[ctx->xfer_length++] = (BYTE)(aid & 0x000000FF);
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | LOOSE_RESPONSE_CMAC | WANTS_OPERATION_OK);
+	/* Communicate the info block to the card and check the operation's return status. */
+	status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | CHECK_RESPONSE_CMAC | LOOSE_RESPONSE_CMAC | WANTS_OPERATION_OK);
 
-  /* If the current application is deleted, the root application is implicitly selected */
-  if ((status == DF_OPERATION_OK) && (ctx->current_aid == aid))
-  {
-    ctx->current_aid = 0;
-    Desfire_CleanupAuthentication(SPROX_PARAM_PV);
-  }
+	/* If the current application is deleted, the root application is implicitly selected */
+	if ((status == DF_OPERATION_OK) && (ctx->current_aid == aid))
+	{
+		ctx->current_aid = 0;
+		Desfire_CleanupAuthentication(SPROX_PARAM_PV);
+	}
 
-  return status;
+	return status;
 }
 
 /**f* DesfireAPI/GetApplicationIDs
@@ -459,83 +463,83 @@ SPROX_API_FUNC(Desfire_DeleteApplication) (SPROX_PARAM  DWORD aid)
  *   SelectApplication
  *
  **/
-SPROX_API_FUNC(Desfire_GetApplicationIDs) (SPROX_PARAM  BYTE aid_max_count, DWORD aid_list[], BYTE *aid_count)
+SPROX_API_FUNC(Desfire_GetApplicationIDs) (SPROX_PARAM  BYTE aid_max_count, DWORD aid_list[], BYTE* aid_count)
 {
-  BYTE       i;
-  DWORD      recv_length = 1;
-  BYTE       recv_buffer[256];
-  SPROX_RC   status;
-  SPROX_DESFIRE_GET_CTX();
+	BYTE       i;
+	DWORD      recv_length = 1;
+	BYTE       recv_buffer[256];
+	SPROX_RC   status;
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Set the number of applications to zero */
-  if (aid_count != NULL)
-    *aid_count = 0;
+	/* Set the number of applications to zero */
+	if (aid_count != NULL)
+		*aid_count = 0;
 
-  /* create the info block containing the command code */
-  ctx->xfer_length = 0;
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_GET_APPLICATION_IDS;
+	/* create the info block containing the command code */
+	ctx->xfer_length = 0;
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_GET_APPLICATION_IDS;
 
-  for (;;)
-  {
-    status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | WANTS_ADDITIONAL_FRAME | WANTS_OPERATION_OK);
+	for (;;)
+	{
+		status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | WANTS_ADDITIONAL_FRAME | WANTS_OPERATION_OK);
 
-    if (status != DF_OPERATION_OK)
-      goto done;
+		if (status != DF_OPERATION_OK)
+			goto done;
 
-    memcpy(&recv_buffer[recv_length], &ctx->xfer_buffer[INF + 1], ctx->xfer_length - 1);
-    recv_length += (ctx->xfer_length - 1);
+		memcpy(&recv_buffer[recv_length], &ctx->xfer_buffer[INF + 1], ctx->xfer_length - 1);
+		recv_length += (ctx->xfer_length - 1);
 
-    if (ctx->xfer_buffer[INF + 0] != DF_ADDITIONAL_FRAME)
-      break;
+		if (ctx->xfer_buffer[INF + 0] != DF_ADDITIONAL_FRAME)
+			break;
 
-    ctx->xfer_length = 1;
-  }
+		ctx->xfer_length = 1;
+	}
 
-  recv_buffer[0] = DF_OPERATION_OK;
+	recv_buffer[0] = DF_OPERATION_OK;
 
-  /* Check the CMAC */
-  status = Desfire_VerifyCmacRecv(SPROX_PARAM_P  recv_buffer, &recv_length);
-  if (status != DF_OPERATION_OK)
-    goto done;
+	/* Check the CMAC */
+	status = Desfire_VerifyCmacRecv(SPROX_PARAM_P  recv_buffer, &recv_length);
+	if (status != DF_OPERATION_OK)
+		goto done;
 
 
-  recv_length -= 1;     /* substract 1 byte for the received status */
+	recv_length -= 1;     /* substract 1 byte for the received status */
 
-  /* ByteCount must be in multiples of APPLICATION_ID_SIZE bytes
-     we check this to proof the format integrity
-     if zero bytes have been received this is ok -> means no
-     applications existing */
-  if (recv_length % APPLICATION_ID_SIZE)
-  {
-    status = DFCARD_WRONG_LENGTH;
-    goto done;
-  }
+	/* ByteCount must be in multiples of APPLICATION_ID_SIZE bytes
+	   we check this to proof the format integrity
+	   if zero bytes have been received this is ok -> means no
+	   applications existing */
+	if (recv_length % APPLICATION_ID_SIZE)
+	{
+		status = DFCARD_WRONG_LENGTH;
+		goto done;
+	}
 
-  for (i = 0; i < (recv_length / APPLICATION_ID_SIZE); i++)
-  {
-    /* Extract AID */
-    if ((aid_list != NULL) && (i < aid_max_count))
+	for (i = 0; i < (recv_length / APPLICATION_ID_SIZE); i++)
+	{
+		/* Extract AID */
+		if ((aid_list != NULL) && (i < aid_max_count))
 		{
-		  DWORD aid;
+			DWORD aid;
 
-      aid = recv_buffer[INF + 3 + APPLICATION_ID_SIZE * i];
-      aid <<= 8;
-      aid += recv_buffer[INF + 2 + APPLICATION_ID_SIZE * i];
-      aid <<= 8;
-      aid += recv_buffer[INF + 1 + APPLICATION_ID_SIZE * i];
+			aid = recv_buffer[INF + 3 + APPLICATION_ID_SIZE * i];
+			aid <<= 8;
+			aid += recv_buffer[INF + 2 + APPLICATION_ID_SIZE * i];
+			aid <<= 8;
+			aid += recv_buffer[INF + 1 + APPLICATION_ID_SIZE * i];
 
-      aid_list[i] = aid;
+			aid_list[i] = aid;
 		}
-  }
+	}
 
-  if (aid_count != NULL)
-    *aid_count = i;
+	if (aid_count != NULL)
+		*aid_count = i;
 
 	if ((aid_list != NULL) && (i >= aid_max_count))
 		status = DFCARD_OVERFLOW;
 
 done:
-  return status;
+	return status;
 }
 
 /**f* DesfireAPI/Desfire_GetIsoApplications
@@ -580,31 +584,31 @@ done:
  *   GetApplicationIDs
  *
  **/
-SPROX_API_FUNC(Desfire_GetIsoApplications) (SPROX_PARAM  BYTE app_max_count, DF_ISO_APPLICATION_ST app_list[], BYTE *app_count)
+SPROX_API_FUNC(Desfire_GetIsoApplications) (SPROX_PARAM  BYTE app_max_count, DF_ISO_APPLICATION_ST app_list[], BYTE* app_count)
 {
-  BYTE       i;
-  DWORD      recv_length = 1;
-  BYTE       recv_buffer[1024];
-  SPROX_RC   status;
-  SPROX_DESFIRE_GET_CTX();
+	BYTE       i;
+	DWORD      recv_length = 1;
+	BYTE       recv_buffer[1024];
+	SPROX_RC   status;
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Set the number of applications to zero */
-  if (app_count != NULL)
-    *app_count = 0;
+	/* Set the number of applications to zero */
+	if (app_count != NULL)
+		*app_count = 0;
 
-  /* create the info block containing the command code */
-  ctx->xfer_length = 0;
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_GET_DF_NAMES;
+	/* create the info block containing the command code */
+	ctx->xfer_length = 0;
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_GET_DF_NAMES;
 
 	i = 0;
-  for (;;)
-  {
-    status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | WANTS_ADDITIONAL_FRAME | WANTS_OPERATION_OK);
+	for (;;)
+	{
+		status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | WANTS_ADDITIONAL_FRAME | WANTS_OPERATION_OK);
 
-    if (status != DF_OPERATION_OK)
-      goto done;
+		if (status != DF_OPERATION_OK)
+			goto done;
 
-		if ( (ctx->xfer_length !=1) && (ctx->xfer_length<6))
+		if ((ctx->xfer_length != 1) && (ctx->xfer_length < 6))
 		{
 			status = DFCARD_WRONG_LENGTH;
 			goto done;
@@ -627,7 +631,7 @@ SPROX_API_FUNC(Desfire_GetIsoApplications) (SPROX_PARAM  BYTE app_max_count, DF_
 
 			for (app.bIsoNameLen = 0; app.bIsoNameLen < sizeof(app.abIsoName); app.bIsoNameLen++)
 			{
-				if ((WORD) (INF + 6 + app.bIsoNameLen) >= ctx->xfer_length)
+				if ((WORD)(INF + 6 + app.bIsoNameLen) >= ctx->xfer_length)
 					break;
 				app.abIsoName[app.bIsoNameLen] = ctx->xfer_buffer[INF + 6 + app.bIsoNameLen];
 			}
@@ -637,32 +641,32 @@ SPROX_API_FUNC(Desfire_GetIsoApplications) (SPROX_PARAM  BYTE app_max_count, DF_
 		i++;
 
 		/* Remember the frame for later CMAC processing */
-    memcpy(&recv_buffer[recv_length], &ctx->xfer_buffer[INF + 1], ctx->xfer_length - 1);
-    recv_length += (ctx->xfer_length - 1);
+		memcpy(&recv_buffer[recv_length], &ctx->xfer_buffer[INF + 1], ctx->xfer_length - 1);
+		recv_length += (ctx->xfer_length - 1);
 
-    if (ctx->xfer_buffer[INF + 0] != DF_ADDITIONAL_FRAME)
-      break;
+		if (ctx->xfer_buffer[INF + 0] != DF_ADDITIONAL_FRAME)
+			break;
 
-    ctx->xfer_length = 1;
-  }
+		ctx->xfer_length = 1;
+	}
 
-  recv_buffer[0] = DF_OPERATION_OK;
+	recv_buffer[0] = DF_OPERATION_OK;
 
-  /* Check the CMAC */
-  status = Desfire_VerifyCmacRecv(SPROX_PARAM_P  recv_buffer, &recv_length);
-  if (status != DF_OPERATION_OK)
-    goto done;
+	/* Check the CMAC */
+	status = Desfire_VerifyCmacRecv(SPROX_PARAM_P  recv_buffer, &recv_length);
+	if (status != DF_OPERATION_OK)
+		goto done;
 
-  recv_length -= 1;     /* substract 1 byte for the received status */
+	recv_length -= 1;     /* substract 1 byte for the received status */
 
-  if (app_count != NULL)
-    *app_count = i;
+	if (app_count != NULL)
+		*app_count = i;
 
 	if ((app_list != NULL) && (i >= app_max_count))
 		status = DFCARD_OVERFLOW;
 
 done:
-  return status;
+	return status;
 }
 
 /**f* DesfireAPI/SelectApplication
@@ -701,28 +705,28 @@ done:
  **/
 SPROX_API_FUNC(Desfire_SelectApplication) (SPROX_PARAM  DWORD aid)
 {
-  SPROX_RC status;
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_RC status;
+	SPROX_DESFIRE_GET_CTX();
 
-  /* Each SelectApplication causes a currently valid authentication state to be lost */
-  Desfire_CleanupAuthentication(SPROX_PARAM_PV);
+	/* Each SelectApplication causes a currently valid authentication state to be lost */
+	Desfire_CleanupAuthentication(SPROX_PARAM_PV);
 
-  /* Create the info block containing the command code and the given parameters. */
-  ctx->xfer_buffer[INF + 0] = DF_SELECT_APPLICATION;
-  ctx->xfer_buffer[INF + 1] = (BYTE) (aid & 0x000000FF);
-  aid >>= 8;
-  ctx->xfer_buffer[INF + 2] = (BYTE) (aid & 0x000000FF);
-  aid >>= 8;
-  ctx->xfer_buffer[INF + 3] = (BYTE) (aid & 0x000000FF);
-  ctx->xfer_length = 4;
+	/* Create the info block containing the command code and the given parameters. */
+	ctx->xfer_buffer[INF + 0] = DF_SELECT_APPLICATION;
+	ctx->xfer_buffer[INF + 1] = (BYTE)(aid & 0x000000FF);
+	aid >>= 8;
+	ctx->xfer_buffer[INF + 2] = (BYTE)(aid & 0x000000FF);
+	aid >>= 8;
+	ctx->xfer_buffer[INF + 3] = (BYTE)(aid & 0x000000FF);
+	ctx->xfer_length = 4;
 
-  /* Communicate the info block to the card and check the operation's return status. */
-  status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, WANTS_OPERATION_OK);
+	/* Communicate the info block to the card and check the operation's return status. */
+	status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, WANTS_OPERATION_OK);
 
-  if (status == DF_OPERATION_OK)
-    ctx->current_aid = aid;
+	if (status == DF_OPERATION_OK)
+		ctx->current_aid = aid;
 
-  return status;
+	return status;
 }
 
 /**t* DesfireAPI/DF_VERSION_INFO
@@ -762,86 +766,86 @@ SPROX_API_FUNC(Desfire_SelectApplication) (SPROX_PARAM  DWORD aid)
  *
  **/
 
-/**f* DesfireAPI/GetVersion
- *
- * NAME
- *   GetVersion
- *
- * DESCRIPTION
- *   Returns manufacturing related data of the DesFire card
- *
- * SYNOPSIS
- *
- *   [[sprox_desfire.dll]]
- *   SWORD SPROX_Desfire_GetVersion(DF_VERSION_INFO *pVersionInfo);
- *
- *   [[sprox_desfire_ex.dll]]
- *   SWORD SPROXx_Desfire_GetVersion(SPROX_INSTANCE rInst,
- *                                     DF_VERSION_INFO *pVersionInfo);
- *
- *   [[pcsc_desfire.dll]]
- *   LONG  SCardDesfire_GetVersion(SCARDHANDLE hCard,
- *                                     DF_VERSION_INFO *pVersionInfo);
- *
- * INPUTS
- *   DF_VERSION_INFO *pVersionInfo : card's version information
- *
- * RETURNS
- *   DF_OPERATION_OK    : operation succeeded
- *   Other code if internal or communication error has occured.
- *
- **/
-SPROX_API_FUNC(Desfire_GetVersion) (SPROX_PARAM  DF_VERSION_INFO *pVersionInfo)
+ /**f* DesfireAPI/GetVersion
+  *
+  * NAME
+  *   GetVersion
+  *
+  * DESCRIPTION
+  *   Returns manufacturing related data of the DesFire card
+  *
+  * SYNOPSIS
+  *
+  *   [[sprox_desfire.dll]]
+  *   SWORD SPROX_Desfire_GetVersion(DF_VERSION_INFO *pVersionInfo);
+  *
+  *   [[sprox_desfire_ex.dll]]
+  *   SWORD SPROXx_Desfire_GetVersion(SPROX_INSTANCE rInst,
+  *                                     DF_VERSION_INFO *pVersionInfo);
+  *
+  *   [[pcsc_desfire.dll]]
+  *   LONG  SCardDesfire_GetVersion(SCARDHANDLE hCard,
+  *                                     DF_VERSION_INFO *pVersionInfo);
+  *
+  * INPUTS
+  *   DF_VERSION_INFO *pVersionInfo : card's version information
+  *
+  * RETURNS
+  *   DF_OPERATION_OK    : operation succeeded
+  *   Other code if internal or communication error has occured.
+  *
+  **/
+SPROX_API_FUNC(Desfire_GetVersion) (SPROX_PARAM  DF_VERSION_INFO* pVersionInfo)
 {
-  DWORD      recv_length = 1;
-  BYTE       recv_buffer[256];
-  SPROX_RC   status;
-  SPROX_DESFIRE_GET_CTX();
+	DWORD      recv_length = 1;
+	BYTE       recv_buffer[256];
+	SPROX_RC   status;
+	SPROX_DESFIRE_GET_CTX();
 
-  if (pVersionInfo != NULL)
-    memset(pVersionInfo, 0, sizeof(DF_VERSION_INFO));
+	if (pVersionInfo != NULL)
+		memset(pVersionInfo, 0, sizeof(DF_VERSION_INFO));
 
-  /* create the info block containing the command code */
-  ctx->xfer_length = 0;
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_GET_VERSION;
+	/* create the info block containing the command code */
+	ctx->xfer_length = 0;
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_GET_VERSION;
 
-  for (;;)
-  {
-    status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | WANTS_ADDITIONAL_FRAME | WANTS_OPERATION_OK);
-    if (status != DF_OPERATION_OK)
-      goto done;
+	for (;;)
+	{
+		status = SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  0, COMPUTE_COMMAND_CMAC | WANTS_ADDITIONAL_FRAME | WANTS_OPERATION_OK);
+		if (status != DF_OPERATION_OK)
+			goto done;
 
-    memcpy(&recv_buffer[recv_length], &ctx->xfer_buffer[INF + 1], ctx->xfer_length - 1);
+		memcpy(&recv_buffer[recv_length], &ctx->xfer_buffer[INF + 1], ctx->xfer_length - 1);
 
-    recv_length += (ctx->xfer_length - 1);
+		recv_length += (ctx->xfer_length - 1);
 
-    if (ctx->xfer_buffer[INF + 0] != DF_ADDITIONAL_FRAME)
-      break;
+		if (ctx->xfer_buffer[INF + 0] != DF_ADDITIONAL_FRAME)
+			break;
 
-    ctx->xfer_length = 1;
-  }
+		ctx->xfer_length = 1;
+	}
 
-  recv_buffer[0] = DF_OPERATION_OK;
+	recv_buffer[0] = DF_OPERATION_OK;
 
-  /* Check the CMAC */
-  status = Desfire_VerifyCmacRecv(SPROX_PARAM_P  recv_buffer, &recv_length);
+	/* Check the CMAC */
+	status = Desfire_VerifyCmacRecv(SPROX_PARAM_P  recv_buffer, &recv_length);
 
-  if (status != DF_OPERATION_OK)
-    goto done;
+	if (status != DF_OPERATION_OK)
+		goto done;
 
-  recv_length -= 1;     /* substract 1 byte for the received status */
+	recv_length -= 1;     /* substract 1 byte for the received status */
 
-  if (recv_length != sizeof(DF_VERSION_INFO))
-  {
-    status = DFCARD_WRONG_LENGTH;
-    goto done;
-  }
+	if (recv_length != sizeof(DF_VERSION_INFO))
+	{
+		status = DFCARD_WRONG_LENGTH;
+		goto done;
+	}
 
-  if (pVersionInfo != NULL)
-    memcpy(pVersionInfo, &recv_buffer[1], sizeof(DF_VERSION_INFO));
+	if (pVersionInfo != NULL)
+		memcpy(pVersionInfo, &recv_buffer[1], sizeof(DF_VERSION_INFO));
 
 done:
-  return status;
+	return status;
 
 }
 
@@ -886,25 +890,25 @@ done:
  **/
 SPROX_API_FUNC(Desfire_SetConfiguration) (SPROX_PARAM  BYTE option, const BYTE data[], BYTE length)
 {
-  SPROX_DESFIRE_GET_CTX();
+	SPROX_DESFIRE_GET_CTX();
 
-  ctx->xfer_length = 0;
+	ctx->xfer_length = 0;
 
-  /* Create the info block containing the command code and the key number argument. */
-  ctx->xfer_buffer[ctx->xfer_length++] = DF_SET_CONFIGURATION;
-  ctx->xfer_buffer[ctx->xfer_length++] = option;
+	/* Create the info block containing the command code and the key number argument. */
+	ctx->xfer_buffer[ctx->xfer_length++] = DF_SET_CONFIGURATION;
+	ctx->xfer_buffer[ctx->xfer_length++] = option;
 
-  if (data != NULL)
-  {
-    memcpy(&ctx->xfer_buffer[ctx->xfer_length], data, length);
-    ctx->xfer_length += length;
-  }
+	if (data != NULL)
+	{
+		memcpy(&ctx->xfer_buffer[ctx->xfer_length], data, length);
+		ctx->xfer_length += length;
+	}
 
-  /* Add the CRC */
-  Desfire_XferAppendCrc(SPROX_PARAM_P  2);
+	/* Add the CRC */
+	Desfire_XferAppendCrc(SPROX_PARAM_P  2);
 
-  /* Cipher the option, the data and the CRC */
-  Desfire_XferCipherSend(SPROX_PARAM_P  2);
+	/* Cipher the option, the data and the CRC */
+	Desfire_XferCipherSend(SPROX_PARAM_P  2);
 
-  return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  1, CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
+	return SPROX_API_CALL(Desfire_Command) (SPROX_PARAM_P  1, CHECK_RESPONSE_CMAC | WANTS_OPERATION_OK);
 }

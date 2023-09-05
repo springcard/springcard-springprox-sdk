@@ -2,56 +2,56 @@
 #define __CALYPSO_AUDIT_H__
 
 #ifdef WIN32
-  #define CALYPSO_HOST
+#define CALYPSO_HOST
 
-  #include <windows.h> 
-  #include <winscard.h>
-  #include <stdio.h>
+#include <windows.h> 
+#include <winscard.h>
+#include <stdio.h>
 
-  BOOL PcscStartup(void);
-  void PcscCleanup(void);
-  DWORD PcscReaderCount(void);
-  char *PcscReaderName(DWORD idx);
-  DWORD PcscReaderIndex(const char *name);
-  BOOL PcscCardPresent(DWORD idx);
-  BOOL PcscCardAtr(DWORD idx, BYTE atr[], DWORD *atrlen);
-  BOOL PcscWaitCard(DWORD idx, BYTE atr[], DWORD *atrlen);
-  BOOL PcscConnect(DWORD idx, SCARDHANDLE *hCard);
-  BOOL PcscDisconnect(SCARDHANDLE hCard, DWORD dwDisposition);
-  BOOL PcscDirectTransmit(DWORD idx, const BYTE send_cmd[], DWORD send_len, BYTE recv_cmd[], DWORD *recv_len);
+BOOL PcscStartup(void);
+void PcscCleanup(void);
+DWORD PcscReaderCount(void);
+char* PcscReaderName(DWORD idx);
+DWORD PcscReaderIndex(const char* name);
+BOOL PcscCardPresent(DWORD idx);
+BOOL PcscCardAtr(DWORD idx, BYTE atr[], DWORD* atrlen);
+BOOL PcscWaitCard(DWORD idx, BYTE atr[], DWORD* atrlen);
+BOOL PcscConnect(DWORD idx, SCARDHANDLE* hCard);
+BOOL PcscDisconnect(SCARDHANDLE hCard, DWORD dwDisposition);
+BOOL PcscDirectTransmit(DWORD idx, const BYTE send_cmd[], DWORD send_len, BYTE recv_cmd[], DWORD* recv_len);
 
 #endif
 
 #ifdef __linux__
-  #define CALYPSO_HOST
+#define CALYPSO_HOST
 #endif
 
 #ifdef CALYPSO_HOST
-  #include "products/springprox/springprox.h"
-  #include "cardware/calypso/calypso_api.h"
+#include "products/springprox/springprox.h"
+#include "cardware/calypso/calypso_api.h"
 #else
-  #include "project.h"
+#include "project.h"
 #endif
 
 
 typedef struct
 {
-  BOOL  Verbose;
-  BOOL  Quiet;
-  BOOL  Test;
+	BOOL  Verbose;
+	BOOL  Quiet;
+	BOOL  Test;
 
-  BOOL  SamPcsc;
-  DWORD SamPcscIndex;
-  BYTE  SamLegacySlot;
+	BOOL  SamPcsc;
+	DWORD SamPcscIndex;
+	BYTE  SamLegacySlot;
 
-  BOOL  CardPcsc;
-  DWORD CardPcscIndex;
-  WORD  CardLegacyProtos;
+	BOOL  CardPcsc;
+	DWORD CardPcscIndex;
+	WORD  CardLegacyProtos;
 
-  BYTE  LogLevel;
+	BYTE  LogLevel;
 #ifdef CALYPSO_HOST
-  BOOL  LogCreate;
-  char  LogFile[MAX_PATH];
+	BOOL  LogCreate;
+	char  LogFile[MAX_PATH];
 #endif
 
 
@@ -71,7 +71,7 @@ extern SCARDHANDLE   hSamPcsc;
 extern BYTE          SamAtr[32];
 extern CALYPSO_SZ    SamAtrLen;
 
-void CalypsoAuditStartup(int argc, char **argv);
+void CalypsoAuditStartup(int argc, char** argv);
 
 #define TRACE_S(v)                printf((v == NULL) ? "\n" : v)
 #define TRACE_B(v)                printf("%c", v)
@@ -93,7 +93,7 @@ void set_leds_t(WORD value, WORD ms);
 
 #endif
 
-void TRACE_RC(const char *s);
+void TRACE_RC(const char* s);
 void poFatal(void);
 
 #endif

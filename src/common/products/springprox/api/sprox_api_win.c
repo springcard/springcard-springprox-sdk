@@ -144,33 +144,28 @@ void LoadSettings(void)
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	__try
+	(void)hModule;
+	(void)lpReserved;
+	switch (ul_reason_for_call)
 	{
-		switch (ul_reason_for_call)
-		{
-		case DLL_PROCESS_ATTACH:
-			LoadSettings();
+	case DLL_PROCESS_ATTACH:
+		LoadSettings();
 #ifndef SPROX_API_REENTRANT
-			memset(sprox_ctx_glob, 0, sizeof(SPROX_CTX_ST));
-			sprox_ctx_glob->com_handle = INVALID_HANDLE_VALUE;
+		memset(sprox_ctx_glob, 0, sizeof(SPROX_CTX_ST));
+		sprox_ctx_glob->com_handle = INVALID_HANDLE_VALUE;
 #endif
-			break;
-		case DLL_THREAD_ATTACH:
-			break;
-		case DLL_THREAD_DETACH:
-			break;
-		case DLL_PROCESS_DETACH:
+		break;
+	case DLL_THREAD_ATTACH:
+		break;
+	case DLL_THREAD_DETACH:
+		break;
+	case DLL_PROCESS_DETACH:
 #ifndef SPROX_API_REENTRANT
-			SPROX_ReaderClose();
+		SPROX_ReaderClose();
 #endif
-			break;
-		}
-		return TRUE;
+		break;
 	}
-	__except (1)
-	{
-		return FALSE;
-	}
+	return TRUE;
 }
 
 #endif

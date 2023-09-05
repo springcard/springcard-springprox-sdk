@@ -12,58 +12,58 @@
  **/
 #include "sprox_mifplus_i.h"
 
-/**f* MifPlusAPI/VirtualCardSupport
- *
- * NAME
- *   VirtualCardSupport
- *
- * NOTES
- *   This command is supported only by Mifare Plus X at Level 3.
- *
- * SYNOPSIS
- *
- *   [[sprox_milplus.dll]]
- *   SWORD SPROX_MifPlus_VirtualCardSupport(const BYTE install_id[16]);
- *
- *   [[sprox_milplus_ex.dll]]
- *   SWORD SPROXx_MifPlus_VirtualCardSupport(SPROX_INSTANCE rInst,
- *                                           const BYTE install_id[16]);
- *
- *   [[pcsc_mifplus.dll]]
- *   LONG  SCardMifPlus_VirtualCardSupport(SCARDHANDLE hCard,
- *                                         const BYTE install_id[16]);
- *
- * INPUTS
- *   const BYTE install_id[16] : Installation Identifier
- *
- * SEE ALSO
- *   VirtualCard
- *   VirtualCardSupportLast
- *
- **/
+ /**f* MifPlusAPI/VirtualCardSupport
+  *
+  * NAME
+  *   VirtualCardSupport
+  *
+  * NOTES
+  *   This command is supported only by Mifare Plus X at Level 3.
+  *
+  * SYNOPSIS
+  *
+  *   [[sprox_milplus.dll]]
+  *   SWORD SPROX_MifPlus_VirtualCardSupport(const BYTE install_id[16]);
+  *
+  *   [[sprox_milplus_ex.dll]]
+  *   SWORD SPROXx_MifPlus_VirtualCardSupport(SPROX_INSTANCE rInst,
+  *                                           const BYTE install_id[16]);
+  *
+  *   [[pcsc_mifplus.dll]]
+  *   LONG  SCardMifPlus_VirtualCardSupport(SCARDHANDLE hCard,
+  *                                         const BYTE install_id[16]);
+  *
+  * INPUTS
+  *   const BYTE install_id[16] : Installation Identifier
+  *
+  * SEE ALSO
+  *   VirtualCard
+  *   VirtualCardSupportLast
+  *
+  **/
 SPROX_API_FUNC(MifPlus_VirtualCardSupport) (SPROX_PARAM  const BYTE install_id[16])
 {
-  SPROX_RC rc;
-  WORD rlen;
-  BYTE buffer[64];
+	SPROX_RC rc;
+	WORD rlen;
+	BYTE buffer[64];
 	SPROX_MIFPLUS_GET_CTX();
 
-  if (install_id == NULL)
-    return MFP_LIB_CALL_ERROR;
+	if (install_id == NULL)
+		return MFP_LIB_CALL_ERROR;
 
 	ctx->in_session = FALSE;
 
-  buffer[0] = MFP_CMD_VIRTUAL_CARD_SUPPORT;
+	buffer[0] = MFP_CMD_VIRTUAL_CARD_SUPPORT;
 	memcpy(&buffer[1], install_id, 16);
 
-  rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, 17, buffer, sizeof(buffer), &rlen);
+	rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, 17, buffer, sizeof(buffer), &rlen);
 	if (rc != MFP_SUCCESS)
-	  goto done;
+		goto done;
 
-  rc = MifPlus_Result(buffer, rlen, 0);
+	rc = MifPlus_Result(buffer, rlen, 0);
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifPlusAPI/VirtualCardSupportLast
@@ -117,41 +117,41 @@ done:
  **/
 SPROX_API_FUNC(MifPlus_VirtualCardSupportLast) (SPROX_PARAM  const BYTE install_id[16], const BYTE pcd_rnd[12], const BYTE pcd_cap[], BYTE pcd_cap_len, BYTE picc_data[16], BYTE picc_mac[8])
 {
-  SPROX_RC rc;
-  WORD rlen;
-  BYTE buffer[64];
+	SPROX_RC rc;
+	WORD rlen;
+	BYTE buffer[64];
 	SPROX_MIFPLUS_GET_CTX();
 
-  if (install_id == NULL)
-    return MFP_LIB_CALL_ERROR;
-  if (((pcd_cap == NULL) && (pcd_cap_len != 0)) || (pcd_cap_len > 3))
-    return MFP_LIB_CALL_ERROR;
+	if (install_id == NULL)
+		return MFP_LIB_CALL_ERROR;
+	if (((pcd_cap == NULL) && (pcd_cap_len != 0)) || (pcd_cap_len > 3))
+		return MFP_LIB_CALL_ERROR;
 
 	ctx->in_session = FALSE;
 
-  buffer[0] = MFP_CMD_VIRTUAL_CARD_SUPPORT_LAST;
-	memcpy(&buffer[1],  install_id, 16);
+	buffer[0] = MFP_CMD_VIRTUAL_CARD_SUPPORT_LAST;
+	memcpy(&buffer[1], install_id, 16);
 	memcpy(&buffer[17], pcd_rnd, 12);
 	buffer[29] = pcd_cap_len;
 	if (pcd_cap_len)
-	  memcpy(&buffer[30], pcd_cap, pcd_cap_len);
+		memcpy(&buffer[30], pcd_cap, pcd_cap_len);
 
-  rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, (WORD) (30 + pcd_cap_len), buffer, sizeof(buffer), &rlen);
+	rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, (WORD)(30 + pcd_cap_len), buffer, sizeof(buffer), &rlen);
 	if (rc != MFP_SUCCESS)
-	  goto done;
+		goto done;
 
-  rc = MifPlus_Result(buffer, rlen, 24);
+	rc = MifPlus_Result(buffer, rlen, 24);
 	if (rc != MFP_SUCCESS)
-    goto done;
+		goto done;
 
-  if (picc_data != NULL)
-	  memcpy(picc_data, &buffer[1], 16);
+	if (picc_data != NULL)
+		memcpy(picc_data, &buffer[1], 16);
 
-  if (picc_mac != NULL)
-	  memcpy(picc_mac, &buffer[17], 8);
+	if (picc_mac != NULL)
+		memcpy(picc_mac, &buffer[17], 8);
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifPlusAPI/VirtualCardSupportCheck
@@ -225,75 +225,75 @@ done:
  *   SelectVirtualCard
  *
  **/
-SPROX_API_FUNC(MifPlus_VirtualCardSupportCheck) (SPROX_PARAM  const BYTE pcd_rnd[12], const BYTE pcd_cap[], BYTE pcd_cap_len, const BYTE picc_data[16], const BYTE picc_mac[8], BYTE *picc_info, BYTE picc_cap[2], BYTE picc_uid[], BYTE *picc_uid_len, const BYTE polling_enc_key[16], const BYTE polling_mac_key[16])
+SPROX_API_FUNC(MifPlus_VirtualCardSupportCheck) (SPROX_PARAM  const BYTE pcd_rnd[12], const BYTE pcd_cap[], BYTE pcd_cap_len, const BYTE picc_data[16], const BYTE picc_mac[8], BYTE* picc_info, BYTE picc_cap[2], BYTE picc_uid[], BYTE* picc_uid_len, const BYTE polling_enc_key[16], const BYTE polling_mac_key[16])
 {
-  BYTE picc_data_e[16];
+	BYTE picc_data_e[16];
 	BYTE calc_mac_data[32];
 	BYTE calc_mac[8];
 	SPROX_MIFPLUS_GET_CTX();
 
-  if (pcd_rnd == NULL)
-    return MFP_LIB_CALL_ERROR;
-  if (((pcd_cap == NULL) && (pcd_cap_len != 0)) || (pcd_cap_len > 3))
-	  return MFP_LIB_CALL_ERROR;
+	if (pcd_rnd == NULL)
+		return MFP_LIB_CALL_ERROR;
+	if (((pcd_cap == NULL) && (pcd_cap_len != 0)) || (pcd_cap_len > 3))
+		return MFP_LIB_CALL_ERROR;
 	if (picc_data == NULL)
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 	if (picc_mac == NULL)
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 
 	ctx->in_session = FALSE;
 
-  /* Decipher the received data block */
-	/* -------------------------------- */
+	/* Decipher the received data block */
+	  /* -------------------------------- */
 
-  AES_Init(&ctx->main_cipher, polling_enc_key);
-  memcpy(picc_data_e, picc_data, 16);
+	AES_Init(&ctx->main_cipher, polling_enc_key);
+	memcpy(picc_data_e, picc_data, 16);
 	AES_Decrypt(&ctx->main_cipher, picc_data_e);
 
-  if (picc_info != NULL)
-	  *picc_info = picc_data_e[0];
+	if (picc_info != NULL)
+		*picc_info = picc_data_e[0];
 
 	if (picc_cap != NULL)
-	  memcpy(picc_cap, &picc_data_e[1], 2);
+		memcpy(picc_cap, &picc_data_e[1], 2);
 
 	switch (picc_data_e[0])
 	{
-	  case 0x83 : /* 4-byte UID */
-		            if (picc_uid != NULL)
-								  memcpy(picc_uid, &picc_data_e[3], 4);
-								if (picc_uid_len != NULL)
-								  *picc_uid_len = 4;
-								break;
-	  case 0x03 : /* 7-byte UID */
-		            if (picc_uid != NULL)
-								  memcpy(picc_uid, &picc_data_e[3], 7);
-								if (picc_uid_len != NULL)
-								  *picc_uid_len = 7;
-								break;
-		default   : if (picc_uid_len != NULL)
-								  *picc_uid_len = 0;
-  }
+	case 0x83: /* 4-byte UID */
+		if (picc_uid != NULL)
+			memcpy(picc_uid, &picc_data_e[3], 4);
+		if (picc_uid_len != NULL)
+			*picc_uid_len = 4;
+		break;
+	case 0x03: /* 7-byte UID */
+		if (picc_uid != NULL)
+			memcpy(picc_uid, &picc_data_e[3], 7);
+		if (picc_uid_len != NULL)
+			*picc_uid_len = 7;
+		break;
+	default: if (picc_uid_len != NULL)
+		*picc_uid_len = 0;
+	}
 
-  /* Assemble the buffer to compute the MAC */
-	/* -------------------------------------- */
+	/* Assemble the buffer to compute the MAC */
+	  /* -------------------------------------- */
 
 	calc_mac_data[0] = MFP_ERR_SUCCESS;
-  memset(&calc_mac_data[1], 0, 3);
+	memset(&calc_mac_data[1], 0, 3);
 	if (pcd_cap_len)
-	  memcpy(&calc_mac_data[1], pcd_cap, pcd_cap_len);
+		memcpy(&calc_mac_data[1], pcd_cap, pcd_cap_len);
 	memcpy(&calc_mac_data[4], picc_data, 16);
 	memcpy(&calc_mac_data[20], pcd_rnd, 12);
 
 	/* Compute the MAC and check the result */
 	/* ------------------------------------ */
 
-  MifPlus_InitCmac(SPROX_PARAM_P  polling_mac_key);
-  MifPlus_ComputeCmac(SPROX_PARAM_P  calc_mac_data, 32, calc_mac);
+	MifPlus_InitCmac(SPROX_PARAM_P  polling_mac_key);
+	MifPlus_ComputeCmac(SPROX_PARAM_P  calc_mac_data, 32, calc_mac);
 
 	if (memcmp(calc_mac, picc_mac, 8))
-	  return MFP_WRONG_CARD_MAC;
+		return MFP_WRONG_CARD_MAC;
 
-  return MFP_SUCCESS;
+	return MFP_SUCCESS;
 }
 
 /**f* MifPlusAPI/SelectVirtualCard
@@ -341,54 +341,54 @@ SPROX_API_FUNC(MifPlus_VirtualCardSupportCheck) (SPROX_PARAM  const BYTE pcd_rnd
  **/
 SPROX_API_FUNC(MifPlus_SelectVirtualCard) (SPROX_PARAM  const BYTE picc_cap[2], const BYTE picc_uid[], BYTE picc_uid_len, const BYTE select_mac_key[16])
 {
-  SPROX_RC rc;
-  WORD rlen;
+	SPROX_RC rc;
+	WORD rlen;
 	BYTE rnd_padd[16];
-  BYTE cmac_entry[16];
+	BYTE cmac_entry[16];
 	BYTE cmac_calc[8];
 	BYTE buffer[64];
 	SPROX_MIFPLUS_GET_CTX();
 
 	if ((picc_cap == NULL) || (picc_uid == NULL))
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 	if (select_mac_key == NULL)
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 
 	ctx->in_session = FALSE;
 
 	GetRandomBytes(SPROX_PARAM_P  rnd_padd, 16);
 
-  cmac_entry[0] = MFP_CMD_SELECT_VIRTUAL_CARD;
+	cmac_entry[0] = MFP_CMD_SELECT_VIRTUAL_CARD;
 	memcpy(&cmac_entry[1], picc_cap, 2);
 	switch (picc_uid_len)
 	{
-	  case  4 : memcpy(&cmac_entry[3], picc_uid, 4);
-		          memcpy(&cmac_entry[7], rnd_padd, 9);
-							break;
-	  case  7 : memcpy(&cmac_entry[3], rnd_padd, 6);
-		          memcpy(&cmac_entry[9], picc_uid, 7);
-							break;
-		default : return MFP_LIB_CALL_ERROR;
+	case  4: memcpy(&cmac_entry[3], picc_uid, 4);
+		memcpy(&cmac_entry[7], rnd_padd, 9);
+		break;
+	case  7: memcpy(&cmac_entry[3], rnd_padd, 6);
+		memcpy(&cmac_entry[9], picc_uid, 7);
+		break;
+	default: return MFP_LIB_CALL_ERROR;
 	}
 
 	/* Compute the MAC */
-  MifPlus_InitCmac(SPROX_PARAM_P  select_mac_key);
-  MifPlus_ComputeCmac(SPROX_PARAM_P  cmac_entry, 16, cmac_calc);
+	MifPlus_InitCmac(SPROX_PARAM_P  select_mac_key);
+	MifPlus_ComputeCmac(SPROX_PARAM_P  cmac_entry, 16, cmac_calc);
 
 	/* Build the command buffer */
 	buffer[0] = MFP_CMD_SELECT_VIRTUAL_CARD;
 	memcpy(&buffer[1], cmac_calc, 8);
 
-  /* Send the command */
-  rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, 9, buffer, sizeof(buffer), &rlen);
+	/* Send the command */
+	rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, 9, buffer, sizeof(buffer), &rlen);
 	if (rc != MFP_SUCCESS)
-	  goto done;
+		goto done;
 
-  /* Check result */
-  rc = MifPlus_Result(buffer, rlen, 0);
+	/* Check result */
+	rc = MifPlus_Result(buffer, rlen, 0);
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifPlusAPI/DeselectVirtualCard
@@ -417,24 +417,24 @@ done:
  **/
 SPROX_API_FUNC(MifPlus_DeselectVirtualCard) (SPROX_PARAM_V)
 {
-  SPROX_RC rc;
-  WORD rlen;
-  BYTE buffer[64];
+	SPROX_RC rc;
+	WORD rlen;
+	BYTE buffer[64];
 	SPROX_MIFPLUS_GET_CTX();
 
 	ctx->in_session = FALSE;
 
-  buffer[0] = MFP_CMD_DESELECT_VIRTUAL_CARD;
+	buffer[0] = MFP_CMD_DESELECT_VIRTUAL_CARD;
 
-  rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, 1, buffer, sizeof(buffer), &rlen);
-  
+	rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, 1, buffer, sizeof(buffer), &rlen);
+
 	if (rc != MFP_SUCCESS)
-	  goto done;
+		goto done;
 
-  rc = MifPlus_Result(buffer, rlen, 0);
-	 
+	rc = MifPlus_Result(buffer, rlen, 0);
+
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifPlusAPI/VirtualCard
@@ -501,7 +501,7 @@ done:
  *   VirtualCardSupportCheck
  *
  **/
-SPROX_API_FUNC(MifPlus_VirtualCard) (SPROX_PARAM  const BYTE install_id[16], const BYTE polling_enc_key[16], const BYTE polling_mac_key[16], const BYTE pcd_cap[], BYTE pcd_cap_len, BYTE *picc_info, BYTE picc_cap[2], BYTE picc_uid[], BYTE *picc_uid_len)
+SPROX_API_FUNC(MifPlus_VirtualCard) (SPROX_PARAM  const BYTE install_id[16], const BYTE polling_enc_key[16], const BYTE polling_mac_key[16], const BYTE pcd_cap[], BYTE pcd_cap_len, BYTE* picc_info, BYTE picc_cap[2], BYTE picc_uid[], BYTE* picc_uid_len)
 {
 	return SPROX_API_CALL(MifPlus_VirtualCardEx) (SPROX_PARAM_P  install_id, polling_enc_key, polling_mac_key, NULL, 1, pcd_cap, pcd_cap_len, picc_info, picc_cap, picc_uid, picc_uid_len, NULL);
 }
@@ -579,77 +579,77 @@ SPROX_API_FUNC(MifPlus_VirtualCard) (SPROX_PARAM  const BYTE install_id[16], con
  *   VirtualCard
  *
  **/
-SPROX_API_FUNC(MifPlus_VirtualCardEx) (SPROX_PARAM  const BYTE install_ids[], const BYTE polling_enc_keys[], const BYTE polling_mac_keys[], const BYTE select_mac_keys[], BYTE install_count, const BYTE pcd_cap[], BYTE pcd_cap_len, BYTE *picc_info, BYTE picc_cap[2], BYTE picc_uid[], BYTE *picc_uid_len, BYTE *install_idx)
+SPROX_API_FUNC(MifPlus_VirtualCardEx) (SPROX_PARAM  const BYTE install_ids[], const BYTE polling_enc_keys[], const BYTE polling_mac_keys[], const BYTE select_mac_keys[], BYTE install_count, const BYTE pcd_cap[], BYTE pcd_cap_len, BYTE* picc_info, BYTE picc_cap[2], BYTE picc_uid[], BYTE* picc_uid_len, BYTE* install_idx)
 {
-  SPROX_RC rc;
+	SPROX_RC rc;
 	BYTE pcd_rnd[12];
 	BYTE l_picc_cap[2];
 	BYTE l_picc_uid[7];
 	BYTE l_picc_uid_len;
 	BYTE picc_data[16];
 	BYTE picc_mac[8];
-  BYTE i;
+	BYTE i;
 	SPROX_MIFPLUS_GET_CTX();
 
 	if ((install_ids == NULL) || (install_count == 0))
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 	if ((polling_enc_keys == NULL) || (polling_mac_keys == NULL))
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 	if ((install_count > 1) && (select_mac_keys == NULL))
-	  return MFP_LIB_CALL_ERROR;
+		return MFP_LIB_CALL_ERROR;
 
 	if (picc_uid == NULL)
-	  picc_uid = l_picc_uid;
+		picc_uid = l_picc_uid;
 	if (picc_uid_len == NULL)
-	  picc_uid_len = &l_picc_uid_len;
+		picc_uid_len = &l_picc_uid_len;
 	if (picc_cap == NULL)
-	  picc_cap = l_picc_cap;
+		picc_cap = l_picc_cap;
 
 	GetRandomBytes(SPROX_PARAM_P  pcd_rnd, 12);
 
-  /* Send VirtualCardSupport for every Installation ID but the last */
-	/* -------------------------------------------------------------- */
-	for (i=0; i<(install_count-1); i++)
+	/* Send VirtualCardSupport for every Installation ID but the last */
+	  /* -------------------------------------------------------------- */
+	for (i = 0; i < (install_count - 1); i++)
 	{
-    rc = SPROX_API_CALL(MifPlus_VirtualCardSupport) (SPROX_PARAM_P  &install_ids[16 * i]);
+		rc = SPROX_API_CALL(MifPlus_VirtualCardSupport) (SPROX_PARAM_P & install_ids[16 * i]);
 		if (rc != MFP_SUCCESS)
-      goto done;
+			goto done;
 	}
 
-  /* Send VirtualCardSupportLast for the last Installation ID, retrieve card's "nounce" */
-	/* ---------------------------------------------------------------------------------- */
-  rc = SPROX_API_CALL(MifPlus_VirtualCardSupportLast) (SPROX_PARAM_P  &install_ids[16 * (install_count-1)], pcd_rnd, pcd_cap, pcd_cap_len, picc_data, picc_mac);
+	/* Send VirtualCardSupportLast for the last Installation ID, retrieve card's "nounce" */
+	  /* ---------------------------------------------------------------------------------- */
+	rc = SPROX_API_CALL(MifPlus_VirtualCardSupportLast) (SPROX_PARAM_P & install_ids[16 * (install_count - 1)], pcd_rnd, pcd_cap, pcd_cap_len, picc_data, picc_mac);
 	if (rc != MFP_SUCCESS)
-    goto done;
+		goto done;
 
-  /* Lookup using the provided keys to see whether the nounce makes sense or not */
-	/* --------------------------------------------------------------------------- */
-  for (i=0; i<install_count; i++)
+	/* Lookup using the provided keys to see whether the nounce makes sense or not */
+	  /* --------------------------------------------------------------------------- */
+	for (i = 0; i < install_count; i++)
 	{
-	  rc = SPROX_API_CALL(MifPlus_VirtualCardSupportCheck) (SPROX_PARAM_P  pcd_rnd, pcd_cap, pcd_cap_len, picc_data, picc_mac, picc_info, picc_cap, picc_uid, picc_uid_len, &polling_enc_keys[16 * i], &polling_mac_keys[16 * i]);
-    if (rc == MFP_SUCCESS)
+		rc = SPROX_API_CALL(MifPlus_VirtualCardSupportCheck) (SPROX_PARAM_P  pcd_rnd, pcd_cap, pcd_cap_len, picc_data, picc_mac, picc_info, picc_cap, picc_uid, picc_uid_len, &polling_enc_keys[16 * i], &polling_mac_keys[16 * i]);
+		if (rc == MFP_SUCCESS)
 		{
-		  /* This nounce is actually an understandabable answer! */
-			/* --------------------------------------------------- */
+			/* This nounce is actually an understandabable answer! */
+			  /* --------------------------------------------------- */
 
-		  if (install_idx != NULL)
-			  *install_idx = i;
+			if (install_idx != NULL)
+				*install_idx = i;
 
-      /* Tell the card we want to use __this__ Installation ID */
-			/* ----------------------------------------------------- */
+			/* Tell the card we want to use __this__ Installation ID */
+				  /* ----------------------------------------------------- */
 
 			if (install_count > 1)
 			{
-			  rc = SPROX_API_CALL(MifPlus_SelectVirtualCard) (SPROX_PARAM_P  picc_cap, picc_uid, *picc_uid_len, &select_mac_keys[16 * i]);
-			  if (rc != MFP_SUCCESS)
-  			  goto done;
+				rc = SPROX_API_CALL(MifPlus_SelectVirtualCard) (SPROX_PARAM_P  picc_cap, picc_uid, *picc_uid_len, &select_mac_keys[16 * i]);
+				if (rc != MFP_SUCCESS)
+					goto done;
 			}
 
-      break;
+			break;
 		}
-  }
+	}
 
 
 done:
-  return rc;
+	return rc;
 }

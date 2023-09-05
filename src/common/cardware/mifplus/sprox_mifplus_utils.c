@@ -15,14 +15,14 @@
 
 SPROX_RC MifPlus_Result(BYTE rsp_buffer[], WORD rsp_got_len, WORD rsp_expect_len)
 {
-  if (rsp_got_len == 0)
-	  return MFP_EMPTY_CARD_ANSWER;
+	if (rsp_got_len == 0)
+		return MFP_EMPTY_CARD_ANSWER;
 
-  if (rsp_buffer[0] != MFP_ERR_SUCCESS)
-    return MFP_ERROR-rsp_buffer[0];
+	if (rsp_buffer[0] != MFP_ERR_SUCCESS)
+		return MFP_ERROR - rsp_buffer[0];
 
 	if (rsp_got_len != (rsp_expect_len + 1))
-	  return MFP_WRONG_CARD_LENGTH;
+		return MFP_WRONG_CARD_LENGTH;
 
 	return MFP_SUCCESS;
 }
@@ -49,14 +49,14 @@ SPROX_RC MifPlus_Result(BYTE rsp_buffer[], WORD rsp_got_len, WORD rsp_expect_len
  *                                   BYTE *level)
  *
  **/
-SPROX_API_FUNC(MifPlus_GetCardLevel) (SPROX_PARAM  BYTE *level)
+SPROX_API_FUNC(MifPlus_GetCardLevel) (SPROX_PARAM  BYTE* level)
 {
-  SPROX_MIFPLUS_GET_CTX();
+	SPROX_MIFPLUS_GET_CTX();
 
 	if (level != NULL)
-	  *level = ctx->level;
+		*level = ctx->level;
 
-  return MFP_SUCCESS;
+	return MFP_SUCCESS;
 }
 
 /**f* MifPlusAPI/EnterTcl
@@ -84,20 +84,20 @@ SPROX_API_FUNC(MifPlus_GetCardLevel) (SPROX_PARAM  BYTE *level)
  **/
 SPROX_API_FUNC(MifPlus_EnterTcl) (SPROX_PARAM_V)
 {
-  SPROX_RC rc;
-  SPROX_MIFPLUS_GET_CTX();
+	SPROX_RC rc;
+	SPROX_MIFPLUS_GET_CTX();
 
 	if (ctx->tcl)
-	  return MFP_SUCCESS;
+		return MFP_SUCCESS;
 
 #ifdef _USE_PCSC
-  rc = SCardMifPlus_SlotControl(hCard, 0x20, 0x01);
+	rc = SCardMifPlus_SlotControl(hCard, 0x20, 0x01);
 #else
-  rc = SPROX_API_CALL(TclA_GetAts) (SPROX_PARAM_P  ctx->cid, NULL, NULL);
+	rc = SPROX_API_CALL(TclA_GetAts) (SPROX_PARAM_P  ctx->cid, NULL, NULL);
 #endif
 
 	if (rc == MFP_SUCCESS)
-	  ctx->tcl = TRUE;
+		ctx->tcl = TRUE;
 
 	return rc;
 }
@@ -127,26 +127,26 @@ SPROX_API_FUNC(MifPlus_EnterTcl) (SPROX_PARAM_V)
  **/
 SPROX_API_FUNC(MifPlus_LeaveTcl) (SPROX_PARAM_V)
 {
-  SPROX_RC rc;
-  SPROX_MIFPLUS_GET_CTX();
+	SPROX_RC rc;
+	SPROX_MIFPLUS_GET_CTX();
 
 	if (!ctx->tcl)
-	  return MFP_SUCCESS;
+		return MFP_SUCCESS;
 
 #ifdef _USE_PCSC
-  rc = SCardMifPlus_SlotControl(hCard, 0x20, 0x00);
+	rc = SCardMifPlus_SlotControl(hCard, 0x20, 0x00);
 #else
-  rc = SPROX_API_CALL(Tcl_Deselect) (SPROX_PARAM_P  ctx->cid);
+	rc = SPROX_API_CALL(Tcl_Deselect) (SPROX_PARAM_P  ctx->cid);
 #endif
-	
-	if (rc == MFP_SUCCESS)
-	  ctx->tcl = FALSE;
 
-  /* The card is now halted, we must wake-it up */
+	if (rc == MFP_SUCCESS)
+		ctx->tcl = FALSE;
+
+	/* The card is now halted, we must wake-it up */
 #ifdef _USE_PCSC
-  
+
 #else
-  rc = SPROX_API_CALL(A_SelectAgain) (SPROX_PARAM_P  NULL, 0);
+	rc = SPROX_API_CALL(A_SelectAgain) (SPROX_PARAM_P  NULL, 0);
 #endif
 
 	return rc;

@@ -51,81 +51,81 @@
 
 
 typedef struct
-{ 
-  BOOL  _NotEmpty : 1;
-  BOOL  _TestCard : 1;
-  
-  BOOL  _HolderDataCardStatus : 1;
-  
-  BYTE  VersionNumber;
-  DWORD NetworkId;
-  BYTE  ApplicationIssuerId;
-  WORD  ApplicationEndDate;
-  WORD  Authenticator;
-  
-  BYTE  HolderDataCardStatus;
+{
+	BOOL  _NotEmpty : 1;
+	BOOL  _TestCard : 1;
+
+	BOOL  _HolderDataCardStatus : 1;
+
+	BYTE  VersionNumber;
+	DWORD NetworkId;
+	BYTE  ApplicationIssuerId;
+	WORD  ApplicationEndDate;
+	WORD  Authenticator;
+
+	BYTE  HolderDataCardStatus;
 
 } CALYPSO_ENVANDHOLDER_ST;
 
 typedef struct
 {
-  BOOL  _NotEmpty : 1;
-  BOOL  _StartDate : 1;
-  BOOL  _EndDate : 1;
-  BOOL  _NetworkId : 1;
-  BOOL  _SerialNumber : 1;
-  
-  BYTE  Provider;    
-  WORD  Tariff;  
+	BOOL  _NotEmpty : 1;
+	BOOL  _StartDate : 1;
+	BOOL  _EndDate : 1;
+	BOOL  _NetworkId : 1;
+	BOOL  _SerialNumber : 1;
 
-  DWORD NetworkId;
-  DWORD SerialNumber;
-  WORD  StartDate;
-  WORD  EndDate;
-  BYTE  Areas;
+	BYTE  Provider;
+	WORD  Tariff;
 
-  BYTE  Status;
-  WORD  Authenticator;
+	DWORD NetworkId;
+	DWORD SerialNumber;
+	WORD  StartDate;
+	WORD  EndDate;
+	BYTE  Areas;
 
-  WORD  Authenticator_C;    
-  
+	BYTE  Status;
+	WORD  Authenticator;
+
+	WORD  Authenticator_C;
+
 } CALYPSO_CONTRACT_ST;
 
 typedef struct
 {
-  BOOL  _NotOKCounter : 1;
-  BOOL  _LocationId : 1;
-  BOOL  _Device : 1;
-  BOOL  _RouteNumber : 1;
-  BOOL  _JourneyRun : 1;
-  BOOL  _VehicleId : 1;
-  
-  WORD  EventDate;
-  WORD  EventTime;
-  BYTE  Code;
-  BYTE  ServiceProvider;
-  BYTE  NotOKCounter;
-  WORD  LocationId;
-  WORD  Device;
-  WORD  RouteNumber;
-  WORD  JourneyRun;
-  WORD  VehicleId;
-  
-  BYTE  ContractPointer;
-  
+	BOOL  _NotOKCounter : 1;
+	BOOL  _LocationId : 1;
+	BOOL  _Device : 1;
+	BOOL  _RouteNumber : 1;
+	BOOL  _JourneyRun : 1;
+	BOOL  _VehicleId : 1;
+
+	WORD  EventDate;
+	WORD  EventTime;
+	BYTE  Code;
+	BYTE  ServiceProvider;
+	BYTE  NotOKCounter;
+	WORD  LocationId;
+	WORD  Device;
+	WORD  RouteNumber;
+	WORD  JourneyRun;
+	WORD  VehicleId;
+
+	BYTE  ContractPointer;
+
 } CALYPSO_EVENT_ST;
 
 typedef struct
 {
-  BYTE  ShortId;
-  BYTE  Type;
-  BYTE  SubType;
-  BYTE  RecSize;
-  BYTE  NumRec;
-  DWORD AC;
-  DWORD NKey;
-  BYTE  Status;
-  BYTE  KVC[3];
+	BYTE  ShortId;
+	BYTE  Type;
+	BYTE  SubType;
+	BYTE  RecSize;
+	BYTE  NumRec;
+	DWORD AC;
+	DWORD NKey;
+	BYTE  Status;
+	BYTE  KVC[3];
 
 } FILE_INFO_ST;
 
@@ -133,33 +133,33 @@ typedef struct
 
 typedef struct
 {
-  BOOL   _IsReload;
-  BOOL   _IsDebit;
-  BOOL   _HasSerialNumber;
+	BOOL   _IsReload;
+	BOOL   _IsDebit;
+	BOOL   _HasSerialNumber;
 
-  signed long CurrentBalance;
-  BYTE   CurrentKVC;
+	signed long CurrentBalance;
+	BYTE   CurrentKVC;
 
-  struct
-  {
-    WORD   Date;
-    WORD   Time;
+	struct
+	{
+		WORD   Date;
+		WORD   Time;
 
-    signed long Amount;
-    signed long Balance;
+		signed long Amount;
+		signed long Balance;
 
-    BYTE   KVC;
-    BYTE   SamId[4];
+		BYTE   KVC;
+		BYTE   SamId[4];
 
-  } ReloadOrDebit;
+	} ReloadOrDebit;
 
-  struct
-  {
-    BYTE Free1;
-    BYTE Free2;
-  } Reload;
+	struct
+	{
+		BYTE Free1;
+		BYTE Free2;
+	} Reload;
 
-  BYTE   SerialNumber[8];
+	BYTE   SerialNumber[8];
 
 } CALYPSO_STOREDVALUE_ST;
 

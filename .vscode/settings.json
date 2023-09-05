@@ -1,0 +1,9 @@
+{
+	"files.associations": {
+		"calypso_api_i.h": "c",
+		"binconvert.h": "c",
+		"sprox_api_i.h": "c",
+		"calypso_api.h": "c",
+		"tchar.h": "c"
+	}
+}

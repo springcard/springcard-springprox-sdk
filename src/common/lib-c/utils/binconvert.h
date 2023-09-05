@@ -1,9 +1,9 @@
 #ifndef __BINCONVERT_H__
 #define __BINCONVERT_H__
 
-char *btoh(char *s, BYTE b);
-char *wtoh(char *s, WORD w);
-char *dwtoh(char *s, DWORD dw);
+char* btoh(char* s, BYTE b);
+char* wtoh(char* s, WORD w);
+char* dwtoh(char* s, DWORD dw);
 
 BOOL ishexq(const char q);
 BOOL ishexb(const char s[2]);
@@ -16,9 +16,10 @@ BYTE  htob(const char s[2]);
 WORD  htow(const char s[4]);
 DWORD htodw(const char s[8]);
 
-WORD  hstob(const char *str, BYTE *data, WORD size);
+WORD  hstob(const char* str, BYTE* data, WORD size);
 
 void atoh(char* s, const BYTE* data, WORD len);
+WORD htoa(const char* str, BYTE* data, WORD size);
 
 BYTE  bcdtob(BYTE b);
 WORD  bcdtow(WORD w);

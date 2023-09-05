@@ -19,23 +19,30 @@
  **/
 #include "../calypso_api_i.h"
 
-CALYPSO_LIB void CALYPSO_API CalypsoGetVersion(char *version, CALYPSO_SZ versionsize)
+CALYPSO_LIB void CALYPSO_API CalypsoGetVersion(char* version, CALYPSO_SZ versionsize)
 {
-  const char s[] = "SpringCard 'VOJJ' library for Calypso v" CALYPSO_API_VERSION;
-  CALYPSO_SZ i;
+	const char s[] = "SpringCard 'VOJJ' library for Calypso v" CALYPSO_API_VERSION;
+	CALYPSO_SZ i;
 
-  if (version != NULL)
-  {
-    for (i=0; i<sizeof(s); i++)
-    {
-      if (i >= (versionsize - 1))
-      {
-        version[i] = '\0';
-        break;
-      }
-      version[i] = s[i];
-    }
-  }
+	if (version != NULL)
+	{
+		for (i = 0; i < sizeof(s); i++)
+		{
+			if (i >= (versionsize - 1))
+			{
+				version[i] = '\0';
+				break;
+			}
+			version[i] = s[i];
+		}
+	}
+}
+
+CALYPSO_PROC CalypsoCardActivateHex(CALYPSO_CTX_ST* ctx, const char* aid)
+{
+	BYTE buffer[64];
+	WORD length = htoa(aid, buffer, sizeof(buffer));
+	return CalypsoCardActivate(ctx, buffer, length);
 }
 
 /**f* CSB6_Calypso/CalypsoCardActivate
@@ -61,156 +68,157 @@ CALYPSO_LIB void CALYPSO_API CalypsoGetVersion(char *version, CALYPSO_SZ version
  *   If AID is not provided (NULL), the default AID "1TIC.ICA" is used.
  *
  **/
-CALYPSO_PROC CalypsoCardActivate(CALYPSO_CTX_ST *ctx, const BYTE aid[], CALYPSO_SZ aidsize)
+CALYPSO_PROC CalypsoCardActivate(CALYPSO_CTX_ST* ctx, const BYTE aid[], CALYPSO_SZ aidsize)
 {
-  CALYPSO_RC rc;
+	CALYPSO_RC rc;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;  
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
-  memset(&ctx->CardApplication, 0, sizeof(ctx->CardApplication));
+	memset(&ctx->CardApplication, 0, sizeof(ctx->CardApplication));
 
-  /* Select the Ticketing application. May fail (old cards don't have it) */
-  rc = CalypsoCardSelectApplication(ctx, aid, aidsize, NULL, NULL);
-  CalypsoTraceRC(TR_TRACE|TR_CARD, "- CardSelectApplication ->", rc);
-  if (rc & CALYPSO_ERR_FATAL_) return rc;
-  
-  if (rc == 0)
-  {
-    /* Parse the FCI returned by the Ticketing application */
-    rc = CalypsoParseFci(ctx, NULL, 0);
-    CalypsoTraceRC(TR_TRACE|TR_CARD, "- ParseFci ->", rc);
-    if (rc) return rc;
-  } else
-  {
-    /* Parse the ATR instead */
+	/* Select the Ticketing application. May fail (old cards don't have it) */
+	rc = CalypsoCardSelectApplication(ctx, aid, aidsize, NULL, NULL);
+	CalypsoTraceRC(TR_TRACE | TR_CARD, "- CardSelectApplication ->", rc);
+	if (rc & CALYPSO_ERR_FATAL_) return rc;
+
+	if (rc == 0)
+	{
+		/* Parse the FCI returned by the Ticketing application */
+		rc = CalypsoParseFci(ctx, NULL, 0);
+		CalypsoTraceRC(TR_TRACE | TR_CARD, "- ParseFci ->", rc);
+		if (rc) return rc;
+	}
+	else
+	{
+		/* Parse the ATR instead */
 #ifdef CALYPSO_HOST
-    if (!ctx->Card.AtrLen)
-    {
-      /* Get ATR as returned by the reader */
-      CALYPSO_RC atr_rc = CalypsoCardGetAtr(ctx, NULL, NULL);
-      CalypsoTraceRC(TR_TRACE|TR_CARD, "- CardGetAtr ->", atr_rc);
-      if (atr_rc & CALYPSO_ERR_FATAL_) return rc;
-    }
+		if (!ctx->Card.AtrLen)
+		{
+			/* Get ATR as returned by the reader */
+			CALYPSO_RC atr_rc = CalypsoCardGetAtr(ctx, NULL, NULL);
+			CalypsoTraceRC(TR_TRACE | TR_CARD, "- CardGetAtr ->", atr_rc);
+			if (atr_rc & CALYPSO_ERR_FATAL_) return rc;
+		}
 #endif
 
-    rc = CalypsoParseCardAtr(ctx, NULL, 0);
-    CalypsoTraceRC(TR_TRACE|TR_CARD, "- ParseCardAtr ->", rc);
+		rc = CalypsoParseCardAtr(ctx, NULL, 0);
+		CalypsoTraceRC(TR_TRACE | TR_CARD, "- ParseCardAtr ->", rc);
 
 #ifdef CALYPSO_HOST
-    if ((rc == CALYPSO_ERR_ATR_INVALID) || (rc == CALYPSO_ERR_STATUS_WORD))
-    {
-      /* Ask the reader the real ATR (if reader is compliant with this specific command...) */
-      CALYPSO_SZ recv_len, send_len;
+		if ((rc == CALYPSO_ERR_ATR_INVALID) || (rc == CALYPSO_ERR_STATUS_WORD))
+		{
+			/* Ask the reader the real ATR (if reader is compliant with this specific command...) */
+			CALYPSO_SZ recv_len, send_len;
 
-      send_len = 0;
-      ctx->Card.Buffer[send_len++] = 0xFF; /* Embedded APDU interpreter CLA */
-      ctx->Card.Buffer[send_len++] = 0xCA; /* Get Data */
-      ctx->Card.Buffer[send_len++] = 0xFA; /* ATR */
-      ctx->Card.Buffer[send_len++] = 0x01; /* Actual Calypso ATR, no a computed one */
-      ctx->Card.Buffer[send_len++] = 0x00;
+			send_len = 0;
+			ctx->Card.Buffer[send_len++] = 0xFF; /* Embedded APDU interpreter CLA */
+			ctx->Card.Buffer[send_len++] = 0xCA; /* Get Data */
+			ctx->Card.Buffer[send_len++] = 0xFA; /* ATR */
+			ctx->Card.Buffer[send_len++] = 0x01; /* Actual Calypso ATR, no a computed one */
+			ctx->Card.Buffer[send_len++] = 0x00;
 
-      recv_len = sizeof(ctx->Card.Buffer);
-      if ((CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len) == CALYPSO_SUCCESS)
-       && (recv_len > 2) && (ctx->Card.Buffer[recv_len-2] == 0x90) && (ctx->Card.Buffer[recv_len-1] == 0x00))
-      {
-        /* Everything is OK */
-        ctx->Card.AtrLen = recv_len-2;
-        if (ctx->Card.AtrLen > sizeof(ctx->Card.Atr))
-          ctx->Card.AtrLen = sizeof(ctx->Card.Atr);
-        memcpy(ctx->Card.Atr, ctx->Card.Buffer, ctx->Card.AtrLen);
+			recv_len = sizeof(ctx->Card.Buffer);
+			if ((CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len) == CALYPSO_SUCCESS)
+				&& (recv_len > 2) && (ctx->Card.Buffer[recv_len - 2] == 0x90) && (ctx->Card.Buffer[recv_len - 1] == 0x00))
+			{
+				/* Everything is OK */
+				ctx->Card.AtrLen = recv_len - 2;
+				if (ctx->Card.AtrLen > sizeof(ctx->Card.Atr))
+					ctx->Card.AtrLen = sizeof(ctx->Card.Atr);
+				memcpy(ctx->Card.Atr, ctx->Card.Buffer, ctx->Card.AtrLen);
 
-        CalypsoTraceHex(TR_TRACE|TR_CARD, "- New ATR =", ctx->Card.Atr, ctx->Card.AtrLen);
+				CalypsoTraceHex(TR_TRACE | TR_CARD, "- New ATR =", ctx->Card.Atr, ctx->Card.AtrLen);
 
-        rc = CalypsoParseCardAtr(ctx, NULL, 0);
-        CalypsoTraceRC(TR_TRACE|TR_CARD, "- ParseCardAtr ->", rc);
-      }
-    }
+				rc = CalypsoParseCardAtr(ctx, NULL, 0);
+				CalypsoTraceRC(TR_TRACE | TR_CARD, "- ParseCardAtr ->", rc);
+			}
+		}
 #endif
 
-    if (!ctx->CardApplication.Revision)
-    {
-      /* At least try to select the Transport DF */
-      CALYPSO_SZ recv_len;
-      recv_len = sizeof(ctx->Card.Buffer);
-      rc = CalypsoCardSelectDF(ctx, 0x2000, ctx->Card.Buffer, &recv_len);
-      if (rc & CALYPSO_ERR_FATAL_) return rc;
-      if (rc == 0)
-      {
-        /* Success */
+		if (!ctx->CardApplication.Revision)
+		{
+			/* At least try to select the Transport DF */
+			CALYPSO_SZ recv_len;
+			recv_len = sizeof(ctx->Card.Buffer);
+			rc = CalypsoCardSelectDF(ctx, 0x2000, ctx->Card.Buffer, &recv_len);
+			if (rc & CALYPSO_ERR_FATAL_) return rc;
+			if (rc == 0)
+			{
+				/* Success */
 
-        CalypsoTraceHex(TR_TRACE|TR_CARD, "- Transport DF ", ctx->Card.Buffer, recv_len);
-        ctx->CardApplication.Revision = 1;
-      }
-    }
+				CalypsoTraceHex(TR_TRACE | TR_CARD, "- Transport DF ", ctx->Card.Buffer, recv_len);
+				ctx->CardApplication.Revision = 1;
+			}
+		}
 
-  }
+	}
 
-  if (!ctx->CardApplication.Revision)
-  {
-    CalypsoTraceStr(TR_TRACE|TR_CARD, "Unsupported Card");
-    rc = CALYPSO_CARD_NOT_SUPPORTED;
-  }
+	if (!ctx->CardApplication.Revision)
+	{
+		CalypsoTraceStr(TR_TRACE | TR_CARD, "Unsupported Card");
+		rc = CALYPSO_CARD_NOT_SUPPORTED;
+	}
 
-  return rc;
+	return rc;
 }
 
-CALYPSO_RC CalypsoCardSerialNumber(CALYPSO_CTX_ST *ctx, BYTE card_uid[8])
+CALYPSO_RC CalypsoCardSerialNumber(CALYPSO_CTX_ST* ctx, BYTE card_uid[8])
 {
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
-  if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
 
-  if (card_uid != NULL)
-    memcpy(card_uid, ctx->CardApplication.UID, 8);
+	if (card_uid != NULL)
+		memcpy(card_uid, ctx->CardApplication.UID, 8);
 
-  return 0;
+	return 0;
 }
 
 CALYPSO_PROC CalypsoCardStartupInfo(P_CALYPSO_CTX ctx, BYTE info[7])
 {
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
-  if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
 
-  if (info != NULL)
-    memcpy(info, ctx->CardApplication.StartupInfo, 7);
+	if (info != NULL)
+		memcpy(info, ctx->CardApplication.StartupInfo, 7);
 
-  return 0;
+	return 0;
 }
 
-CALYPSO_RC CalypsoCardRevision(CALYPSO_CTX_ST *ctx)
+CALYPSO_RC CalypsoCardRevision(CALYPSO_CTX_ST* ctx)
 {
-  if (ctx == NULL) return 0;
-  return ctx->CardApplication.Revision;  
+	if (ctx == NULL) return 0;
+	return ctx->CardApplication.Revision;
 }
 
-CALYPSO_RC CalypsoCardDFName(CALYPSO_CTX_ST *ctx, BYTE name[], CALYPSO_SZ *namesize)
+CALYPSO_RC CalypsoCardDFName(CALYPSO_CTX_ST* ctx, BYTE name[], CALYPSO_SZ* namesize)
 {
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
-  if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
 
-  if ((namesize != NULL) && (*namesize != 0) && (*namesize < ctx->CardApplication.DFNameLen))
-  {
-    *namesize = ctx->CardApplication.DFNameLen;
-    return CALYPSO_ERR_BUFFER_TOO_SHORT;
-  }
+	if ((namesize != NULL) && (*namesize != 0) && (*namesize < ctx->CardApplication.DFNameLen))
+	{
+		*namesize = ctx->CardApplication.DFNameLen;
+		return CALYPSO_ERR_BUFFER_TOO_SHORT;
+	}
 
-  if (namesize != NULL)
-    *namesize = ctx->CardApplication.DFNameLen;
-  if (name != NULL)
-    memcpy(name, ctx->CardApplication.DFName, ctx->CardApplication.DFNameLen);
+	if (namesize != NULL)
+		*namesize = ctx->CardApplication.DFNameLen;
+	if (name != NULL)
+		memcpy(name, ctx->CardApplication.DFName, ctx->CardApplication.DFNameLen);
 
-  return 0;
+	return 0;
 }
 
-CALYPSO_RC CalypsoCardSessionModifs(CALYPSO_CTX_ST *ctx)
+CALYPSO_RC CalypsoCardSessionModifs(CALYPSO_CTX_ST* ctx)
 {
-  if (ctx == NULL) return 0;
-  return ctx->CardApplication.SessionCurMods;  
+	if (ctx == NULL) return 0;
+	return ctx->CardApplication.SessionCurMods;
 }
 
-CALYPSO_RC CalypsoCardSessionModifsMax(CALYPSO_CTX_ST *ctx)
+CALYPSO_RC CalypsoCardSessionModifsMax(CALYPSO_CTX_ST* ctx)
 {
-  if (ctx == NULL) return 0;
-  return ctx->CardApplication.SessionMaxMods;  
+	if (ctx == NULL) return 0;
+	return ctx->CardApplication.SessionMaxMods;
 }
 
 

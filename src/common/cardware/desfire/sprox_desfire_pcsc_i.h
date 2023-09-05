@@ -3,9 +3,9 @@
 
 typedef struct
 {
-  BOOL                  bInited;
-  SCARDHANDLE           hCard;
-  SPROX_DESFIRE_CTX_ST *desfire_ctx;
+	BOOL                  bInited;
+	SCARDHANDLE           hCard;
+	SPROX_DESFIRE_CTX_ST* desfire_ctx;
 
 } INSTANCE_ST;
 

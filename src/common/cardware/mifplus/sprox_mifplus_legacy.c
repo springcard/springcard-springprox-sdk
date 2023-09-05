@@ -16,7 +16,7 @@
 #ifndef _USE_PCSC
 
 #ifndef SPROX_API_REENTRANT 
-	SPROX_MIFPLUS_CTX_ST mifplus_ctx = { 0 };
+SPROX_MIFPLUS_CTX_ST mifplus_ctx = { 0 };
 #endif
 
 /**f* MifPlusAPI/[Legacy]SelectCid
@@ -38,18 +38,18 @@
  *
  *   [[pcsc_mifplus.dll]]
  *   Not applicable.
- * 
+ *
  * INPUTS
  *   BYTE cid        : logical number of the addressed Mifare Plus card
  *
  **/
 SPROX_API_FUNC(MifPlus_SelectCid) (SPROX_PARAM  BYTE cid)
 {
-  SPROX_MIFPLUS_GET_CTX();
+	SPROX_MIFPLUS_GET_CTX();
 
-  ctx->cid = cid;
+	ctx->cid = cid;
 
-  return MFP_SUCCESS;
+	return MFP_SUCCESS;
 }
 
 /**f* MifPlusAPI/[Legacy]SelectCard
@@ -76,7 +76,7 @@ SPROX_API_FUNC(MifPlus_SelectCid) (SPROX_PARAM  BYTE cid)
  *
  *   [[pcsc_mifplus.dll]]
  *   Not applicable.
- * 
+ *
  * INPUTS
  *   BYTE sak         : ISO 14443-3 A Select AKnowledge
  *   const BYTE ats[] : ISO 14443-4 A Answer To Select
@@ -85,90 +85,95 @@ SPROX_API_FUNC(MifPlus_SelectCid) (SPROX_PARAM  BYTE cid)
  **/
 SPROX_API_FUNC(MifPlus_SelectCard) (SPROX_PARAM  BYTE sak, const BYTE ats[], BYTE ats_len)
 {
-  SPROX_MIFPLUS_GET_CTX();
-  
-  if (ats == NULL)
-    return MFP_LIB_CALL_ERROR;
-    
-  /* As the ATS is supplied, guess the card runs in T=CL */
-  ctx->tcl = TRUE;
-  
-  if (sak == MFP_SAK_LEVEL_0_3)
+	(void)ats_len;
+	SPROX_MIFPLUS_GET_CTX();
+
+	if (ats == NULL)
+		return MFP_LIB_CALL_ERROR;
+
+	/* As the ATS is supplied, guess the card runs in T=CL */
+	ctx->tcl = TRUE;
+
+	if (sak == MFP_SAK_LEVEL_0_3)
 	{
-    /* Level 0 or level 3 ? call a Level 3 function to make the difference */
+		/* Level 0 or level 3 ? call a Level 3 function to make the difference */
 		SPROX_RC rc = SPROX_API_CALL(MifPlus_DeselectVirtualCard) (SPROX_PARAM_PV);
-  
+
 		switch (rc)
 		{
-		  case MFP_SUCCESS : ctx->level = 3; break;
-		  case MFP_ERROR-MFP_ERR_CONDITION_OF_USE : ctx->level = 0; break;
-		  default : return MFP_LIB_UNKNOWN_CARD_LEVEL;
+		case MFP_SUCCESS: ctx->level = 3; break;
+		case MFP_ERROR - MFP_ERR_CONDITION_OF_USE: ctx->level = 0; break;
+		default: return MFP_LIB_UNKNOWN_CARD_LEVEL;
 		}
 
-	} else
-	if ((sak | 0x10) == MFP_SAK_LEVEL_1)
-	{
-	  /* Level 1 */
-		ctx->level = 1;
-
-	} else
-	if ((sak | 0x10) == MFP_SAK_LEVEL_2)
-	{
-	  /* Level 2 */
-		ctx->level = 2;
-
-	} else
-	{
-	  return MFP_LIB_UNKNOWN_CARD_LEVEL;
 	}
-	
+	else
+		if ((sak | 0x10) == MFP_SAK_LEVEL_1)
+		{
+			/* Level 1 */
+			ctx->level = 1;
+
+		}
+		else
+			if ((sak | 0x10) == MFP_SAK_LEVEL_2)
+			{
+				/* Level 2 */
+				ctx->level = 2;
+
+			}
+			else
+			{
+				return MFP_LIB_UNKNOWN_CARD_LEVEL;
+			}
+
 	return MFP_SUCCESS;
 }
 
 
-SPROX_API_FUNC(MifPlus_Command) (SPROX_PARAM  const BYTE cmd_buffer[], WORD cmd_len, BYTE rsp_buffer[], WORD rsp_max_len, WORD *rsp_got_len)
-{  
-  SPROX_RC status;
-  WORD rlen = rsp_max_len;
-  SPROX_MIFPLUS_GET_CTX();
-  
-#ifdef MIFPLUS_DEBUG
-  {
-    WORD i;
-    printf("MifPlus < ");
-    for (i=0; i<cmd_len; i++)
-      printf("%02X", cmd_buffer[i]);
-    printf("\n");
-  }
-#endif
-  
-  if (ctx->tcl)
-  {
-    status = SPROX_API_CALL(Tcl_Exchange) (SPROX_PARAM_P  ctx->cid, cmd_buffer, cmd_len, rsp_buffer, &rlen);
-  } else
-  {
-    rlen += 2;
-    status = SPROX_API_CALL(A_Exchange) (SPROX_PARAM_P  cmd_buffer, (WORD) (cmd_len+2), rsp_buffer, &rlen, TRUE, 1024);
-    if (rlen > 2) rlen -=2;
-  }
+SPROX_API_FUNC(MifPlus_Command) (SPROX_PARAM  const BYTE cmd_buffer[], WORD cmd_len, BYTE rsp_buffer[], WORD rsp_max_len, WORD* rsp_got_len)
+{
+	SPROX_RC status;
+	WORD rlen = rsp_max_len;
+	SPROX_MIFPLUS_GET_CTX();
 
 #ifdef MIFPLUS_DEBUG
-  {
-    WORD i;
-    printf("MifPlus > ");
-    for (i=0; i<rlen; i++)
-      printf("%02X", rsp_buffer[i]);
-    printf("\n");
-  }
+	{
+		WORD i;
+		printf("MifPlus < ");
+		for (i = 0; i < cmd_len; i++)
+			printf("%02X", cmd_buffer[i]);
+		printf("\n");
+	}
 #endif
-  
+
+	if (ctx->tcl)
+	{
+		status = SPROX_API_CALL(Tcl_Exchange) (SPROX_PARAM_P  ctx->cid, cmd_buffer, cmd_len, rsp_buffer, &rlen);
+	}
+	else
+	{
+		rlen += 2;
+		status = SPROX_API_CALL(A_Exchange) (SPROX_PARAM_P  cmd_buffer, (WORD)(cmd_len + 2), rsp_buffer, &rlen, TRUE, 1024);
+		if (rlen > 2) rlen -= 2;
+	}
+
+#ifdef MIFPLUS_DEBUG
+	{
+		WORD i;
+		printf("MifPlus > ");
+		for (i = 0; i < rlen; i++)
+			printf("%02X", rsp_buffer[i]);
+		printf("\n");
+	}
+#endif
+
 	if (status != MFP_SUCCESS)
-	  return status;
-	  
-	if (rsp_got_len != NULL)
-	  *rsp_got_len = rlen;
+		return status;
 
-  return status;
+	if (rsp_got_len != NULL)
+		*rsp_got_len = rlen;
+
+	return status;
 }
 
 #endif

@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	rc = SPROX_GetLibraryA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_GetLibrary(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("Failed to get API version\n");
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 	/* Open the reader */
 	/* --------------- */
 
-	rc = SPROX_ReaderOpenA(szCommDevice);
+	rc = SPROX_ReaderOpen(szCommDevice);
 	if (rc != MI_OK)
 	{
 		printf("Reader not found\n");
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
 	/* Display reader's information */
 	printf("Reader found\n");
-	rc = SPROX_ReaderGetDeviceA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetDevice(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("SPROX_ReaderGetDevice err. %d\n", rc);
@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 	}
 	printf("Reader found on %s\n", s_buffer);
 
-	rc = SPROX_ReaderGetFirmwareA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetFirmware(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("SPROX_ReaderGetFirmware err. %d\n", rc);
@@ -112,13 +112,13 @@ int main(int argc, char** argv)
 	printf("\tRS-485 driver wired                     : %s\n", (features & SPROX_WITH_RS485_DRIVER) ? yes : no);
 	printf("\t115200bps supported                     : %s\n", (features & SPROX_WITH_BAUDRATE_115200) ? yes : no);
 	printf("\tSeparated RX/TX buffers                 : %s\n", (features & SPROX_WITH_DUAL_BUFFERS) ? yes : no);
-	printf("\tJumbo RX / TX buffers                   : % s\n", (features & SPROX_WITH_XXL_BUFFERS) ? yes : no);
+	printf("\tJumbo RX / TX buffers                   : %s\n", (features & SPROX_WITH_XXL_BUFFERS) ? yes : no);
 	printf("\tUSB CDC-ACM (virtul serial) profile     : %s\n", (features & SPROX_WITH_USB_VCP) ? yes : no);
 	printf("\tUSB CCID (PC/SC) profile                : %s\n", (features & SPROX_WITH_USB_CCID) ? yes : no);
 	printf("\tUSB HID Keyboard (RFID Scanner) profile : %s\n", (features & SPROX_WITH_USB_HID) ? yes : no);
-	printf("\tConfiguration memory (\"FEED\")           : % s\n", (features & SPROX_WITH_FEED) ? yes : no);
-	printf("\tStorage memory                          : % s\n", (features & SPROX_WITH_STORAGE) ? yes : no);
-	printf("\tShell (\"human console\")                 : % s\n", (features & SPROX_WITH_HUMAN_CONSOLE) ? yes : no);
+	printf("\tConfiguration memory (\"FEED\")           : %s\n", (features & SPROX_WITH_FEED) ? yes : no);
+	printf("\tStorage memory                          : %s\n", (features & SPROX_WITH_STORAGE) ? yes : no);
+	printf("\tShell (\"human console\")                 : %s\n", (features & SPROX_WITH_HUMAN_CONSOLE) ? yes : no);
 	printf("\n");
 
 close:

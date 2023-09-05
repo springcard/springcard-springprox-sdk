@@ -50,7 +50,6 @@ int main(int argc, char** argv)
 	BYTE info_len = sizeof(info);
 
 	WORD got_proto;
-	BOOL verbose = FALSE;
 
 	/* Display the informations and check the command line */
 	/* --------------------------------------------------- */

@@ -15,7 +15,7 @@
  * AUTHOR
  *   Johann.D / SpringCard
  *
- * HISTORY  
+ * HISTORY
  *   JDA 15/02/2003 : [1.00]
  *                    creation from CSB3 tree
  *   JDA 16/05/2003 : [1.01]
@@ -129,7 +129,7 @@
  *   JDA 29/09/2014 : [version 1.80]
  *                    version fully validated over K663
  *   JDA 28/04/2017 : [version 1.81]
- *                    added SPROX_Iso15693_Extended... and related 
+ *                    added SPROX_Iso15693_Extended... and related
  *                    new protocol: PicoTag 15693 (new iClass)
  *   JDA 18/05/2017 : SPROX_Iso15693_Halt was missing
  *   JDA 05/04/2018 : [version 1.90]
@@ -145,19 +145,19 @@
 #define SPRINGPROX_H
 
 #if (defined(UNDER_CE) || defined(_WIN32_WCE))
-  /* WinCE is only a subset of Win32 */
-  #ifndef WIN32
-    #define WIN32
-  #endif
-  #ifndef WINCE
-    #define WINCE
-  #endif
+ /* WinCE is only a subset of Win32 */
+#ifndef WIN32
+#define WIN32
+#endif
+#ifndef WINCE
+#define WINCE
+#endif
 #endif
 
 #if (defined (_WIN32))
-  #ifndef WIN32
-    #define WIN32
-  #endif
+#ifndef WIN32
+#define WIN32
+#endif
 #endif
 
 #ifdef WIN32
@@ -165,75 +165,75 @@
   /* Win32 code */
   /* ---------- */
 
-  #include <windows.h>
-  #include <tchar.h>
+#include <windows.h>
+#include <tchar.h>
 
-  typedef signed char  SBYTE;
-  typedef signed short SWORD;
-  typedef signed long  SDWORD;
+typedef signed char  SBYTE;
+typedef signed short SWORD;
+typedef signed long  SDWORD;
 
-  #ifndef SPRINGPROX_LIB
-    /* We are to link to the DLL */
-    #define SPRINGPROX_LIB __declspec( dllimport )
-  #endif
+#ifndef SPRINGPROX_LIB
+/* We are to link to the DLL */
+#define SPRINGPROX_LIB __declspec( dllimport )
+#endif
 
-  #if (defined(WINCE))
-    /* Under Windows CE we use the stdcall calling convention */
-    #define SPRINGPROX_API __stdcall
-  #else  
-    #if (defined(FORCE_STDCALL))
-      /* stdcall is forced */
-      #define SPRINGPROX_API __stdcall
-    #else
-      /* cdecl is the default calling convention */
-      #define SPRINGPROX_API __cdecl
-    #endif
-  #endif
+#if (defined(WINCE))
+  /* Under Windows CE we use the stdcall calling convention */
+#define SPRINGPROX_API __stdcall
+#else  
+#if (defined(FORCE_STDCALL))
+  /* stdcall is forced */
+#define SPRINGPROX_API __stdcall
+#else
+  /* cdecl is the default calling convention */
+#define SPRINGPROX_API __cdecl
+#endif
+#endif
 
 #else
 
   /* Not Win32 */
   /* --------- */
-  
+
   /* Linkage directive : not specified, use compiler default */
-  #define SPRINGPROX_API
-  
-  /* Calling convention : not specified, use compiler default */
-  #define SPRINGPROX_LIB
-  
-  #include <stdint.h>
-  #include <stddef.h>
-  
-  #ifndef HAS_LIB_C_TYPES
+#define SPRINGPROX_API
 
-    typedef uint8_t  BOOL;
-    typedef uint8_t  BYTE;
-    typedef int8_t   SBYTE;
-    typedef uint16_t WORD;
-    typedef int16_t  SWORD;
-    typedef uint32_t DWORD;
-    typedef int32_t  SDWORD;
-    typedef signed long  LONG;
-    
-    #ifndef TRUE
-      #define TRUE 1
-    #endif
-    #ifndef FALSE
-      #define FALSE 0
-    #endif
-    
-    #ifdef HAVE_TCHAR_H
-      #include <tchar.h>
-    #else
-      #ifdef UNICODE
-        typedef wchar_t TCHAR;
-      #else
-        typedef char TCHAR;
-      #endif
-    #endif
+/* Calling convention : not specified, use compiler default */
+#define SPRINGPROX_LIB
 
-  #endif
-  
+#include <stdint.h>
+#include <stddef.h>
+
+#ifndef HAS_LIB_C_TYPES
+
+typedef uint8_t  BOOL;
+typedef uint8_t  BYTE;
+typedef int8_t   SBYTE;
+typedef uint16_t WORD;
+typedef int16_t  SWORD;
+typedef uint32_t DWORD;
+typedef int32_t  SDWORD;
+typedef signed long  LONG;
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifdef HAVE_TCHAR_H
+#include <tchar.h>
+#else
+#ifdef UNICODE
+typedef wchar_t TCHAR;
+#else
+typedef char TCHAR;
+#endif
+#endif
+
+#endif
+
 #endif
 
 
@@ -243,75 +243,75 @@ extern  "C"
 {
 #endif
 
-/* Library identification */
-/* ---------------------- */
+	/* Library identification */
+	/* ---------------------- */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_GetLibrary(TCHAR library[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_GetLibraryW(wchar_t library[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_GetLibraryA(char library[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_GetLibrary(TCHAR library[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_GetLibraryW(wchar_t library[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_GetLibraryA(char library[], WORD len);
 
-/* Return code to error message translation */
-/* ---------------------------------------- */
-SPRINGPROX_LIB const TCHAR   *SPRINGPROX_API SPROX_GetErrorMessage(SWORD status);
-SPRINGPROX_LIB const wchar_t *SPRINGPROX_API SPROX_GetErrorMessageW(SWORD status);
-SPRINGPROX_LIB const char    *SPRINGPROX_API SPROX_GetErrorMessageA(SWORD status);
+	/* Return code to error message translation */
+	/* ---------------------------------------- */
+	SPRINGPROX_LIB const TCHAR* SPRINGPROX_API SPROX_GetErrorMessage(SWORD status);
+	SPRINGPROX_LIB const wchar_t* SPRINGPROX_API SPROX_GetErrorMessageW(SWORD status);
+	SPRINGPROX_LIB const char* SPRINGPROX_API SPROX_GetErrorMessageA(SWORD status);
 
-SPRINGPROX_LIB void  SPRINGPROX_API SPROX_SetVerbose(BYTE level, const TCHAR *filename);
+	SPRINGPROX_LIB void  SPRINGPROX_API SPROX_SetVerbose(BYTE level, const TCHAR* filename);
 
-/* Reader access functions */
-/* ----------------------- */
+	/* Reader access functions */
+	/* ----------------------- */
 
-/* Open the reader (this library is not reentrant, we work with one reader at a time   */
-/* Set device to the communication port name ("COM1", "USB", "/dev/ttyS2" ...) or NULL */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderOpen(const TCHAR device[]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderOpenW(const wchar_t device[]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderOpenA(const char device[]);
+	/* Open the reader (this library is not reentrant, we work with one reader at a time   */
+	/* Set device to the communication port name ("COM1", "USB", "/dev/ttyS2" ...) or NULL */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderOpen(const TCHAR device[]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderOpenW(const wchar_t device[]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderOpenA(const char device[]);
 
-/* Close the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderClose(void);
+	/* Close the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderClose(void);
 
-/* Suspend the reader, without destroying the handle to access it */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderDeactivate(void);
+	/* Suspend the reader, without destroying the handle to access it */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderDeactivate(void);
 
-/* Resume the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderActivate(void);
+	/* Resume the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderActivate(void);
 
-/* Discover the reader on a previously opened communication port */
+	/* Discover the reader on a previously opened communication port */
 #ifdef WIN32
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderAttachSerial(HANDLE hComm);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderAttachUSB(HANDLE hComm);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderAttachSerial(HANDLE hComm);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderAttachUSB(HANDLE hComm);
 #endif
 
-/* Enumerate the compliant devices found on USB */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_EnumUSBDevices(DWORD idx, TCHAR device[64], TCHAR description[64]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_EnumUSBDevicesW(DWORD idx, wchar_t device[64], wchar_t description[64]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_EnumUSBDevicesA(DWORD idx, char device[64], char description[64]);
+	/* Enumerate the compliant devices found on USB */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_EnumUSBDevices(DWORD idx, TCHAR device[64], TCHAR description[64]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_EnumUSBDevicesW(DWORD idx, wchar_t device[64], wchar_t description[64]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_EnumUSBDevicesA(DWORD idx, char device[64], char description[64]);
 
-/* Select the address (RS-485 bus mode only) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSelectAddress(BYTE address);
+	/* Select the address (RS-485 bus mode only) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSelectAddress(BYTE address);
 
-/* Reader information functions */
-/* ---------------------------- */
+	/* Reader information functions */
+	/* ---------------------------- */
 
-/* Retrieve name of the communication port */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDevice(TCHAR device[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDeviceW(wchar_t device[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDeviceA(char device[], WORD len);
+	/* Retrieve name of the communication port */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDevice(TCHAR device[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDeviceW(wchar_t device[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDeviceA(char device[], WORD len);
 
-/* Retrieve reader's firmware (type - version) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFirmware(TCHAR firmware[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFirmwareW(wchar_t firmware[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFirmwareA(char firmware[], WORD len);
+	/* Retrieve reader's firmware (type - version) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFirmware(TCHAR firmware[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFirmwareW(wchar_t firmware[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFirmwareA(char firmware[], WORD len);
 
-/* Retrieve actual features of reader's firmware */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFeatures(DWORD *features);
+	/* Retrieve actual features of reader's firmware */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetFeatures(DWORD* features);
 
-/* Retrieve communication settings between host and reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDeviceSettings(DWORD *settings);
-/* Select communication settings between host and reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetDeviceSettings(DWORD settings);
+	/* Retrieve communication settings between host and reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetDeviceSettings(DWORD* settings);
+	/* Select communication settings between host and reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetDeviceSettings(DWORD settings);
 
-/* Bitmasks for SPROX_ReaderGetDeviceSettings and SPROX_ReaderSetDeviceSettings */
+	/* Bitmasks for SPROX_ReaderGetDeviceSettings and SPROX_ReaderSetDeviceSettings */
 #define SPROX_SETTINGS_PROTOCOL_MASK       0x00000003
 #define SPROX_SETTINGS_PROTOCOL_OSI        0x00000000
 #define SPROX_SETTINGS_PROTOCOL_ASCII      0x00000001
@@ -331,28 +331,28 @@ SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetDeviceSettings(DWORD settings
 #define SPROX_SETTINGS_FORCE_PROTOCOL      0x00000004
 
 /* Read configuration constants of the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetConsts(DWORD *consts);
-/* Write configuration constants of the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetConsts(DWORD consts);
-/* Read advanced configuration constants of the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetConstsEx(BYTE ident, BYTE consts[], WORD *length);
-/* Write advanced configuration constants of the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetConstsEx(BYTE ident, const BYTE consts[], WORD length);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetConsts(DWORD* consts);
+	/* Write configuration constants of the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetConsts(DWORD consts);
+	/* Read advanced configuration constants of the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetConstsEx(BYTE ident, BYTE consts[], WORD* length);
+	/* Write advanced configuration constants of the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderSetConstsEx(BYTE ident, const BYTE consts[], WORD length);
 
-/* Miscellaneous reader functions */
-/* ------------------------------ */
+	/* Miscellaneous reader functions */
+	/* ------------------------------ */
 
-/* Restart the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderRestart(void);
+	/* Restart the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderRestart(void);
 
-/* Reset the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderReset(void);
+	/* Reset the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderReset(void);
 
-/* Drive the LEDs */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLed(BYTE led_r, BYTE led_g);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLedY(BYTE led_r, BYTE led_g, BYTE led_y);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLeds(WORD leds);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLedsT(WORD leds, WORD ms);
+	/* Drive the LEDs */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLed(BYTE led_r, BYTE led_g);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLedY(BYTE led_r, BYTE led_g, BYTE led_y);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLeds(WORD leds);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLedsT(WORD leds, WORD ms);
 
 #define LED_OFF             0x00
 #define LED_ON              0x01
@@ -364,21 +364,21 @@ SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlLedsT(WORD leds, WORD ms);
 #define LED_BLINK_FAST_INV  0x07
 #define LED_BLINK_HEART_INV 0x08
 
-/* Drive the buzzer */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlBuzzer(WORD time_ms);
+	/* Drive the buzzer */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlBuzzer(WORD time_ms);
 
-/* Read the MODE pin */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlReadModeIO(BOOL *in_value);
+	/* Read the MODE pin */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlReadModeIO(BOOL* in_value);
 
-/* Read or write the USER pin */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlReadUserIO(BOOL *in_value);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlWriteUserIO(BOOL out_value);
+	/* Read or write the USER pin */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlReadUserIO(BOOL* in_value);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlWriteUserIO(BOOL out_value);
 
-/* Drive the RF field */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlRF(BYTE param);
+	/* Drive the RF field */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlRF(BYTE param);
 
-/* Configure the reader for ISO/IEC 14443-A or 14443-B or 15693 or ICODE1 operation */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_SetConfig(BYTE mode);
+	/* Configure the reader for ISO/IEC 14443-A or 14443-B or 15693 or ICODE1 operation */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_SetConfig(BYTE mode);
 #define CFG_MODE_ISO_14443_A          0x01
 #define CFG_MODE_ISO_14443_B          0x02
 #define CFG_MODE_ISO_14443_Bi         0x03
@@ -388,150 +388,150 @@ SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_SetConfig(BYTE mode);
 #define CFG_MODE_INSIDE_PICO_15693    0x13
 #define CFG_MODE_INSIDE_PICO CFG_MODE_INSIDE_PICO_14443
 
-/* Retrieve RF chipset's information (NXP RC type and serial number) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetRc500Id(BYTE micore_type[5], BYTE micore_snr[4]);
+	/* Retrieve RF chipset's information (NXP RC type and serial number) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReaderGetRc500Id(BYTE micore_type[5], BYTE micore_snr[4]);
 
-/* Send a raw control command to the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlEx(const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD *recv_bytelen);
+	/* Send a raw control command to the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ControlEx(const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD* recv_bytelen);
 
-/* Send a raw command to the reader, and receive its response */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Function(BYTE cmd, const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD *recv_bytelen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FunctionWaitResp(BYTE recv_buffer[], WORD *recv_bytelen, WORD timeout_s);
+	/* Send a raw command to the reader, and receive its response */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Function(BYTE cmd, const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD* recv_bytelen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FunctionWaitResp(BYTE recv_buffer[], WORD* recv_bytelen, WORD timeout_s);
 
-/* Test communication with the reader */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Echo(WORD len);
+	/* Test communication with the reader */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Echo(WORD len);
 
-/* Access to reader's non-volatile memory */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReadStorage(DWORD address, BYTE buffer[], WORD length);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_WriteStorage(DWORD address, const BYTE buffer[], WORD length);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StorageSize(DWORD *size);
+	/* Access to reader's non-volatile memory */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ReadStorage(DWORD address, BYTE buffer[], WORD length);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_WriteStorage(DWORD address, const BYTE buffer[], WORD length);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StorageSize(DWORD* size);
 
-/* Low level registry access */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_WriteRCRegister(BYTE reg, BYTE value);
+	/* Low level registry access */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_WriteRCRegister(BYTE reg, BYTE value);
 
-/* ISO/IEC 14443-A functions */
-/* ------------------------- */
-
-
-/* Layer 3 */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_Request(BYTE req_code, BYTE atq[2]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_RequestAny(BYTE atq[2]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_RequestIdle(BYTE atq[2]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_SelectAny(BYTE atq[2], BYTE snr[10], BYTE *snrlen, BYTE sak[1]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_SelectIdle(BYTE atq[2], BYTE snr[10], BYTE *snrlen, BYTE sak[1]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_SelectAgain(const BYTE snr[10], BYTE snrlen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_Halt(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_Exchange(const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD *recv_bytelen, BYTE append_crc, WORD timeout);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_ExchangeRaw(const BYTE send_buffer[], WORD send_bitslen, BYTE recv_buffer[], WORD *recv_bitslen, WORD timeout);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_ExchangeRawEx(BYTE param1, BYTE param2, const BYTE send_data[], WORD send_bitslen, BYTE recv_data[], WORD *recv_bitslen, WORD timeout);
-SPRINGPROX_LIB WORD SPRINGPROX_API  SPROX_ComputeIso14443ACrc(BYTE crc[2], const BYTE buffer[], WORD size);
+	/* ISO/IEC 14443-A functions */
+	/* ------------------------- */
 
 
-/* Layer 4 (T=CL) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_ActivateAny(BYTE atq[2], BYTE snr[10], BYTE *snrlen, BYTE sak[1]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_ActivateIdle(BYTE atq[2], BYTE snr[10], BYTE *snrlen, BYTE sak[1]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_ActivateAgain(const BYTE snr[10], BYTE snrlen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Halt(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Deselect(BYTE cid);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_GetAts(BYTE cid, BYTE ats[32], BYTE *atslen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Pps(BYTE cid, BYTE dsi, BYTE dri);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Exchange(BYTE fsci, BYTE cid, BYTE nad, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
+	/* Layer 3 */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_Request(BYTE req_code, BYTE atq[2]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_RequestAny(BYTE atq[2]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_RequestIdle(BYTE atq[2]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_SelectAny(BYTE atq[2], BYTE snr[], BYTE* snrlen, BYTE sak[1]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_SelectIdle(BYTE atq[2], BYTE snr[], BYTE* snrlen, BYTE sak[1]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_SelectAgain(const BYTE snr[], BYTE snrlen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_Halt(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_Exchange(const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD* recv_bytelen, BYTE append_crc, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_ExchangeRaw(const BYTE send_buffer[], WORD send_bitslen, BYTE recv_buffer[], WORD* recv_bitslen, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_A_ExchangeRawEx(BYTE param1, BYTE param2, const BYTE send_data[], WORD send_bitslen, BYTE recv_data[], WORD* recv_bitslen, WORD timeout);
+	SPRINGPROX_LIB WORD SPRINGPROX_API  SPROX_ComputeIso14443ACrc(BYTE crc[2], const BYTE buffer[], WORD size);
 
-/* ISO/IEC 14443-B functions */
-/* ------------------------- */
 
-/* Layer 3 */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_SelectAny(BYTE afi, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_SelectIdle(BYTE afi, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_AnticollAny(BYTE slots, BYTE afi, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_AnticollIdle(BYTE slots, BYTE afi, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_AnticollSlot(BYTE slot, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_Exchange(const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD *recv_bytelen, BYTE append_crc, WORD timeout);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_Halt(const BYTE pupi[4]);
-SPRINGPROX_LIB WORD SPRINGPROX_API  SPROX_ComputeIso14443BCrc(BYTE crc[2], const BYTE buffer[], WORD size);
+	/* Layer 4 (T=CL) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_ActivateAny(BYTE atq[2], BYTE snr[], BYTE* snrlen, BYTE sak[1]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_ActivateIdle(BYTE atq[2], BYTE snr[], BYTE* snrlen, BYTE sak[1]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_ActivateAgain(const BYTE snr[], BYTE snrlen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Halt(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Deselect(BYTE cid);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_GetAts(BYTE cid, BYTE ats[], BYTE* atslen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Pps(BYTE cid, BYTE dsi, BYTE dri);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclA_Exchange(BYTE fsci, BYTE cid, BYTE nad, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
 
-/* Layer 4 (T=CL) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_ActivateAny(BYTE afi, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_ActivateIdle(BYTE afi, BYTE atq[11]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Attrib(const BYTE atq[11], BYTE cid);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_AttribEx(const BYTE atq[11], BYTE cid, BYTE dsi, BYTE dri);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Deselect(BYTE cid);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Halt(const BYTE pupi[4]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Exchange(BYTE fsci, BYTE cid, BYTE nad, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
+	/* ISO/IEC 14443-B functions */
+	/* ------------------------- */
 
-/* ISO/IEC 14443 type independant functions */
-/* ------------------------------------------ */
+	/* Layer 3 */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_SelectAny(BYTE afi, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_SelectIdle(BYTE afi, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_AnticollAny(BYTE slots, BYTE afi, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_AnticollIdle(BYTE slots, BYTE afi, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_AnticollSlot(BYTE slot, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_Exchange(const BYTE send_buffer[], WORD send_bytelen, BYTE recv_buffer[], WORD* recv_bytelen, BYTE append_crc, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_B_Halt(const BYTE pupi[4]);
+	SPRINGPROX_LIB WORD SPRINGPROX_API  SPROX_ComputeIso14443BCrc(BYTE crc[2], const BYTE buffer[], WORD size);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Tcl_Exchange(BYTE cid, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Tcl_Deselect(BYTE cid);
+	/* Layer 4 (T=CL) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_ActivateAny(BYTE afi, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_ActivateIdle(BYTE afi, BYTE atq[11]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Attrib(const BYTE pupi[4], BYTE cid);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_AttribEx(const BYTE pupi[4], BYTE cid, BYTE dsi, BYTE dri);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Deselect(BYTE cid);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Halt(const BYTE pupi[4]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_TclB_Exchange(BYTE fsci, BYTE cid, BYTE nad, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
 
-/* B' (Innovatron) */
-/* --------------- */
+	/* ISO/IEC 14443 type independant functions */
+	/* ------------------------------------------ */
 
-/* Those function are only avalaible for Calypso-enabled readers */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Apgen(BYTE uid[4], BYTE atr[32], BYTE *atrlen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Attrib(BYTE uid[4]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Exchange(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Disc(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_SamFastSpeed(BYTE card_slot);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Tcl_Exchange(BYTE cid, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Tcl_Deselect(BYTE cid);
 
-/* ISO/IEC 15693 functions */
-/* ----------------------- */
+	/* B' (Innovatron) */
+	/* --------------- */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_SelectAny(BYTE afi, BYTE snr[8]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_SelectAgain(BYTE snr[8]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_Halt(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ReadSingleBlock(BYTE snr[8], BYTE addr, BYTE data[], WORD *datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteSingleBlock(BYTE snr[8], BYTE addr, const BYTE data[], WORD datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_LockBlock(BYTE snr[8], BYTE addr);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ReadMultipleBlocks(BYTE snr[8], BYTE addr, BYTE count, BYTE data[], WORD *datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteMultipleBlocks(BYTE snr[8], BYTE addr, BYTE count, const BYTE data[], WORD datalen);
-// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteAFI(BYTE snr[8], BYTE afi);
-// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_LockAFI(BYTE snr[8]);
-// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteDSFID(BYTE snr[8], BYTE afi);
-// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_LockDSFID(BYTE snr[8]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_GetSystemInformation(BYTE snr[8], BYTE data[], WORD *datalen);
-// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_GetMultipleBlockSecurityStatus(BYTE snr[8], BYTE addr, BYTE count, BYTE data[], WORD *datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedReadSingleBlock(BYTE snr[8], WORD addr, BYTE data[], WORD *datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedWriteSingleBlock(BYTE snr[8], WORD addr, const BYTE data[], WORD datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedLockBlock(BYTE snr[8], WORD addr);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedReadMultipleBlocks(BYTE snr[8], WORD addr, WORD count, BYTE data[], WORD *datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedWriteMultipleBlocks(BYTE snr[8], WORD addr, WORD count, const BYTE data[], WORD datalen);
-// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedGetMultipleBlockSecurityStatus(BYTE snr[8], WORD addr, WORD count, BYTE data[], WORD *datalen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_Exchange(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len, WORD timeout);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExchangeStdCommand(BOOL opt_flag, BYTE snr[8], BYTE cmd_opcode, const BYTE cmd_params[], WORD cmd_params_len, BYTE recv_buffer[], WORD *recv_len, WORD timeout);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExchangeCustomCommand(BOOL opt_flag, BYTE mfg_id, BYTE snr[8], BYTE cmd_opcode, const BYTE cmd_params[], WORD cmd_params_len, BYTE recv_buffer[], WORD *recv_len, WORD timeout);
+	/* Those function are only avalaible for Calypso-enabled readers */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Apgen(BYTE uid[4], BYTE atr[], BYTE* atrlen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Attrib(BYTE uid[4]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Exchange(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_Disc(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Bi_SamFastSpeed(BYTE card_slot);
 
-/* ICODE1 functions */
-/* ---------------- */
+	/* ISO/IEC 15693 functions */
+	/* ----------------------- */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ICode1_SelectAny(BYTE afi, BYTE snr[8]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ICode1_UnselectedRead(BYTE addr, BYTE count, BYTE data[], WORD *datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_SelectAny(BYTE afi, BYTE snr[8]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_SelectAgain(BYTE snr[8]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_Halt(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ReadSingleBlock(BYTE snr[8], BYTE addr, BYTE data[], WORD* datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteSingleBlock(BYTE snr[8], BYTE addr, const BYTE data[], WORD datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_LockBlock(BYTE snr[8], BYTE addr);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ReadMultipleBlocks(BYTE snr[8], BYTE addr, BYTE count, BYTE data[], WORD* datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteMultipleBlocks(BYTE snr[8], BYTE addr, BYTE count, const BYTE data[], WORD datalen);
+	// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteAFI(BYTE snr[8], BYTE afi);
+	// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_LockAFI(BYTE snr[8]);
+	// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_WriteDSFID(BYTE snr[8], BYTE afi);
+	// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_LockDSFID(BYTE snr[8]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_GetSystemInformation(BYTE snr[8], BYTE data[], WORD* datalen);
+	// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_GetMultipleBlockSecurityStatus(BYTE snr[8], BYTE addr, BYTE count, BYTE data[], WORD *datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedReadSingleBlock(BYTE snr[8], WORD addr, BYTE data[], WORD* datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedWriteSingleBlock(BYTE snr[8], WORD addr, const BYTE data[], WORD datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedLockBlock(BYTE snr[8], WORD addr);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedReadMultipleBlocks(BYTE snr[8], WORD addr, WORD count, BYTE data[], WORD* datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedWriteMultipleBlocks(BYTE snr[8], WORD addr, WORD count, const BYTE data[], WORD datalen);
+	// SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExtendedGetMultipleBlockSecurityStatus(BYTE snr[8], WORD addr, WORD count, BYTE data[], WORD *datalen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_Exchange(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExchangeStdCommand(BOOL opt_flag, BYTE snr[8], BYTE cmd_opcode, const BYTE cmd_params[], WORD cmd_params_len, BYTE recv_buffer[], WORD* recv_len, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Iso15693_ExchangeCustomCommand(BOOL opt_flag, BYTE mfg_id, BYTE snr[8], BYTE cmd_opcode, const BYTE cmd_params[], WORD cmd_params_len, BYTE recv_buffer[], WORD* recv_len, WORD timeout);
 
-/* Inside Pico family/HID iClass */
-/* ----------------------------- */
+	/* ICODE1 functions */
+	/* ---------------- */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Pico_Exchange14443(const BYTE *send_data, WORD send_bytelen, BYTE *recv_data, WORD *recv_bytelen, BYTE append_crc, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ICode1_SelectAny(BYTE afi, BYTE snr[8]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ICode1_UnselectedRead(BYTE addr, BYTE count, BYTE data[], WORD* datalen);
+
+	/* Inside Pico family/HID iClass */
+	/* ----------------------------- */
+
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Pico_Exchange14443(const BYTE* send_data, WORD send_bytelen, BYTE* recv_data, WORD* recv_bytelen, BYTE append_crc, WORD timeout);
 #define SPROX_Pico_Exchange SPROX_Pico_Exchange14443
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Pico_Exchange15693(const BYTE *send_data, WORD send_bytelen, BYTE *recv_data, WORD *recv_bytelen, BYTE append_crc, WORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Pico_Exchange15693(const BYTE* send_data, WORD send_bytelen, BYTE* recv_data, WORD* recv_bytelen, BYTE append_crc, WORD timeout);
 
-/* Find functions */
-/* -------------- */
+	/* Find functions */
+	/* -------------- */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Find(WORD want_protos, WORD *got_proto, BYTE uid[32], BYTE *uidlen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindEx(WORD want_protos, WORD *got_proto, BYTE uid[32], BYTE *uidlen, BYTE info[32], BYTE *infolen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Find(WORD want_protos, WORD* got_proto, BYTE uid[], BYTE* uidlen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindEx(WORD want_protos, WORD* got_proto, BYTE uid[], BYTE* uidlen, BYTE info[], BYTE* infolen);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindWait(WORD want_protos, WORD *got_proto, BYTE uid[32], BYTE *uidlen, WORD timeout_s, WORD interval_ms);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindWaitEx(WORD want_protos, WORD *got_proto, BYTE uid[32], BYTE *uidlen, BYTE info[32], BYTE *infolen, WORD timeout_s, WORD interval_ms);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindWaitCancel(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindWait(WORD want_protos, WORD* got_proto, BYTE uid[], BYTE* uidlen, WORD timeout_s, WORD interval_ms);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindWaitEx(WORD want_protos, WORD* got_proto, BYTE uid[], BYTE* uidlen, BYTE info[], BYTE* infolen, WORD timeout_s, WORD interval_ms);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindWaitCancel(void);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindLpcd(WORD want_protos, WORD *got_proto, BYTE uid[32], BYTE *uidlen, WORD timeout_s);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindLpcdEx(WORD want_protos, WORD *got_proto, BYTE uid[32], BYTE *uidlen, BYTE info[32], BYTE *infolen, WORD timeout_s, BOOL forced_pulses);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindLpcd(WORD want_protos, WORD* got_proto, BYTE uid[], BYTE* uidlen, WORD timeout_s);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_FindLpcdEx(WORD want_protos, WORD* got_proto, BYTE uid[], BYTE* uidlen, BYTE info[], BYTE* infolen, WORD timeout_s, BOOL forced_pulses);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Exchange(BYTE did, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Atr(BYTE did, const BYTE gi[], WORD gi_len, BYTE nfcid3t[10], BYTE gt[], WORD *gt_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Dsl(BYTE did);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Rls(BYTE did);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Exchange(BYTE did, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Atr(BYTE did, const BYTE gi[], WORD gi_len, BYTE nfcid3t[10], BYTE gt[], WORD* gt_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Dsl(BYTE did);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Rls(BYTE did);
 
 
 #define PROTO_14443_A              0x0001
@@ -553,54 +553,54 @@ SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_NfcI_Rls(BYTE did);
 #define PROTO_ANY                  0xFFFF
 
 
-/* Legacy Mifare functions */
-/* ----------------------- */
+	/* Legacy Mifare functions */
+	/* ----------------------- */
 
-/* Mifare is a registered trademark of Philips.                            */
-/* Please refer to Philips documentation for any explanation on this part. */
+	/* Mifare is a registered trademark of Philips.                            */
+	/* Please refer to Philips documentation for any explanation on this part. */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStSelectAny(BYTE snr[10], BYTE atq[2], BYTE sak[1]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStSelectIdle(BYTE snr[10], BYTE atq[2], BYTE sak[1]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStSelectAgain(const BYTE snr[4]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStHalt(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStSelectAny(BYTE snr[10], BYTE atq[2], BYTE sak[1]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStSelectIdle(BYTE snr[10], BYTE atq[2], BYTE sak[1]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStSelectAgain(const BYTE snr[4]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStHalt(void);
 
-/* Mifare read, without authentication (Mifare UltraLight cards) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifRead(const BYTE snr[4], BYTE addr, BYTE data[16]);
+	/* Mifare read, without authentication (Mifare UltraLight cards) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifRead(const BYTE snr[4], BYTE addr, BYTE data[16]);
 
-/* Mifare write, without authentication (Mifare UltraLight cards) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifWrite(const BYTE snr[4], BYTE addr, const BYTE data[16]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifWrite4(const BYTE snr[4], BYTE addr, const BYTE data[4]);
+	/* Mifare write, without authentication (Mifare UltraLight cards) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifWrite(const BYTE snr[4], BYTE addr, const BYTE data[16]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifWrite4(const BYTE snr[4], BYTE addr, const BYTE data[4]);
 
-/* Mifare standard authenticate and read */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadBlock(const BYTE snr[4], BYTE block, BYTE data[16], const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadBlock2(const BYTE snr[4], BYTE block, BYTE data[16], BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadSector(const BYTE snr[4], BYTE sector, BYTE data[240], const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadSector2(const BYTE snr[4], BYTE sector, BYTE data[240], BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadTag768(const BYTE snr[4], WORD *sectors, BYTE data[768]);
+	/* Mifare standard authenticate and read */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadBlock(const BYTE snr[4], BYTE block, BYTE data[16], const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadBlock2(const BYTE snr[4], BYTE block, BYTE data[16], BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadSector(const BYTE snr[4], BYTE sector, BYTE data[], const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadSector2(const BYTE snr[4], BYTE sector, BYTE data[], BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadTag768(const BYTE snr[4], WORD* sectors, BYTE data[]);
 
-/* Mifare standard authenticate and write */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteBlock(const BYTE snr[4], BYTE block, const BYTE data[16], const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteBlock2(const BYTE snr[4], BYTE block, const BYTE data[16], BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteSector(const BYTE snr[4], BYTE sector, const BYTE data[240], const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteSector2(const BYTE snr[4], BYTE sector, const BYTE data[240], BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteTag768(const BYTE snr[4], WORD *sectors, const BYTE data[768]);
+	/* Mifare standard authenticate and write */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteBlock(const BYTE snr[4], BYTE block, const BYTE data[16], const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteBlock2(const BYTE snr[4], BYTE block, const BYTE data[16], BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteSector(const BYTE snr[4], BYTE sector, const BYTE data[], const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteSector2(const BYTE snr[4], BYTE sector, const BYTE data[], BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteTag768(const BYTE snr[4], WORD* sectors, const BYTE data[]);
 
-/* Mifare standard counter manipulation */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadCounter(const BYTE snr[4], BYTE block, SDWORD *value, const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadCounter2(const BYTE snr[4], BYTE block, SDWORD *value, BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteCounter(const BYTE snr[4], BYTE block, SDWORD value, const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteCounter2(const BYTE snr[4], BYTE block, SDWORD value, BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStDecrementCounter(const BYTE snr[4], BYTE block, DWORD step, const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStDecrementCounter2(const BYTE snr[4], BYTE block, DWORD step, BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStIncrementCounter(const BYTE snr[4], BYTE block, DWORD step, const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStIncrementCounter2(const BYTE snr[4], BYTE block, DWORD step, BYTE key_idx);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStRestoreCounter(const BYTE snr[4], BYTE src_block, BYTE dst_block, const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStRestoreCounter2(const BYTE snr[4], BYTE src_block, BYTE dst_block, BYTE key_idx);
+	/* Mifare standard counter manipulation */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadCounter(const BYTE snr[4], BYTE block, SDWORD* value, const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStReadCounter2(const BYTE snr[4], BYTE block, SDWORD* value, BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteCounter(const BYTE snr[4], BYTE block, SDWORD value, const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStWriteCounter2(const BYTE snr[4], BYTE block, SDWORD value, BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStDecrementCounter(const BYTE snr[4], BYTE block, DWORD step, const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStDecrementCounter2(const BYTE snr[4], BYTE block, DWORD step, BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStIncrementCounter(const BYTE snr[4], BYTE block, DWORD step, const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStIncrementCounter2(const BYTE snr[4], BYTE block, DWORD step, BYTE key_idx);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStRestoreCounter(const BYTE snr[4], BYTE src_block, BYTE dst_block, const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStRestoreCounter2(const BYTE snr[4], BYTE src_block, BYTE dst_block, BYTE key_idx);
 
-/* Mifare standard sector trailers formatting */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStUpdateAccessBlock(const BYTE snr[4], BYTE sect, const BYTE old_key_val[6], const BYTE new_key_A[6], const BYTE new_key_B[6], BYTE ac0, BYTE ac1, BYTE ac2, BYTE ac3);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStUpdateAccessBlock2(const BYTE snr[4], BYTE sect, BYTE old_key_idx, const BYTE new_key_A[6], const BYTE new_key_B[6], BYTE ac0, BYTE ac1, BYTE ac2, BYTE ac3);
-/* Valid access conditions for ac0, ac1 and ac2 */
+	/* Mifare standard sector trailers formatting */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStUpdateAccessBlock(const BYTE snr[4], BYTE sect, const BYTE old_key_val[6], const BYTE new_key_A[6], const BYTE new_key_B[6], BYTE ac0, BYTE ac1, BYTE ac2, BYTE ac3);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStUpdateAccessBlock2(const BYTE snr[4], BYTE sect, BYTE old_key_idx, const BYTE new_key_A[6], const BYTE new_key_B[6], BYTE ac0, BYTE ac1, BYTE ac2, BYTE ac3);
+	/* Valid access conditions for ac0, ac1 and ac2 */
 #define ACC_BLOCK_TRANSPORT 0x00
 #define ACC_BLOCK_DATA      0x04
 #define ACC_BLOCK_VALUE ACC_BLOCK_DATA
@@ -610,19 +610,19 @@ SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStUpdateAccessBlock2(const BYTE snr
 #define ACC_AUTH_TRANSPORT  0x01
 
 /* Perform Mifare standard authentication */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthKey(BYTE auth_mode, const BYTE snr[4], const BYTE key_val[6], BYTE block);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthKey2(const BYTE snr[4], BYTE key_idx, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthKey(BYTE auth_mode, const BYTE snr[4], const BYTE key_val[6], BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthKey2(const BYTE snr[4], BYTE key_idx, BYTE block);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthE2(BYTE auth_mode, const BYTE snr[4], BYTE key_sector, BYTE block);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthRam(BYTE auth_mode, BYTE key_sector, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthE2(BYTE auth_mode, const BYTE snr[4], BYTE key_sector, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifStAuthRam(BYTE auth_mode, BYTE key_sector, BYTE block);
 
-/* Load a Mifare standard key into reader's memory (RAM or EEPROM) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLoadKey(BOOL eeprom, BYTE key_type, BYTE key_offset, const BYTE key_val[6]);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLoadKeyEx(BYTE key_idx, const BYTE key_val[6]);
+	/* Load a Mifare standard key into reader's memory (RAM or EEPROM) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLoadKey(BOOL eeprom, BYTE key_type, BYTE key_offset, const BYTE key_val[6]);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLoadKeyEx(BYTE key_idx, const BYTE key_val[6]);
 
-/* Who is the last authentication key successfully used ? */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLastAuthKey(BYTE * info);
-/* Related defines */
+	/* Who is the last authentication key successfully used ? */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLastAuthKey(BYTE* info);
+	/* Related defines */
 #define MIF_RAM_KEY     0x80
 #define MIF_E2_KEY      0x40
 #define MIF_CODED_KEY   0xC0
@@ -633,116 +633,116 @@ SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MifLastAuthKey(BYTE * info);
 /* ------------------------------------------------------------------------------------ */
 
 /* Power up the card in a slot */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_PowerUp(BYTE slot, BYTE config, BYTE atr[32], WORD *atr_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_PowerUp_Auto(BYTE slot, BYTE atr[32], WORD *atr_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_PowerUp(BYTE slot, BYTE config, BYTE atr[], WORD* atr_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_PowerUp_Auto(BYTE slot, BYTE atr[], WORD* atr_len);
 
-/* Power down the card in a slot */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_PowerDown(BYTE slot);
+	/* Power down the card in a slot */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_PowerDown(BYTE slot);
 
-/* Exchange with the card in a slot */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_Exchange(BYTE slot, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
+	/* Exchange with the card in a slot */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_Exchange(BYTE slot, const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
 
-/* Get status of a slot */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_Status(BYTE slot, BYTE *stat, BYTE *type, BYTE config[4]);
+	/* Get status of a slot */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_Status(BYTE slot, BYTE* stat, BYTE* type, BYTE config[4]);
 
-/* Configure / retrieve actual configuration of a slot */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_SetConfig(BYTE slot, BYTE mode, BYTE type);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetConfig(BYTE slot, BYTE *mode, BYTE *type);
+	/* Configure / retrieve actual configuration of a slot */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_SetConfig(BYTE slot, BYTE mode, BYTE type);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetConfig(BYTE slot, BYTE* mode, BYTE* type);
 
-/* Retrieve smartcard coupler's firmware (type - version) */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetFirmware(TCHAR firmware[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetFirmwareW(wchar_t firmware[], WORD len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetFirmwareA(char firmware[], WORD len);
+	/* Retrieve smartcard coupler's firmware (type - version) */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetFirmware(TCHAR firmware[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetFirmwareW(wchar_t firmware[], WORD len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_GetFirmwareA(char firmware[], WORD len);
 
-/* Transparent exchange between host and smartcard coupler */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_Control(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len);
+	/* Transparent exchange between host and smartcard coupler */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Card_Control(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len);
 
-/* Fingerprint related functions (reader with embedded Sagem MorphoSmart CBM module) */
-/* --------------------------------------------------------------------------------- */
+	/* Fingerprint related functions (reader with embedded Sagem MorphoSmart CBM module) */
+	/* --------------------------------------------------------------------------------- */
 
-/* Power up the MorphoSmart */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_Open(TCHAR *mso_product, TCHAR *mso_firmware, TCHAR *mso_sensor);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_OpenW(wchar_t *mso_product, wchar_t *mso_firmware, wchar_t *mso_sensor);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_OpenA(char *mso_product, char *mso_firmware, char *mso_sensor);
+	/* Power up the MorphoSmart */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_Open(TCHAR* mso_product, TCHAR* mso_firmware, TCHAR* mso_sensor);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_OpenW(wchar_t* mso_product, wchar_t* mso_firmware, wchar_t* mso_sensor);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_OpenA(char* mso_product, char* mso_firmware, char* mso_sensor);
 
-/* Power down the MorphoSmart */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_Close(void);
+	/* Power down the MorphoSmart */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_Close(void);
 
-/* Transparent exchange between host and MorphoSmart */
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_Exchange(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD *recv_len, DWORD timeout, BYTE *async);
+	/* Transparent exchange between host and MorphoSmart */
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_MSO_Exchange(const BYTE send_buffer[], WORD send_len, BYTE recv_buffer[], WORD* recv_len, DWORD timeout, BYTE* async);
 
-/* Miscelleanous utilities, helpers for VB or Delphi users */
-/* ------------------------------------------------------- */
+	/* Miscelleanous utilities, helpers for VB or Delphi users */
+	/* ------------------------------------------------------- */
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Malloc(BYTE **buffer, WORD size);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Free(BYTE * buffer);
-SPRINGPROX_LIB WORD  SPRINGPROX_API SPROX_StrLen(const TCHAR *buffer);
-SPRINGPROX_LIB WORD  SPRINGPROX_API SPROX_StrLenW(const wchar_t *buffer);
-SPRINGPROX_LIB WORD  SPRINGPROX_API SPROX_StrLenA(const char *buffer);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ArrayToString(TCHAR *string, const BYTE *buffer, WORD size);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ArrayToStringW(wchar_t *string, const BYTE *buffer, WORD size);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ArrayToStringA(char *string, const BYTE *buffer, WORD size);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StringToArray(BYTE *buffer, const TCHAR *string, WORD size);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StringToArrayW(BYTE *buffer, const wchar_t *string, WORD size);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StringToArrayA(BYTE *buffer, const char *string, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Malloc(BYTE** buffer, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_Free(BYTE* buffer);
+	SPRINGPROX_LIB WORD  SPRINGPROX_API SPROX_StrLen(const TCHAR* buffer);
+	SPRINGPROX_LIB WORD  SPRINGPROX_API SPROX_StrLenW(const wchar_t* buffer);
+	SPRINGPROX_LIB WORD  SPRINGPROX_API SPROX_StrLenA(const char* buffer);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ArrayToString(TCHAR* string, const BYTE* buffer, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ArrayToStringW(wchar_t* string, const BYTE* buffer, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_ArrayToStringA(char* string, const BYTE* buffer, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StringToArray(BYTE* buffer, const TCHAR* string, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StringToArrayW(BYTE* buffer, const wchar_t* string, WORD size);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SPROX_StringToArrayA(BYTE* buffer, const char* string, WORD size);
 
-/* Philips basic function set */
-/* -------------------------- */
+	/* Philips basic function set */
+	/* -------------------------- */
 
-/* Those functions are copied from Philips "Pegoda" low-level API */
-/* For better performance, DO NOT USE those low level calls.      */ 
+	/* Those functions are copied from Philips "Pegoda" low-level API */
+	/* For better performance, DO NOT USE those low level calls.      */
 
-/* Modes for 'Mf500InterfaceOpen' */
+	/* Modes for 'Mf500InterfaceOpen' */
 #define USB         0x00000031
 #define RS232       0x00000040
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500InterfaceOpen(DWORD mode, DWORD unused);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500InterfaceClose(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500InterfaceOpen(DWORD mode, DWORD unused);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500InterfaceClose(void);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdConfig(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdSetDefaultAttrib(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdSetAttrib(BYTE DSI, BYTE DRI);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdGetAttrib(BYTE *FSCImax, BYTE *FSDImax, BYTE *DSsupp, BYTE *DRsupp, BYTE *DREQDS);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdConfig(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdSetDefaultAttrib(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdSetAttrib(BYTE DSI, BYTE DRI);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdGetAttrib(BYTE* FSCImax, BYTE* FSDImax, BYTE* DSsupp, BYTE* DRsupp, BYTE* DREQDS);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccRequest(BYTE req_code, BYTE *atq);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCommonRequest(BYTE req_code, BYTE *atq);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAnticoll(BYTE bcnt, BYTE *snr);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCascAnticoll(BYTE select_code, BYTE bcnt, BYTE *snr);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccSelect(const BYTE *snr, BYTE *sak);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCascSelect(BYTE sel_code, const BYTE *snr, BYTE *sak);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccActivateWakeup(BYTE br, BYTE *atq, BYTE *sak, const BYTE *uid, BYTE uid_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccActivateIdle(BYTE br, BYTE *atq, BYTE *sak, BYTE *uid, BYTE *uid_len);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuth(BYTE auth_mode, BYTE key_sector, BYTE block);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuthRam(BYTE auth_mode, BYTE key_sector, BYTE block);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuthE2(BYTE auth_mode, BYTE *snr, BYTE key_sector, BYTE block);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuthKey(BYTE auth_mode, const BYTE *snr, BYTE *keys, BYTE block);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccRead(BYTE addr, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCommonRead(BYTE cmd, BYTE addr, BYTE datalen, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccWrite(BYTE addr, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccWrite4(BYTE addr, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCommonWrite(BYTE cmd, BYTE addr, BYTE datalen, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccValue(BYTE dd_mode, BYTE addr, BYTE *value, BYTE trans_addr);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccValueDebit(BYTE dd_mode, BYTE addr, BYTE *value);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccHalt(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccExchangeBlock(BYTE *send_data, WORD send_bytelen, BYTE *rec_data, WORD *rec_bytelen, BYTE append_crc, DWORD timeout);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccRequest(BYTE req_code, BYTE* atq);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCommonRequest(BYTE req_code, BYTE* atq);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAnticoll(BYTE bcnt, BYTE* snr);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCascAnticoll(BYTE select_code, BYTE bcnt, BYTE* snr);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccSelect(const BYTE* snr, BYTE* sak);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCascSelect(BYTE sel_code, const BYTE* snr, BYTE* sak);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccActivateWakeup(BYTE br, BYTE* atq, BYTE* sak, const BYTE* uid, BYTE uid_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccActivateIdle(BYTE br, BYTE* atq, BYTE* sak, BYTE* uid, BYTE* uid_len);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuth(BYTE auth_mode, BYTE key_sector, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuthRam(BYTE auth_mode, BYTE key_sector, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuthE2(BYTE auth_mode, BYTE* snr, BYTE key_sector, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccAuthKey(BYTE auth_mode, const BYTE* snr, BYTE* keys, BYTE block);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccRead(BYTE addr, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCommonRead(BYTE cmd, BYTE addr, BYTE datalen, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccWrite(BYTE addr, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccWrite4(BYTE addr, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccCommonWrite(BYTE cmd, BYTE addr, BYTE datalen, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccValue(BYTE dd_mode, BYTE addr, BYTE* value, BYTE trans_addr);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccValueDebit(BYTE dd_mode, BYTE addr, BYTE* value);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccHalt(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PiccExchangeBlock(BYTE* send_data, WORD send_bytelen, BYTE* rec_data, WORD* rec_bytelen, BYTE append_crc, DWORD timeout);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500HostCodeKey(BYTE *uncoded, BYTE *coded);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdLoadKeyE2(BYTE key_type, BYTE sector, BYTE *uncoded_keys);
-SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdLoadKeyRam(BYTE key_type, BYTE sector, BYTE *uncoded_keys);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500HostCodeKey(BYTE* uncoded, BYTE* coded);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdLoadKeyE2(BYTE key_type, BYTE sector, BYTE* uncoded_keys);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API Mf500PcdLoadKeyRam(BYTE key_type, BYTE sector, BYTE* uncoded_keys);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdSetTmo(DWORD tmoLength);
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdGetSnr(BYTE *snr);
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdReadE2(WORD startaddr, BYTE length, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdWriteE2(WORD startaddr, BYTE length, BYTE *data);
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdReset(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdSetTmo(DWORD tmoLength);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdGetSnr(BYTE* snr);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdReadE2(WORD startaddr, BYTE length, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdWriteE2(WORD startaddr, BYTE length, BYTE* data);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdReset(void);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdSetIdleMode(void);
-SPRINGPROX_LIB SWORD SPRINGPROX_API PcdClearIdleMode(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdSetIdleMode(void);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API PcdClearIdleMode(void);
 
-SPRINGPROX_LIB SWORD SPRINGPROX_API ExchangeByteStream(BYTE cmd, BYTE *send_data, WORD send_bytelen, BYTE *rec_data, WORD *rec_bytelen);
-SPRINGPROX_LIB SWORD SPRINGPROX_API ReadRIC(BYTE reg, BYTE *value);
-SPRINGPROX_LIB SWORD SPRINGPROX_API WriteRIC(BYTE reg, BYTE value);
-SPRINGPROX_LIB SWORD SPRINGPROX_API SetRCBitMask(BYTE reg, BYTE mask);
-SPRINGPROX_LIB SWORD SPRINGPROX_API ClearRCBitMask(BYTE reg, BYTE mask);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API ExchangeByteStream(BYTE cmd, BYTE* send_data, WORD send_bytelen, BYTE* rec_data, WORD* rec_bytelen);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API ReadRIC(BYTE reg, BYTE* value);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API WriteRIC(BYTE reg, BYTE value);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API SetRCBitMask(BYTE reg, BYTE mask);
+	SPRINGPROX_LIB SWORD SPRINGPROX_API ClearRCBitMask(BYTE reg, BYTE mask);
 
 #ifdef __cplusplus
 }

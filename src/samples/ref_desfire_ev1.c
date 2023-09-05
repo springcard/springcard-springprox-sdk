@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	rc = SPROX_GetLibraryA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_GetLibrary(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("Failed to get API version\n");
@@ -93,18 +93,18 @@ int main(int argc, char** argv)
 		/* Open reader */
 		/* ----------- */
 
-		rc = SPROX_ReaderOpenA(szCommDevice);
+		rc = SPROX_ReaderOpen(szCommDevice);
 		if (rc != MI_OK)
 		{
 			printf("Reader not found\n");
 			goto done;
 		}
 
-		rc = SPROX_ReaderGetDeviceA(s_buffer, sizeof(s_buffer));
+		rc = SPROX_ReaderGetDevice(s_buffer, sizeof(s_buffer));
 		if (rc == MI_OK)
 			printf("Reader found on %s\n", s_buffer);
 
-		rc = SPROX_ReaderGetFirmwareA(s_buffer, sizeof(s_buffer));
+		rc = SPROX_ReaderGetFirmware(s_buffer, sizeof(s_buffer));
 		if (rc == MI_OK)
 			printf("Reader firmware is %s\n", s_buffer);
 
@@ -496,13 +496,9 @@ static BOOL sprox_desfire_library_selftest_ex(TEST_MODE iTestMode, BOOL fLegacyC
 	WORD  awIsoFiles[32];
 	BYTE abDataBuffer[8192];
 	WORD wAccessRights;
-	BOOL trace = FALSE;
-	BOOL beep = TRUE;
 	int i, j, iTransaction, iFileIndex;
 	DF_VERSION_INFO stVersionInfo;
 	DF_ADDITIONAL_FILE_SETTINGS unFileSettings;
-
-	BOOL f = FALSE;
 
 	//  After activating a DesFire card the currently selected 'application' is the card
 	//  iTestMode (AID = 0). Therefore the next command is redundant.
@@ -810,13 +806,13 @@ static BOOL sprox_desfire_library_selftest_ex(TEST_MODE iTestMode, BOOL fLegacyC
 	if (!fLegacyCard)
 	{
 		// The ISO DF=2000 application will allow ISO EFs
-		rc = SPROX_Desfire_CreateIsoApplication(0xFF2000, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x2000, "1TIC.ICA", 8);
+		rc = SPROX_Desfire_CreateIsoApplication(0xFF2000, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x2000, (const unsigned char *)"1TIC.ICA", 8);
 		CHECK_RC();
-		rc = SPROX_Desfire_CreateIsoApplication(0xFF3000, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x3000, "2MPP.EPP", 8);
+		rc = SPROX_Desfire_CreateIsoApplication(0xFF3000, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x3000, (const unsigned char *)"2MPP.EPP", 8);
 		CHECK_RC();
-		rc = SPROX_Desfire_CreateIsoApplication(0xFF4000, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x4000, "3JDA.JDA", 8);
+		rc = SPROX_Desfire_CreateIsoApplication(0xFF4000, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x4000, (const unsigned char *)"3JDA.JDA", 8);
 		CHECK_RC();
-		rc = SPROX_Desfire_CreateIsoApplication(0xFF3F00, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x3F00, "Test Master File", 16);
+		rc = SPROX_Desfire_CreateIsoApplication(0xFF3F00, 0xFF, DF_APPLSETTING2_ISO_EF_IDS, 0x3F00, (const unsigned char *)"Test Master File", 16);
 		CHECK_RC();
 	}
 
@@ -1032,7 +1028,7 @@ static BOOL sprox_desfire_library_selftest_ex(TEST_MODE iTestMode, BOOL fLegacyC
 	//  Try to overwrite the file.
 	//  Since we have made the file read-only, this should fail.
 
-	rc = SPROX_Desfire_WriteData(bStdDataFileID, DF_COMM_MODE_PLAIN, 20, 5, "Essai");
+	rc = SPROX_Desfire_WriteData(bStdDataFileID, DF_COMM_MODE_PLAIN, 20, 5, (const unsigned char *)"Essai");
 	if (rc != (DFCARD_ERROR - DF_PERMISSION_DENIED))
 		CHECK_RC();
 
@@ -1223,7 +1219,10 @@ static BOOL sprox_desfire_library_selftest_ex(TEST_MODE iTestMode, BOOL fLegacyC
 	}
 	else if (iTestMode == TM_ISO_3DES2K)
 	{
-		rc = SPROX_Desfire_ChangeKey24(0, appBKeyMaster0_16, NULL); // JDA
+		BYTE buffer[24];
+		memcpy(&buffer[0], appBKeyMaster0_16, 16);
+		memcpy(&buffer[16], appBKeyMaster0_16, 8);
+		rc = SPROX_Desfire_ChangeKey24(0, buffer, NULL); // JDA
 		CHECK_RC();
 		rc = SPROX_Desfire_AuthenticateIso(0, appBKeyMaster0_16);
 		CHECK_RC();

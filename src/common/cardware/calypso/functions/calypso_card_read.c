@@ -16,88 +16,88 @@
 #include "../calypso_api_i.h"
 #include "calypso_card_commands_i.h"
 
-/*
- **********************************************************************************************************************
- *
- * FILES AND APPLICATIONS SELECTION
- *
- **********************************************************************************************************************
- */
+ /*
+  **********************************************************************************************************************
+  *
+  * FILES AND APPLICATIONS SELECTION
+  *
+  **********************************************************************************************************************
+  */
 
-CALYPSO_PROC CalypsoCardSelectFileEx(CALYPSO_CTX_ST *ctx, BYTE apdu_p1, BYTE apdu_p2, const BYTE file_path[], CALYPSO_SZ file_path_len, BYTE resp[], CALYPSO_SZ *respsize)
+CALYPSO_PROC CalypsoCardSelectFileEx(CALYPSO_CTX_ST* ctx, BYTE apdu_p1, BYTE apdu_p2, const BYTE file_path[], CALYPSO_SZ file_path_len, BYTE resp[], CALYPSO_SZ* respsize)
 {
-  CALYPSO_RC rc;
-  CALYPSO_SZ recv_len, send_len = 0;
+	CALYPSO_RC rc;
+	CALYPSO_SZ recv_len, send_len = 0;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
-  if (file_path_len > CALYPSO_MAX_DATA_SZ) return CALYPSO_ERR_INVALID_PARAM;
-  
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (file_path_len > CALYPSO_MAX_DATA_SZ) return CALYPSO_ERR_INVALID_PARAM;
+
 #ifdef CALYPSO_BENCHMARK
-  ctx->benchmark.nb_select++;
+	ctx->benchmark.nb_select++;
 #endif
 
-  CalypsoTraceStr(TR_TRACE|TR_CARD, "SelectFile");
-  CalypsoTraceValH(TR_TRACE|TR_CARD, "CLA=", ctx->Card.CLA, 2);
-  CalypsoTraceValH(TR_TRACE|TR_CARD, "P1=", apdu_p1, 2);
-  CalypsoTraceValH(TR_TRACE|TR_CARD, "P2=", apdu_p2, 2);
-  CalypsoTraceHex(TR_TRACE|TR_CARD, "Data=", file_path, file_path_len);
+	CalypsoTraceStr(TR_TRACE | TR_CARD, "SelectFile");
+	CalypsoTraceValH(TR_TRACE | TR_CARD, "CLA=", ctx->Card.CLA, 2);
+	CalypsoTraceValH(TR_TRACE | TR_CARD, "P1=", apdu_p1, 2);
+	CalypsoTraceValH(TR_TRACE | TR_CARD, "P2=", apdu_p2, 2);
+	CalypsoTraceHex(TR_TRACE | TR_CARD, "Data=", file_path, file_path_len);
 
-  ctx->Card.Buffer[send_len++] = ctx->Card.CLA;
-  ctx->Card.Buffer[send_len++] = CALYPSO_INS_SELECT;
-  ctx->Card.Buffer[send_len++] = apdu_p1;
-  ctx->Card.Buffer[send_len++] = apdu_p2;
-  ctx->Card.Buffer[send_len++] = (BYTE) file_path_len;
-  memcpy(&ctx->Card.Buffer[send_len], file_path, file_path_len);
-  send_len += file_path_len;
+	ctx->Card.Buffer[send_len++] = ctx->Card.CLA;
+	ctx->Card.Buffer[send_len++] = CALYPSO_INS_SELECT;
+	ctx->Card.Buffer[send_len++] = apdu_p1;
+	ctx->Card.Buffer[send_len++] = apdu_p2;
+	ctx->Card.Buffer[send_len++] = (BYTE)file_path_len;
+	memcpy(&ctx->Card.Buffer[send_len], file_path, file_path_len);
+	send_len += file_path_len;
 
-  recv_len = sizeof(ctx->Card.Buffer);
-  rc = CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len);
-  if (rc) goto done;
+	recv_len = sizeof(ctx->Card.Buffer);
+	rc = CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len);
+	if (rc) goto done;
 
-  rc = CalypsoCardSetSW(ctx, recv_len);
-  if (rc) goto done;
+	rc = CalypsoCardSetSW(ctx, recv_len);
+	if (rc) goto done;
 
-  switch (ctx->Card.SW)
-  {
-    case 0x9000 : break;
-    case 0x6283 : ctx->CardApplication.Invalidated = TRUE; break; /* Invalidated - let's accept it anyway, to be able to revalidate */
+	switch (ctx->Card.SW)
+	{
+	case 0x9000: break;
+	case 0x6283: ctx->CardApplication.Invalidated = TRUE; break; /* Invalidated - let's accept it anyway, to be able to revalidate */
 
-    case 0x6700 : rc = CALYPSO_ERR_SW_WRONG_P3; break;
-    case 0x6A82 : rc = CALYPSO_CARD_FILE_NOT_FOUND; break;
+	case 0x6700: rc = CALYPSO_ERR_SW_WRONG_P3; break;
+	case 0x6A82: rc = CALYPSO_CARD_FILE_NOT_FOUND; break;
 
-    default     : if ((ctx->Card.SW & 0xFF00) == 0x6100)
-                    break;
-                  rc = CALYPSO_ERR_STATUS_WORD;
-  }
-  if (rc) goto done;
+	default: if ((ctx->Card.SW & 0xFF00) == 0x6100)
+		break;
+		rc = CALYPSO_ERR_STATUS_WORD;
+	}
+	if (rc) goto done;
 
-  if (recv_len == 2)
-  {
-    /* Get Response */
-    recv_len = sizeof(ctx->Card.Buffer);
-    rc = CalypsoCardGetResponse(ctx, &recv_len);
-    if (rc) goto done;
-  }
+	if (recv_len == 2)
+	{
+		/* Get Response */
+		recv_len = sizeof(ctx->Card.Buffer);
+		rc = CalypsoCardGetResponse(ctx, &recv_len);
+		if (rc) goto done;
+	}
 
-  CalypsoTraceHex(TR_TRACE|TR_CARD, "Resp=", ctx->Card.Buffer, recv_len);
+	CalypsoTraceHex(TR_TRACE | TR_CARD, "Resp=", ctx->Card.Buffer, recv_len);
 
-  recv_len -= 2;
-  
-  if ((resp != NULL) && (respsize != NULL) && (*respsize != 0) && (*respsize < recv_len))
-  {
-    *respsize = recv_len;
-    rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
-    goto done;
-  }
+	recv_len -= 2;
 
-  if (resp != NULL)
-    memcpy(resp, ctx->Card.Buffer, recv_len);
+	if ((resp != NULL) && (respsize != NULL) && (*respsize != 0) && (*respsize < recv_len))
+	{
+		*respsize = recv_len;
+		rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
+		goto done;
+	}
 
-  if (respsize != NULL)
-    *respsize = recv_len;
+	if (resp != NULL)
+		memcpy(resp, ctx->Card.Buffer, recv_len);
+
+	if (respsize != NULL)
+		*respsize = recv_len;
 
 done:
-  RETURN("SelectFileEx");
+	RETURN("SelectFileEx");
 }
 
 /**f* SpringProxINS/CalypsoCardSelectApplication
@@ -131,45 +131,46 @@ done:
  *   - CalypsoCardMaxSessionUpdates
  *
  **/
-CALYPSO_PROC CalypsoCardSelectApplication(CALYPSO_CTX_ST *ctx, const BYTE aid[], CALYPSO_SZ aidsize, BYTE fci[], CALYPSO_SZ *fcisize)
+CALYPSO_PROC CalypsoCardSelectApplication(CALYPSO_CTX_ST* ctx, const BYTE aid[], CALYPSO_SZ aidsize, BYTE fci[], CALYPSO_SZ* fcisize)
 {
-  CALYPSO_SZ l;
-  CALYPSO_RC rc;
-  
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
-  if (aid == NULL)
-  {
-    aid = (const BYTE *) "1TIC.ICA";
-    aidsize = 8;
-  }
-  
-  CalypsoTraceStr(TR_TRACE|TR_CARD, "SelectApplication");
-  CalypsoTraceHex(TR_TRACE|TR_CARD, "AID=", aid, aidsize);
+	CALYPSO_SZ l;
+	CALYPSO_RC rc;
 
-  ctx->CardApplication.FciLen = 0;
-  l = sizeof(ctx->CardApplication.Fci);
-  rc = CalypsoCardSelectFileEx(ctx, 0x04, 0x00, aid, aidsize, ctx->CardApplication.Fci, &l);
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (aid == NULL)
+	{
+		aid = (const BYTE*)"1TIC.ICA";
+		aidsize = 8;
+	}
 
-  if (!rc)
-  { 
-    ctx->CardApplication.FciLen = l;
-      
-    CalypsoTraceHex(TR_TRACE|TR_CARD, "FCI=", ctx->CardApplication.Fci, ctx->CardApplication.FciLen);
-    
-    if ((fcisize != NULL) && (*fcisize != 0) && (*fcisize < ctx->CardApplication.FciLen))
-    {     
-      *fcisize = ctx->CardApplication.FciLen;
-      rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
-    } else
-    {
-      if (fci != NULL)
-        memcpy(fci, ctx->CardApplication.Fci, ctx->CardApplication.FciLen);
-      if (fcisize != NULL)
-        *fcisize = ctx->CardApplication.FciLen;
-    }
-  }
+	CalypsoTraceStr(TR_TRACE | TR_CARD, "SelectApplication");
+	CalypsoTraceHex(TR_TRACE | TR_CARD, "AID=", aid, aidsize);
 
-  RETURN("SelectApplication");
+	ctx->CardApplication.FciLen = 0;
+	l = sizeof(ctx->CardApplication.Fci);
+	rc = CalypsoCardSelectFileEx(ctx, 0x04, 0x00, aid, aidsize, ctx->CardApplication.Fci, &l);
+
+	if (!rc)
+	{
+		ctx->CardApplication.FciLen = l;
+
+		CalypsoTraceHex(TR_TRACE | TR_CARD, "FCI=", ctx->CardApplication.Fci, ctx->CardApplication.FciLen);
+
+		if ((fcisize != NULL) && (*fcisize != 0) && (*fcisize < ctx->CardApplication.FciLen))
+		{
+			*fcisize = ctx->CardApplication.FciLen;
+			rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
+		}
+		else
+		{
+			if (fci != NULL)
+				memcpy(fci, ctx->CardApplication.Fci, ctx->CardApplication.FciLen);
+			if (fcisize != NULL)
+				*fcisize = ctx->CardApplication.FciLen;
+		}
+	}
+
+	RETURN("SelectApplication");
 }
 
 /**f* SpringProxINS/CalypsoCardSelectDF
@@ -191,27 +192,27 @@ CALYPSO_PROC CalypsoCardSelectApplication(CALYPSO_CTX_ST *ctx, const BYTE aid[],
  *   CALYPSO_RC               : 0 or an error code
  *
  **/
-CALYPSO_PROC CalypsoCardSelectDF(CALYPSO_CTX_ST *ctx, WORD file_id, BYTE resp[], CALYPSO_SZ *respsize)
+CALYPSO_PROC CalypsoCardSelectDF(CALYPSO_CTX_ST* ctx, WORD file_id, BYTE resp[], CALYPSO_SZ* respsize)
 {
-  CALYPSO_RC rc;
-  BYTE file_path[2];
+	CALYPSO_RC rc;
+	BYTE file_path[2];
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
-  file_path[0]  = (BYTE) (file_id >> 8);
-  file_path[1]  = (BYTE) (file_id);
+	file_path[0] = (BYTE)(file_id >> 8);
+	file_path[1] = (BYTE)(file_id);
 
-  if ((resp == NULL) && (respsize == NULL))
-  {
-    resp      = ctx->LastCardSelectResp;
-    respsize  = &ctx->LastCardSelectRespLen;
-    *respsize = sizeof(ctx->LastCardSelectResp);
-  }
+	if ((resp == NULL) && (respsize == NULL))
+	{
+		resp = ctx->LastCardSelectResp;
+		respsize = &ctx->LastCardSelectRespLen;
+		*respsize = sizeof(ctx->LastCardSelectResp);
+	}
 
-  rc = CalypsoCardSelectFileEx(ctx, 0x00, 0x00, file_path, 2, resp, respsize);
-  if (rc && (resp == ctx->LastCardSelectResp)) ctx->LastCardSelectRespLen = 0;
+	rc = CalypsoCardSelectFileEx(ctx, 0x00, 0x00, file_path, 2, resp, respsize);
+	if (rc && (resp == ctx->LastCardSelectResp)) ctx->LastCardSelectRespLen = 0;
 
-  return rc;
+	return rc;
 }
 
 /**f* SpringProxINS/CalypsoCardSelectEF
@@ -233,27 +234,27 @@ CALYPSO_PROC CalypsoCardSelectDF(CALYPSO_CTX_ST *ctx, WORD file_id, BYTE resp[],
  *   CALYPSO_RC               : 0 or an error code
  *
  **/
-CALYPSO_PROC CalypsoCardSelectEF(CALYPSO_CTX_ST *ctx, WORD file_id, BYTE resp[], CALYPSO_SZ *respsize)
+CALYPSO_PROC CalypsoCardSelectEF(CALYPSO_CTX_ST* ctx, WORD file_id, BYTE resp[], CALYPSO_SZ* respsize)
 {
-  CALYPSO_RC rc;
-  BYTE file_path[2];
+	CALYPSO_RC rc;
+	BYTE file_path[2];
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
-  file_path[0]  = (BYTE) (file_id >> 8);
-  file_path[1]  = (BYTE) (file_id);
+	file_path[0] = (BYTE)(file_id >> 8);
+	file_path[1] = (BYTE)(file_id);
 
-  if ((resp == NULL) && (respsize == NULL))
-  {
-    resp      = ctx->LastCardSelectResp;
-    respsize  = &ctx->LastCardSelectRespLen;
-    *respsize = sizeof(ctx->LastCardSelectResp);
-  }
+	if ((resp == NULL) && (respsize == NULL))
+	{
+		resp = ctx->LastCardSelectResp;
+		respsize = &ctx->LastCardSelectRespLen;
+		*respsize = sizeof(ctx->LastCardSelectResp);
+	}
 
-  rc = CalypsoCardSelectFileEx(ctx, 0x02, 0x00, file_path, 2, resp, respsize);
-  if (rc && (resp == ctx->LastCardSelectResp)) ctx->LastCardSelectRespLen = 0;
+	rc = CalypsoCardSelectFileEx(ctx, 0x02, 0x00, file_path, 2, resp, respsize);
+	if (rc && (resp == ctx->LastCardSelectResp)) ctx->LastCardSelectRespLen = 0;
 
-  return rc;
+	return rc;
 }
 
 /**f* SpringProxINS/CalypsoCardSelectFile
@@ -281,51 +282,53 @@ CALYPSO_PROC CalypsoCardSelectEF(CALYPSO_CTX_ST *ctx, WORD file_id, BYTE resp[],
  *   - 0x00000000 : selects the Master File
  *
  **/
-CALYPSO_PROC CalypsoCardSelectFile(CALYPSO_CTX_ST *ctx, DWORD file_id, BYTE resp[], CALYPSO_SZ *respsize)
+CALYPSO_PROC CalypsoCardSelectFile(CALYPSO_CTX_ST* ctx, DWORD file_id, BYTE resp[], CALYPSO_SZ* respsize)
 {
-  CALYPSO_RC rc;
-  BYTE file_path[4];
-  BYTE file_path_len = 0;
-  BYTE apdu_p1;
+	CALYPSO_RC rc;
+	BYTE file_path[4];
+	BYTE file_path_len = 0;
+	BYTE apdu_p1;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
-  if (file_id & 0xFFFF0000)
-  {
-    file_path[0]  = (BYTE) (file_id >> 24);
-    file_path[1]  = (BYTE) (file_id >> 16);
-    file_path[2]  = (BYTE) (file_id >> 8);
-    file_path[3]  = (BYTE) (file_id);
-    file_path_len = 4;
-    apdu_p1 = 0x08;
+	if (file_id & 0xFFFF0000)
+	{
+		file_path[0] = (BYTE)(file_id >> 24);
+		file_path[1] = (BYTE)(file_id >> 16);
+		file_path[2] = (BYTE)(file_id >> 8);
+		file_path[3] = (BYTE)(file_id);
+		file_path_len = 4;
+		apdu_p1 = 0x08;
 
-  } else
-  if (file_id & 0x0000FFFF)
-  {
-    file_path[0]  = (BYTE) (file_id >> 8);
-    file_path[1]  = (BYTE) (file_id);
-    file_path_len = 2;
-    apdu_p1 = 0x02;
-  } else
-  {
-    file_path[0]  = 0x3F;
-    file_path[1]  = 0x00;
-    file_path_len = 2;
-    apdu_p1 = 0x00;
-  }
+	}
+	else
+		if (file_id & 0x0000FFFF)
+		{
+			file_path[0] = (BYTE)(file_id >> 8);
+			file_path[1] = (BYTE)(file_id);
+			file_path_len = 2;
+			apdu_p1 = 0x02;
+		}
+		else
+		{
+			file_path[0] = 0x3F;
+			file_path[1] = 0x00;
+			file_path_len = 2;
+			apdu_p1 = 0x00;
+		}
 
 
-  if ((resp == NULL) && (respsize == NULL))
-  {
-    resp      = ctx->LastCardSelectResp;
-    respsize  = &ctx->LastCardSelectRespLen;
-    *respsize = sizeof(ctx->LastCardSelectResp);
-  }
+	if ((resp == NULL) && (respsize == NULL))
+	{
+		resp = ctx->LastCardSelectResp;
+		respsize = &ctx->LastCardSelectRespLen;
+		*respsize = sizeof(ctx->LastCardSelectResp);
+	}
 
-  rc = CalypsoCardSelectFileEx(ctx, apdu_p1, 0x00, file_path, file_path_len, resp, respsize);
-  if (rc && (resp == ctx->LastCardSelectResp)) ctx->LastCardSelectRespLen = 0;
+	rc = CalypsoCardSelectFileEx(ctx, apdu_p1, 0x00, file_path, file_path_len, resp, respsize);
+	if (rc && (resp == ctx->LastCardSelectResp)) ctx->LastCardSelectRespLen = 0;
 
-  return rc;
+	return rc;
 }
 
 /*
@@ -336,113 +339,115 @@ CALYPSO_PROC CalypsoCardSelectFile(CALYPSO_CTX_ST *ctx, DWORD file_id, BYTE resp
  **********************************************************************************************************************
  */
 
-/**f* SpringProxINS/CalypsoCardReadBinary
- *
- * NAME
- *   CalypsoCardReadBinary
- *
- * DESCRIPTION
- *   Read bytes from an EF (must be a binary EF)
- *
- * INPUTS
- *   CALYPSO_CTX_ST *ctx      : library context
- *   BYTE           sfi       : identifier of the file (0 for current file)
- *   WORD           offset    : address of first byte
- *   BYTE           ask_size  : size to be read ('Le' parameter in APDU - may be 0)
- *   BYTE           data[]    : buffer to receive the data
- *   CALYPSO_SZ     *datasize : input  = size of the data buffer
- *                              output = actual length of the data
- *
- * RETURNS
- *   CALYPSO_RC            : 0 or an error code
- *
- **/
-CALYPSO_PROC CalypsoCardReadBinary(P_CALYPSO_CTX ctx, BYTE sfi, WORD offset, BYTE ask_size, BYTE data[], CALYPSO_SZ *datasize)
+ /**f* SpringProxINS/CalypsoCardReadBinary
+  *
+  * NAME
+  *   CalypsoCardReadBinary
+  *
+  * DESCRIPTION
+  *   Read bytes from an EF (must be a binary EF)
+  *
+  * INPUTS
+  *   CALYPSO_CTX_ST *ctx      : library context
+  *   BYTE           sfi       : identifier of the file (0 for current file)
+  *   WORD           offset    : address of first byte
+  *   BYTE           ask_size  : size to be read ('Le' parameter in APDU - may be 0)
+  *   BYTE           data[]    : buffer to receive the data
+  *   CALYPSO_SZ     *datasize : input  = size of the data buffer
+  *                              output = actual length of the data
+  *
+  * RETURNS
+  *   CALYPSO_RC            : 0 or an error code
+  *
+  **/
+CALYPSO_PROC CalypsoCardReadBinary(P_CALYPSO_CTX ctx, BYTE sfi, WORD offset, BYTE ask_size, BYTE data[], CALYPSO_SZ* datasize)
 {
-  CALYPSO_RC rc;
-  CALYPSO_SZ recv_len, send_len;
-  CALYPSO_SZ old_datasize = 0;
-  BOOL first_time = TRUE;
+	CALYPSO_RC rc;
+	CALYPSO_SZ recv_len, send_len;
+	CALYPSO_SZ old_datasize = 0;
+	BOOL first_time = TRUE;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
 #ifdef CALYPSO_BENCHMARK
-  ctx->benchmark.nb_read++;
+	ctx->benchmark.nb_read++;
 #endif
 
-  if (datasize != NULL)
-  {
-    old_datasize = *datasize;
-    *datasize = 0;
-  }
+	if (datasize != NULL)
+	{
+		old_datasize = *datasize;
+		*datasize = 0;
+	}
 
-  CalypsoTraceStr(TR_TRACE|TR_CARD, "ReadBinary");
+	CalypsoTraceStr(TR_TRACE | TR_CARD, "ReadBinary");
 
 again:
 
-  send_len = 0;
-  ctx->Card.Buffer[send_len++] = ctx->Card.CLA;
-  ctx->Card.Buffer[send_len++] = CALYPSO_INS_READ_BINARY;
-  if ((sfi != 0x00) && (offset < 0x0100))
-  {
-    ctx->Card.Buffer[send_len++] = 0x80 | sfi;
-  } else
-  if ((sfi == 0x00) && (offset < 0x8000))
-  {
-    ctx->Card.Buffer[send_len++] = offset / 0x0100;
-  } else
-  {
-    rc = CALYPSO_ERR_INVALID_PARAM;
-    goto done;
-  }
-  ctx->Card.Buffer[send_len++] = offset % 0x0100;
-  ctx->Card.Buffer[send_len++] = ask_size;
+	send_len = 0;
+	ctx->Card.Buffer[send_len++] = ctx->Card.CLA;
+	ctx->Card.Buffer[send_len++] = CALYPSO_INS_READ_BINARY;
+	if ((sfi != 0x00) && (offset < 0x0100))
+	{
+		ctx->Card.Buffer[send_len++] = 0x80 | sfi;
+	}
+	else
+		if ((sfi == 0x00) && (offset < 0x8000))
+		{
+			ctx->Card.Buffer[send_len++] = offset / 0x0100;
+		}
+		else
+		{
+			rc = CALYPSO_ERR_INVALID_PARAM;
+			goto done;
+		}
+	ctx->Card.Buffer[send_len++] = offset % 0x0100;
+	ctx->Card.Buffer[send_len++] = ask_size;
 
-  recv_len = sizeof(ctx->Card.Buffer);
-  rc = CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len);
-  if (rc) goto done;
+	recv_len = sizeof(ctx->Card.Buffer);
+	rc = CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len);
+	if (rc) goto done;
 
-  rc = CalypsoCardSetSW(ctx, recv_len);
-  if (rc) goto done;
+	rc = CalypsoCardSetSW(ctx, recv_len);
+	if (rc) goto done;
 
-  if (first_time && ((ctx->Card.SW & 0xFF00) == 0x6C00))
-  {
-    /* Le value incorrect, retry with the specified Le */
-    first_time = FALSE;
-    ask_size = (BYTE) (ctx->Card.SW & 0x00FF);
-    goto again;
-  }
+	if (first_time && ((ctx->Card.SW & 0xFF00) == 0x6C00))
+	{
+		/* Le value incorrect, retry with the specified Le */
+		first_time = FALSE;
+		ask_size = (BYTE)(ctx->Card.SW & 0x00FF);
+		goto again;
+	}
 
-  switch (ctx->Card.SW)
-  {
-    case 0x9000 : break;
+	switch (ctx->Card.SW)
+	{
+	case 0x9000: break;
 
-    case 0x6981 : rc = CALYPSO_CARD_WRONG_FILE_TYPE; break;
-    case 0x6982 : rc = CALYPSO_CARD_ACCESS_DENIED; break;
-    case 0x6985 : rc = CALYPSO_CARD_ACCESS_FORBIDDEN; break;
-    case 0x6986 : rc = CALYPSO_CARD_FILE_NOT_SELECTED; break;
-    case 0x6A82 : rc = CALYPSO_CARD_FILE_NOT_FOUND; break;
-    case 0x6A83 : rc = CALYPSO_CARD_FILE_OVERFLOW; break;
-    case 0x6B00 : rc = CALYPSO_ERR_SW_WRONG_P1P2; break;
+	case 0x6981: rc = CALYPSO_CARD_WRONG_FILE_TYPE; break;
+	case 0x6982: rc = CALYPSO_CARD_ACCESS_DENIED; break;
+	case 0x6985: rc = CALYPSO_CARD_ACCESS_FORBIDDEN; break;
+	case 0x6986: rc = CALYPSO_CARD_FILE_NOT_SELECTED; break;
+	case 0x6A82: rc = CALYPSO_CARD_FILE_NOT_FOUND; break;
+	case 0x6A83: rc = CALYPSO_CARD_FILE_OVERFLOW; break;
+	case 0x6B00: rc = CALYPSO_ERR_SW_WRONG_P1P2; break;
 
-    default     : rc = CALYPSO_ERR_STATUS_WORD;
-  }
+	default: rc = CALYPSO_ERR_STATUS_WORD;
+	}
 
-  if (rc) goto done;
-  
-  if ((data != NULL) && (datasize != NULL) && (old_datasize != 0) && (old_datasize < recv_len-2))
-  {
-    *datasize = recv_len-2;
-    rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
-    goto done;
-  }
-  if (data != NULL)
-    memcpy(data, ctx->Card.Buffer, recv_len-2);
-  if (datasize != NULL)
-    *datasize = recv_len-2;
+	if (rc) goto done;
+
+	if ((data != NULL) && (datasize != NULL) && (old_datasize != 0) && (old_datasize < recv_len - 2))
+	{
+		*datasize = recv_len - 2;
+		rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
+		goto done;
+	}
+	if (data != NULL)
+		memcpy(data, ctx->Card.Buffer, recv_len - 2);
+	if (datasize != NULL)
+		*datasize = recv_len - 2;
 
 done:
-  RETURN("ReadBinary");
+	RETURN("ReadBinary");
 }
 
 /**f* SpringProxINS/CalypsoCardReadRecord
@@ -466,79 +471,79 @@ done:
  *   CALYPSO_RC               : 0 or an error code
  *
  **/
-CALYPSO_PROC CalypsoCardReadRecord(CALYPSO_CTX_ST *ctx, BYTE sfi, BYTE rec_no, BYTE rec_size, BYTE data[], CALYPSO_SZ *datasize)
+CALYPSO_PROC CalypsoCardReadRecord(CALYPSO_CTX_ST* ctx, BYTE sfi, BYTE rec_no, BYTE rec_size, BYTE data[], CALYPSO_SZ* datasize)
 {
-  CALYPSO_RC rc;
-  CALYPSO_SZ recv_len, send_len;
-  CALYPSO_SZ old_datasize = 0;
-  BOOL first_time = TRUE;
+	CALYPSO_RC rc;
+	CALYPSO_SZ recv_len, send_len;
+	CALYPSO_SZ old_datasize = 0;
+	BOOL first_time = TRUE;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
 #ifdef CALYPSO_BENCHMARK
-  ctx->benchmark.nb_read++;
+	ctx->benchmark.nb_read++;
 #endif
 
-  if (datasize != NULL)
-  {
-    old_datasize = *datasize;
-    *datasize = 0;
-  }
+	if (datasize != NULL)
+	{
+		old_datasize = *datasize;
+		*datasize = 0;
+	}
 
-  CalypsoTraceStr(TR_TRACE|TR_CARD, "ReadRecord");
+	CalypsoTraceStr(TR_TRACE | TR_CARD, "ReadRecord");
 
 again:
 
-  send_len = 0;
-  ctx->Card.Buffer[send_len++] = ctx->Card.CLA;
-  ctx->Card.Buffer[send_len++] = CALYPSO_INS_READ_RECORD;
-  ctx->Card.Buffer[send_len++] = rec_no;
-  ctx->Card.Buffer[send_len++] = (sfi * 8) + 4;
-  ctx->Card.Buffer[send_len++] = rec_size;
+	send_len = 0;
+	ctx->Card.Buffer[send_len++] = ctx->Card.CLA;
+	ctx->Card.Buffer[send_len++] = CALYPSO_INS_READ_RECORD;
+	ctx->Card.Buffer[send_len++] = rec_no;
+	ctx->Card.Buffer[send_len++] = (sfi * 8) + 4;
+	ctx->Card.Buffer[send_len++] = rec_size;
 
-  recv_len = sizeof(ctx->Card.Buffer);
-  rc = CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len);
-  if (rc) goto done;
+	recv_len = sizeof(ctx->Card.Buffer);
+	rc = CalypsoCardTransmit(ctx, ctx->Card.Buffer, send_len, ctx->Card.Buffer, &recv_len);
+	if (rc) goto done;
 
-  rc = CalypsoCardSetSW(ctx, recv_len);
-  if (rc) goto done;
+	rc = CalypsoCardSetSW(ctx, recv_len);
+	if (rc) goto done;
 
-  if (first_time && ((ctx->Card.SW & 0xFF00) == 0x6C00))
-  {
-    /* Le value incorrect, retry with the specified Le */
-    first_time = FALSE;
-    rec_size = (BYTE) (ctx->Card.SW & 0x00FF);
-    goto again;
-  }
+	if (first_time && ((ctx->Card.SW & 0xFF00) == 0x6C00))
+	{
+		/* Le value incorrect, retry with the specified Le */
+		first_time = FALSE;
+		rec_size = (BYTE)(ctx->Card.SW & 0x00FF);
+		goto again;
+	}
 
-  switch (ctx->Card.SW)
-  {
-    case 0x9000 : break;
+	switch (ctx->Card.SW)
+	{
+	case 0x9000: break;
 
-    case 0x6981 : rc = CALYPSO_CARD_WRONG_FILE_TYPE; break;
-    case 0x6982 : rc = CALYPSO_CARD_ACCESS_DENIED; break;
-    case 0x6985 : rc = CALYPSO_CARD_ACCESS_FORBIDDEN; break;
-    case 0x6986 : rc = CALYPSO_CARD_FILE_NOT_SELECTED; break;
-    case 0x6A82 : rc = CALYPSO_CARD_FILE_NOT_FOUND; break;
-    case 0x6A83 : rc = CALYPSO_CARD_FILE_OVERFLOW; break;
-    case 0x6B00 : rc = CALYPSO_ERR_SW_WRONG_P1P2; break;
+	case 0x6981: rc = CALYPSO_CARD_WRONG_FILE_TYPE; break;
+	case 0x6982: rc = CALYPSO_CARD_ACCESS_DENIED; break;
+	case 0x6985: rc = CALYPSO_CARD_ACCESS_FORBIDDEN; break;
+	case 0x6986: rc = CALYPSO_CARD_FILE_NOT_SELECTED; break;
+	case 0x6A82: rc = CALYPSO_CARD_FILE_NOT_FOUND; break;
+	case 0x6A83: rc = CALYPSO_CARD_FILE_OVERFLOW; break;
+	case 0x6B00: rc = CALYPSO_ERR_SW_WRONG_P1P2; break;
 
-    default     : rc = CALYPSO_ERR_STATUS_WORD;
-  }
+	default: rc = CALYPSO_ERR_STATUS_WORD;
+	}
 
-  if (rc) goto done;
-  
-  if ((data != NULL) && (datasize != NULL) && (old_datasize != 0) && (old_datasize < recv_len-2))
-  {
-    *datasize = recv_len-2;
-    rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
-    goto done;
-  }
-  if (data != NULL)
-    memcpy(data, ctx->Card.Buffer, recv_len-2);
-  if (datasize != NULL)
-    *datasize = recv_len-2;
+	if (rc) goto done;
+
+	if ((data != NULL) && (datasize != NULL) && (old_datasize != 0) && (old_datasize < recv_len - 2))
+	{
+		*datasize = recv_len - 2;
+		rc = CALYPSO_ERR_BUFFER_TOO_SHORT;
+		goto done;
+	}
+	if (data != NULL)
+		memcpy(data, ctx->Card.Buffer, recv_len - 2);
+	if (datasize != NULL)
+		*datasize = recv_len - 2;
 
 done:
-  RETURN("ReadRecord");
+	RETURN("ReadRecord");
 }

@@ -182,7 +182,7 @@ BOOL MifPlus_FollowingAuthentication(WORD key_address, BOOL* last_block_reached)
 static BOOL confirm(void)
 {
 	char s[16];
-	int i;
+	size_t i;
 
 	for (;;)
 	{
@@ -247,7 +247,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	rc = SPROX_GetLibraryA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_GetLibrary(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("Failed to get API version\n");
@@ -259,7 +259,7 @@ int main(int argc, char** argv)
 	/* Open the reader */
 	/* --------------- */
 
-	rc = SPROX_ReaderOpenA(szCommDevice);
+	rc = SPROX_ReaderOpen(szCommDevice);
 	if (rc != MI_OK)
 	{
 		printf("Reader not found\n");
@@ -268,11 +268,11 @@ int main(int argc, char** argv)
 
 	/* Display reader's information */
 	printf("Reader found\n");
-	rc = SPROX_ReaderGetDeviceA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetDevice(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader found on %s\n", s_buffer);
 
-	rc = SPROX_ReaderGetFirmwareA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetFirmware(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader firwmare is %s\n", s_buffer);
 
@@ -506,7 +506,7 @@ int main(int argc, char** argv)
 			rc = SPROX_MifPlus_CommitPerso();
 			if (rc)
 			{
-				printf("SPROX_MifPlus_CommitPerso failed, rc=%ld\n", rc);
+				printf("SPROX_MifPlus_CommitPerso failed, rc=%d\n", rc);
 				success = FALSE;
 				break;
 			}
@@ -628,7 +628,7 @@ close:
 done:
 	/* Display last error */
 	if (rc != MI_OK)
-		printf("%s (%ld)\n", SPROX_GetErrorMessageA(rc), rc);
+		printf("%s (%d)\n", SPROX_GetErrorMessageA(rc), rc);
 
 	return EXIT_SUCCESS;
 }
@@ -803,23 +803,23 @@ static const MIFPLUS_PERSO_ST mifplus_perso[] =
 { OPT_GTE_4K, 0x404C, { "AES key A sect38" }}, { OPT_GTE_4K, 0x404D, { "AES key B sect38" }},
 { OPT_GTE_4K, 0x404E, { "AES key A sect39" }}, { OPT_GTE_4K, 0x404F, { "AES key B sect39" }},
 
-/* MFP configuration block - see MifPlux X datasheet § 10.11 */
+/* MFP configuration block - see MifPlux X datasheet ï¿½ 10.11 */
 //{ OPT_ONLY_X, 0xB000, { ...define new MFP configuration block here... }},
 
-  /* MFP installation identifier - see MifPlux X datasheet § 9.7.7 */
+  /* MFP installation identifier - see MifPlux X datasheet ï¿½ 9.7.7 */
   { OPT_X_OR_S, 0xB001, { "SpringCard  test" }},
 
   /* ATS information - here we could modify the ATS. WE'D BETTER NOT!!! */
 //{ OPT_X_OR_S, 0xB002, { ...define new ATS here... }},
 
-  /* Field Configuration Block - see MifPlux X datasheet § 10.10 */
+  /* Field Configuration Block - see MifPlux X datasheet ï¿½ 10.10 */
 //{ OPT_X_OR_S, 0xB003, { ...define new Field Configuration Block here... }},
 };
 
 /* Return the value associated to an address in our array */
 static const BYTE* get_perso_value(WORD address)
 {
-	int i;
+	size_t i;
 
 	for (i = 0; i < (sizeof(mifplus_perso) / sizeof(mifplus_perso[0])); i++)
 		if (mifplus_perso[i].address == address)
@@ -831,7 +831,7 @@ static const BYTE* get_perso_value(WORD address)
 BOOL MifPlus_L0_SetRid(void)
 {
 	SWORD rc;
-	/* Enable Random ID - see MifPlux X datasheet § 10.10 */
+	/* Enable Random ID - see MifPlux X datasheet ï¿½ 10.10 */
 	BYTE FCB[16] = { 0x00,
 					   0xAA, /* Use Random ID */
 									 0x55, /* Proximity Check is not mandatory */
@@ -848,7 +848,7 @@ BOOL MifPlus_L0_SetRid(void)
 	rc = SPROX_MifPlus_WritePerso(0xB003, FCB);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_WritePerso(%04X) failed, rc=%ld\n", 0xB003, rc);
+		printf("SPROX_MifPlus_WritePerso(%04X) failed, rc=%d\n", 0xB003, rc);
 		return FALSE;
 	}
 
@@ -861,7 +861,7 @@ BOOL MifPlus_L0_Perso(void)
 	BOOL is_x = FALSE;
 	BOOL is_2k = FALSE;
 	BOOL is_4k = FALSE;
-	int i;
+	size_t i;
 	SWORD rc;
 
 	printf("Doing Level 0 personalization...\n");
@@ -871,8 +871,8 @@ BOOL MifPlus_L0_Perso(void)
 		/* Skip options not applicable to this card. */
 		switch (mifplus_perso[i].option)
 		{
-		case OPT_ONLY_X: if (is_s)  continue;
-		case OPT_GTE_4K: if (is_2k) continue;
+		case OPT_ONLY_X: if (is_s)  continue; break;
+		case OPT_GTE_4K: if (is_2k) continue; break;
 		default: break;
 		}
 
@@ -894,7 +894,7 @@ BOOL MifPlus_L0_Perso(void)
 				}
 			}
 
-			printf("SPROX_MifPlus_WritePerso(%04X) failed, rc=%ld\n", mifplus_perso[i].address, rc);
+			printf("SPROX_MifPlus_WritePerso(%04X) failed, rc=%d\n", mifplus_perso[i].address, rc);
 			return FALSE;
 		}
 
@@ -943,8 +943,6 @@ BOOL MifPlus_L0_Perso(void)
 
 BOOL MifPlus_L1_Test(void)
 {
-	BYTE sectors = 40;
-
 	/* Mifare Plus Level 1 AES Authentication */
 	/* -------------------------------------- */
 
@@ -978,7 +976,7 @@ BOOL MifPlus_L1_Go_L2(void)
 	rc = SPROX_MifPlus_EnterTcl();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_EnterTcl failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_EnterTcl failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1010,7 +1008,7 @@ BOOL MifPlus_L1_Go_L3(void)
 	rc = SPROX_MifPlus_EnterTcl();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_EnterTcl failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_EnterTcl failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1055,7 +1053,7 @@ BOOL MifPlus_L2_Go_L3(void)
 	rc = SPROX_MifPlus_EnterTcl();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_EnterTcl failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_EnterTcl failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1111,7 +1109,7 @@ BOOL MifPlus_L3_Test_VirtualCard()
 		&picc_uid_len);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_VirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_VirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1123,7 +1121,7 @@ BOOL MifPlus_L3_Test_VirtualCard()
 	rc = SPROX_MifPlus_DeselectVirtualCard();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1148,7 +1146,7 @@ BOOL MifPlus_L3_Test_VirtualCard()
 	rc = SPROX_MifPlus_DeselectVirtualCard();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1164,13 +1162,13 @@ BOOL MifPlus_L3_Test_VirtualCard()
 		&picc_uid_len);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_VirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_VirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 	rc = SPROX_MifPlus_DeselectVirtualCard();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1198,7 +1196,7 @@ BOOL MifPlus_L3_Test_VirtualCard()
 	rc = SPROX_MifPlus_DeselectVirtualCard();
 	if (rc)
 	{
-		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_DeselectVirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1217,7 +1215,7 @@ BOOL MifPlus_L3_Test_VirtualCard()
 		&picc_uid_len);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_VirtualCard failed, rc=%ld\n", rc);
+		printf("SPROX_MifPlus_VirtualCard failed, rc=%d\n", rc);
 		return FALSE;
 	}
 
@@ -1231,7 +1229,7 @@ BOOL MifPlus_L3_Read(WORD address, BYTE data[])
 	rc = SPROX_MifPlus_Read(address, data);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_Read(%04X) failed, rc=%ld\n", address, rc);
+		printf("SPROX_MifPlus_Read(%04X) failed, rc=%d\n", address, rc);
 		return FALSE;
 	}
 
@@ -1245,7 +1243,7 @@ BOOL MifPlus_L3_Write(WORD address, BYTE const data[])
 	rc = SPROX_MifPlus_Write(address, data);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_Write(%04X) failed, rc=%ld\n", address, rc);
+		printf("SPROX_MifPlus_Write(%04X) failed, rc=%d\n", address, rc);
 		return FALSE;
 	}
 
@@ -1402,7 +1400,7 @@ BOOL MifPlus_FirstAuthentication(WORD key_address)
 	rc = SPROX_MifPlus_FirstAuthenticate(key_address, key_value, pcd_cap, 6, NULL);
 	if (rc)
 	{
-		printf("SPROX_MifPlus_FirstAuthenticate(%04X) failed, rc=%ld\n", key_address, rc);
+		printf("SPROX_MifPlus_FirstAuthenticate(%04X) failed, rc=%d\n", key_address, rc);
 		return FALSE;
 	}
 
@@ -1433,7 +1431,7 @@ BOOL MifPlus_FollowingAuthentication(WORD key_address, BOOL* last_block_reached)
 
 	if (rc)
 	{
-		printf("SPROX_MifPlus_FollowingAuthenticate(%04X) failed, rc=%ld\n", key_address, rc);
+		printf("SPROX_MifPlus_FollowingAuthenticate(%04X) failed, rc=%d\n", key_address, rc);
 		return FALSE;
 	}
 

@@ -18,50 +18,50 @@
 
 #ifndef CALYPSO_NO_TRANS
 
-/**f* SpringProxINS/CalypsoStartTransaction
- *
- * NAME
- *   CalypsoStartTransaction
- *
- * DESCRIPTION
- *   Start a transaction between card and SAM (light implemenation)
- *   No data will be returned by the card, SAM's KIF will be deduce from card's key_no
- *
- * INPUTS
- *   CALYPSO_CTX_ST *ctx       : library context
- *   BOOL           *ratified  : on output: was the previous session ratified, or not ?
- *   BYTE           key_no     : key number (card side)
- *
- * RETURNS
- *   CALYPSO_RC                : 0 or an error code
- *
- * NOTES
- *   key_no should be either CALYPSO_KEY_ISSUER, CALYPSO_KEY_LOAD or CALYPSO_KEY_DEBIT
- *
- *   See CalypsoStartTransactionEx for implementation details
- *
- * SEE ALSO
- *   CalypsoStartTransactionEx
- *   CalypsoCommitTransaction
- *   CalypsoCancelTransaction
- *
- **/
-CALYPSO_PROC CalypsoStartTransaction(CALYPSO_CTX_ST *ctx, BOOL *ratified, BYTE key_no)
+ /**f* SpringProxINS/CalypsoStartTransaction
+  *
+  * NAME
+  *   CalypsoStartTransaction
+  *
+  * DESCRIPTION
+  *   Start a transaction between card and SAM (light implemenation)
+  *   No data will be returned by the card, SAM's KIF will be deduce from card's key_no
+  *
+  * INPUTS
+  *   CALYPSO_CTX_ST *ctx       : library context
+  *   BOOL           *ratified  : on output: was the previous session ratified, or not ?
+  *   BYTE           key_no     : key number (card side)
+  *
+  * RETURNS
+  *   CALYPSO_RC                : 0 or an error code
+  *
+  * NOTES
+  *   key_no should be either CALYPSO_KEY_ISSUER, CALYPSO_KEY_LOAD or CALYPSO_KEY_DEBIT
+  *
+  *   See CalypsoStartTransactionEx for implementation details
+  *
+  * SEE ALSO
+  *   CalypsoStartTransactionEx
+  *   CalypsoCommitTransaction
+  *   CalypsoCancelTransaction
+  *
+  **/
+CALYPSO_PROC CalypsoStartTransaction(CALYPSO_CTX_ST* ctx, BOOL* ratified, BYTE key_no)
 {
-  BYTE kif;
+	BYTE kif;
 
-  switch (key_no)
-  {
-    case CALYPSO_KEY_ISSUER : kif = CALYPSO_KIF_ISSUER; break;
-    case CALYPSO_KEY_LOAD   : kif = CALYPSO_KIF_LOAD; break;
-    case CALYPSO_KEY_DEBIT  : kif = CALYPSO_KIF_DEBIT; break;
-    default                 : if (ctx->CardApplication.Revision >= 3)
-                                kif = 0xFF;
-                              else
-                                return CALYPSO_KIF_IS_UNKNOWN_FOR_KEY;
-  }
+	switch (key_no)
+	{
+	case CALYPSO_KEY_ISSUER: kif = CALYPSO_KIF_ISSUER; break;
+	case CALYPSO_KEY_LOAD: kif = CALYPSO_KIF_LOAD; break;
+	case CALYPSO_KEY_DEBIT: kif = CALYPSO_KIF_DEBIT; break;
+	default: if (ctx->CardApplication.Revision >= 3)
+		kif = 0xFF;
+		   else
+		return CALYPSO_KIF_IS_UNKNOWN_FOR_KEY;
+	}
 
-  return CalypsoStartTransactionEx(ctx, ratified, key_no, kif, 0, 0, NULL, NULL);  
+	return CalypsoStartTransactionEx(ctx, ratified, key_no, kif, 0, 0, NULL, NULL);
 }
 
 /**f* SpringProxINS/CalypsoStartTransactionEx
@@ -103,109 +103,124 @@ CALYPSO_PROC CalypsoStartTransaction(CALYPSO_CTX_ST *ctx, BOOL *ratified, BYTE k
  *   CalypsoCancelTransaction
  *
  **/
-CALYPSO_PROC CalypsoStartTransactionEx(CALYPSO_CTX_ST *ctx, BOOL *ratified, BYTE key_no, BYTE kif, BYTE sfi, BYTE rec_no, BYTE data[], CALYPSO_SZ *datasize)
+CALYPSO_PROC CalypsoStartTransactionEx(CALYPSO_CTX_ST* ctx, BOOL* ratified, BYTE key_no, BYTE kif, BYTE sfi, BYTE rec_no, BYTE data[], CALYPSO_SZ* datasize)
 {
-  BYTE resp[64];
-  CALYPSO_SZ respsize = sizeof(resp);
-  BYTE sam_chal[4], card_chal[4];
-  BOOL _ratified;
-  BYTE kvc = 0xFF;
-  CALYPSO_RC rc;
-  
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;  
-  if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
+	BYTE resp[64];
+	CALYPSO_SZ respsize = sizeof(resp);
+	BYTE sam_chal[4], card_chal[4];
+	BOOL _ratified;
+	BYTE kvc = 0xFF;
+	CALYPSO_RC rc;
 
-  CalypsoTraceStr(TR_TRACE|TR_TRANS, "StartTransaction");
-  CalypsoTraceValD(TR_TRACE|TR_TRANS, "C'Rev=", ctx->CardApplication.Revision, 0);
-  CalypsoTraceHex(TR_TRACE|TR_TRANS, "C'UID=", ctx->CardApplication.UID, sizeof(ctx->CardApplication.UID));
-  CalypsoTraceValH(TR_TRACE|TR_TRANS, "Key=", key_no, 2);
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (!ctx->CardApplication.Revision) return CALYPSO_CARD_NOT_SUPPORTED;
 
-  if (ctx->CardApplication.SessionActive)
-  {
-    CalypsoTraceStr(TR_ERROR|TR_TRANS, "StartTransaction: Already in transaction");
-  }
+	CalypsoTraceStr(TR_TRACE | TR_TRANS, "StartTransaction");
+	CalypsoTraceValD(TR_TRACE | TR_TRANS, "C'Rev=", ctx->CardApplication.Revision, 0);
+	CalypsoTraceHex(TR_TRACE | TR_TRANS, "C'UID=", ctx->CardApplication.UID, sizeof(ctx->CardApplication.UID));
+	CalypsoTraceValH(TR_TRACE | TR_TRANS, "Key=", key_no, 2);
 
-  /* Feed the SAM with card's UID */
-  rc = CalypsoSamSelectDiversifier(ctx, ctx->CardApplication.UID);
-  if (rc) goto done;
+	if (ctx->CardApplication.SessionActive)
+	{
+		CalypsoTraceStr(TR_ERROR | TR_TRANS, "StartTransaction: Already in transaction");
+	}
 
-  /* Ask the SAM to provide a challenge */
-  rc = CalypsoSamGetChallenge(ctx, sam_chal);
-  if (rc) goto done;
+#if (CALYPSO_WITH_SAM)
+	/* Feed the SAM with card's UID */
+	rc = CalypsoSamSelectDiversifier(ctx, ctx->CardApplication.UID);
+	if (rc) goto done;
 
-  //sfi =0; rec_no = 0;
-  
-  /* Ask the card to open a secure session */
-  if (ctx->CardApplication.Revision >= 3)
-  {
-    rc = CalypsoCardOpenSecureSession3(ctx, resp, &respsize, key_no, sfi, rec_no, sam_chal, card_chal, &_ratified, data, datasize, &kvc, &kif);
-  } else
-  if (ctx->CardApplication.Revision == 2)
-  {
-    rc = CalypsoCardOpenSecureSession2(ctx, resp, &respsize, key_no, sfi, rec_no, sam_chal, card_chal, &_ratified, data, datasize, &kvc);
-  } else
-  if (ctx->CardApplication.Revision == 1)
-  {
-    rc = CalypsoCardOpenSecureSession1(ctx, resp, &respsize, key_no, sfi, rec_no, sam_chal, card_chal, &_ratified, data, datasize);
-  } else
-    rc = CALYPSO_ERR_INVALID_CONTEXT;
-  
-  if (rc) goto done;
-  
-  CalypsoTraceValH(TR_TRACE|TR_TRANS, "KIF=", kif, 2);
-  CalypsoTraceValH(TR_TRACE|TR_TRANS, "KVC=", kvc, 2);
-  CalypsoTraceValD(TR_TRACE|TR_TRANS, "Ratified=", _ratified, 0);
+	/* Ask the SAM to provide a challenge */
+	rc = CalypsoSamGetChallenge(ctx, sam_chal);
+	if (rc) goto done;
 
-  if (ratified != NULL)
-    *ratified = _ratified;
+#else
 
-  /* Forward KVC and challenge to the SAM */
-  if (ctx->CardApplication.Revision == 1)
-  {
-    BYTE kno;
-    switch (kif)
-    {
-      case CALYPSO_KIF_ISSUER : kno = CALYPSO_KNO_ISSUER; break;
-      case CALYPSO_KIF_LOAD   : kno = CALYPSO_KNO_LOAD; break;
-      case CALYPSO_KIF_DEBIT  : kno = CALYPSO_KNO_DEBIT; break;
-      default                 : rc = CALYPSO_KIF_IS_UNKNOWN_FOR_KEY; goto done;
-    }
+	/* Dummy */
+	memset(sam_chal, 0xCC, sizeof(sam_chal));
 
-    rc = CalypsoSamDigestInitCompat(ctx, kno, resp, respsize);
-  } else
-  {
-    if (kif == 0xFF)
-    {
-      /* KIF not returned by the card - let's use default one */
-      switch (key_no)
-      {
-        case CALYPSO_KEY_ISSUER : kif = CALYPSO_KIF_ISSUER; break;
-        case CALYPSO_KEY_LOAD   : kif = CALYPSO_KIF_LOAD; break;
-        case CALYPSO_KEY_DEBIT  : kif = CALYPSO_KIF_DEBIT; break;
-        default : break; /* Oups is 0xFF a valid KIF ??? */
-      }
-      CalypsoTraceValH(TR_TRACE|TR_TRANS, "KIF used=", kif, 2);
-    }
+#endif
 
-    rc = CalypsoSamDigestInit(ctx, kif, kvc, resp, respsize);
-  }
-  if (rc)
-  {
-    /* We'd better rollback the transaction on the card side right now */
-    CalypsoCardCloseSecureSession(ctx, FALSE, NULL, NULL, NULL);
-    goto done;
-  }
+	//sfi =0; rec_no = 0;
 
-  /* Ready ! */
-  ctx->CardApplication.SessionActive  = TRUE;
-  ctx->CardApplication.SessionCurMods = 0;
+	/* Ask the card to open a secure session */
+	if (ctx->CardApplication.Revision >= 3)
+	{
+		rc = CalypsoCardOpenSecureSession3(ctx, resp, &respsize, key_no, sfi, rec_no, sam_chal, card_chal, &_ratified, data, datasize, &kvc, &kif);
+	}
+	else
+		if (ctx->CardApplication.Revision == 2)
+		{
+			rc = CalypsoCardOpenSecureSession2(ctx, resp, &respsize, key_no, sfi, rec_no, sam_chal, card_chal, &_ratified, data, datasize, &kvc);
+		}
+		else
+			if (ctx->CardApplication.Revision == 1)
+			{
+				rc = CalypsoCardOpenSecureSession1(ctx, resp, &respsize, key_no, sfi, rec_no, sam_chal, card_chal, &_ratified, data, datasize);
+			}
+			else
+				rc = CALYPSO_ERR_INVALID_CONTEXT;
 
-  /* Remember KIF and KVC in case we need it later */
-  ctx->CardApplication.CurrentKif = kif;
-  ctx->CardApplication.CurrentKvc = kvc;
+	if (rc) goto done;
+
+	CalypsoTraceValH(TR_TRACE | TR_TRANS, "KIF=", kif, 2);
+	CalypsoTraceValH(TR_TRACE | TR_TRANS, "KVC=", kvc, 2);
+	CalypsoTraceValD(TR_TRACE | TR_TRANS, "Ratified=", _ratified, 0);
+
+	if (ratified != NULL)
+		*ratified = _ratified;
+
+#if (CALYPSO_WITH_SAM)
+	/* Forward KVC and challenge to the SAM */
+	if (ctx->CardApplication.Revision == 1)
+	{
+		BYTE kno;
+		switch (kif)
+		{
+		case CALYPSO_KIF_ISSUER: kno = CALYPSO_KNO_ISSUER; break;
+		case CALYPSO_KIF_LOAD: kno = CALYPSO_KNO_LOAD; break;
+		case CALYPSO_KIF_DEBIT: kno = CALYPSO_KNO_DEBIT; break;
+		default: rc = CALYPSO_KIF_IS_UNKNOWN_FOR_KEY; goto done;
+		}
+
+		rc = CalypsoSamDigestInitCompat(ctx, kno, resp, respsize);
+	}
+	else
+	{
+		if (kif == 0xFF)
+		{
+			/* KIF not returned by the card - let's use default one */
+			switch (key_no)
+			{
+			case CALYPSO_KEY_ISSUER: kif = CALYPSO_KIF_ISSUER; break;
+			case CALYPSO_KEY_LOAD: kif = CALYPSO_KIF_LOAD; break;
+			case CALYPSO_KEY_DEBIT: kif = CALYPSO_KIF_DEBIT; break;
+			default: break; /* Oups is 0xFF a valid KIF ??? */
+			}
+			CalypsoTraceValH(TR_TRACE | TR_TRANS, "KIF used=", kif, 2);
+		}
+
+		rc = CalypsoSamDigestInit(ctx, kif, kvc, resp, respsize);
+	}
+#endif
+
+	if (rc)
+	{
+		/* We'd better rollback the transaction on the card side right now */
+		CalypsoCardCloseSecureSession(ctx, FALSE, NULL, NULL, NULL);
+		goto done;
+	}
+
+	/* Ready ! */
+	ctx->CardApplication.SessionActive = TRUE;
+	ctx->CardApplication.SessionCurMods = 0;
+
+	/* Remember KIF and KVC in case we need it later */
+	ctx->CardApplication.CurrentKif = kif;
+	ctx->CardApplication.CurrentKvc = kvc;
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* SpringProxINS/CalypsoCommitTransaction
@@ -237,48 +252,49 @@ done:
  *   CalypsoCancelTransaction
  *
  **/
-CALYPSO_PROC CalypsoCommitTransaction(CALYPSO_CTX_ST *ctx, BOOL ratify_now)
+CALYPSO_PROC CalypsoCommitTransaction(CALYPSO_CTX_ST* ctx, BOOL ratify_now)
 {
-  BYTE resp[CALYPSO_MAX_DATA_SZ];
-  CALYPSO_SZ respsize = CALYPSO_MAX_DATA_SZ;
-  BYTE sam_sign[4], card_sign[4];
-  DWORD rc;
+	BYTE resp[CALYPSO_MAX_DATA_SZ];
+	CALYPSO_SZ respsize = CALYPSO_MAX_DATA_SZ;
+	BYTE sam_sign[4], card_sign[4];
+	DWORD rc;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
-  CalypsoTraceStr(TR_TRACE|TR_TRANS, "CommitTransaction");
+	CalypsoTraceStr(TR_TRACE | TR_TRANS, "CommitTransaction");
 
-  if (!ctx->CardApplication.SessionActive)
-  {
-    CalypsoTraceStr(TR_ERROR|TR_TRANS, "CommitTransaction: Not in transaction");
-  }
+	if (!ctx->CardApplication.SessionActive)
+	{
+		CalypsoTraceStr(TR_ERROR | TR_TRANS, "CommitTransaction: Not in transaction");
+	}
 
-  ctx->CardApplication.SessionActive = FALSE;
+	ctx->CardApplication.SessionActive = FALSE;
 
-  /* Ask the SAM to compute the signature */
-  rc = CalypsoSamDigestClose(ctx, sam_sign);
-  if (rc) goto done;
+	/* Ask the SAM to compute the signature */
+	rc = CalypsoSamDigestClose(ctx, sam_sign);
+	if (rc) goto done;
 
-  /* Ask the card to close its session */
-  rc = CalypsoCardCloseSecureSession(ctx, ratify_now, sam_sign, resp, &respsize);
-  if (rc) goto done;
+	/* Ask the card to close its session */
+	rc = CalypsoCardCloseSecureSession(ctx, ratify_now, sam_sign, resp, &respsize);
+	if (rc) goto done;
 
-  /* Check card's response to retrieve its signature */
-  if (respsize >= 4)
-  {
-    memcpy(card_sign, &resp[respsize-4], 4);
-  } else
-  {
-    rc = CALYPSO_ERR_RESPONSE_SIZE;
-    goto done;
-  }
+	/* Check card's response to retrieve its signature */
+	if (respsize >= 4)
+	{
+		memcpy(card_sign, &resp[respsize - 4], 4);
+	}
+	else
+	{
+		rc = CALYPSO_ERR_RESPONSE_SIZE;
+		goto done;
+	}
 
-  /* Forward card's signature to the SAM */
-  rc = CalypsoSamDigestAuthenticate(ctx, card_sign);
-  if (rc) goto done;
+	/* Forward card's signature to the SAM */
+	rc = CalypsoSamDigestAuthenticate(ctx, card_sign);
+	if (rc) goto done;
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* SpringProxINS/CalypsoCancelTransaction
@@ -301,27 +317,27 @@ done:
  *   CalypsoCommitTransaction
  *
  **/
-CALYPSO_PROC CalypsoCancelTransaction(CALYPSO_CTX_ST *ctx)
+CALYPSO_PROC CalypsoCancelTransaction(CALYPSO_CTX_ST* ctx)
 {
-  BYTE resp[CALYPSO_MAX_DATA_SZ];
-  CALYPSO_SZ respsize = CALYPSO_MAX_DATA_SZ;
-  CALYPSO_RC rc;
+	BYTE resp[CALYPSO_MAX_DATA_SZ];
+	CALYPSO_SZ respsize = CALYPSO_MAX_DATA_SZ;
+	CALYPSO_RC rc;
 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
 
-  CalypsoTraceStr(TR_TRACE|TR_TRANS, "CancelTransaction");
+	CalypsoTraceStr(TR_TRACE | TR_TRANS, "CancelTransaction");
 
-  if (!ctx->CardApplication.SessionActive)
-  {
-    CalypsoTraceStr(TR_ERROR|TR_TRANS, "CancelTransaction: Not in transaction");
-  }
+	if (!ctx->CardApplication.SessionActive)
+	{
+		CalypsoTraceStr(TR_ERROR | TR_TRANS, "CancelTransaction: Not in transaction");
+	}
 
-  ctx->CardApplication.SessionActive = FALSE;
+	ctx->CardApplication.SessionActive = FALSE;
 
-  /* Ask the card to close its session */
-  rc = CalypsoCardCloseSecureSession(ctx, FALSE, NULL, resp, &respsize);
+	/* Ask the card to close its session */
+	rc = CalypsoCardCloseSecureSession(ctx, FALSE, NULL, resp, &respsize);
 
-  return rc;
+	return rc;
 }
 
 #endif

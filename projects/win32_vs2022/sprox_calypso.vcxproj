@@ -56,6 +56,15 @@
     <ClCompile Include="..\..\src\common\lib-c\utils\binconvert.c" />
     <ClCompile Include="..\..\src\common\lib-c\utils\strl.c" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_api.h" />
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_api_i.h" />
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_card.h" />
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_errors.h" />
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_ins.h" />
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_strings.h" />
+    <ClInclude Include="..\..\src\common\cardware\calypso\calypso_types.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -110,11 +119,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\_output\win32_vs2022\</OutDir>
+    <OutDir>bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\_output\win32_vs2022\</OutDir>
+    <OutDir>bin\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>..\..\src\common;$(IncludePath)</IncludePath>
   </PropertyGroup>

@@ -14,18 +14,18 @@
 
 typedef struct
 {
-  union
-  {
-    DES_CTX_ST  des;
-    TDES_CTX_ST tdes;
-  } cipher;
+	union
+	{
+		DES_CTX_ST  des;
+		TDES_CTX_ST tdes;
+	} cipher;
 
-  BYTE init_vector[8];
+	BYTE init_vector[8];
 
 } AUTH_CTX_ST;
 
-SPROX_API_FUNC(MifUlC_AuthenticateStep1) (SPROX_PARAM  AUTH_CTX_ST *ctx, BYTE rnd_picc[8]);
-SPROX_API_FUNC(MifUlC_AuthenticateStep2) (SPROX_PARAM  AUTH_CTX_ST *ctx, const BYTE rnd_picc[8], const BYTE rnd_pcd[8]);
+SPROX_API_FUNC(MifUlC_AuthenticateStep1) (SPROX_PARAM  AUTH_CTX_ST* ctx, BYTE rnd_picc[8]);
+SPROX_API_FUNC(MifUlC_AuthenticateStep2) (SPROX_PARAM  AUTH_CTX_ST* ctx, const BYTE rnd_picc[8], const BYTE rnd_pcd[8]);
 
 /**f* MifUlCAPI/Authenticate
  *
@@ -54,194 +54,194 @@ SPROX_API_FUNC(MifUlC_AuthenticateStep2) (SPROX_PARAM  AUTH_CTX_ST *ctx, const B
  *
  * RETURNS
  *   MI_OK : authentication succeed
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  **/
 SPROX_API_FUNC(MifUlC_Authenticate) (SPROX_PARAM  const BYTE key_value[16])
 {
-  SPROX_RC rc;
-  AUTH_CTX_ST ctx;
+	SPROX_RC rc;
+	AUTH_CTX_ST ctx;
 	BYTE rnd_picc[8], rnd_pcd[8];
-	
+
 #ifndef _USE_PCSC
-  rc = SPROX_API_CALL(A_SelectAgain) (SPROX_PARAM_P  NULL, 0);
-  if (rc != MI_OK)
-    goto done;
+	rc = SPROX_API_CALL(A_SelectAgain) (SPROX_PARAM_P  NULL, 0);
+	if (rc != MI_OK)
+		goto done;
 #endif
 
-  TDES_Init(&ctx.cipher.tdes, &key_value[0], &key_value[8], &key_value[0]);
-  
-  memset(ctx.init_vector, 0, 8);
-  
-	rc = SPROX_API_CALL(MifUlC_AuthenticateStep1) (SPROX_PARAM_P  &ctx, rnd_picc);
-  if (rc != MI_OK)
-    goto done;
-    
-  GetRandomBytes(SPROX_PARAM_P  rnd_pcd, 8);
-  
-	rc = SPROX_API_CALL(MifUlC_AuthenticateStep2) (SPROX_PARAM_P  &ctx, rnd_picc, rnd_pcd);
-	
-  if (rc != MI_OK)
-    goto done;
+	TDES_Init(&ctx.cipher.tdes, &key_value[0], &key_value[8], &key_value[0]);
+
+	memset(ctx.init_vector, 0, 8);
+
+	rc = SPROX_API_CALL(MifUlC_AuthenticateStep1) (SPROX_PARAM_P & ctx, rnd_picc);
+	if (rc != MI_OK)
+		goto done;
+
+	GetRandomBytes(SPROX_PARAM_P  rnd_pcd, 8);
+
+	rc = SPROX_API_CALL(MifUlC_AuthenticateStep2) (SPROX_PARAM_P & ctx, rnd_picc, rnd_pcd);
+
+	if (rc != MI_OK)
+		goto done;
 
 done:
-  return rc;
+	return rc;
 }
 
 /*
  * MifUlC_AuthenticateStep1
  * ------------------------
  */
-SPROX_API_FUNC(MifUlC_AuthenticateStep1) (SPROX_PARAM  AUTH_CTX_ST *ctx, BYTE rnd_picc[8])
+SPROX_API_FUNC(MifUlC_AuthenticateStep1) (SPROX_PARAM  AUTH_CTX_ST* ctx, BYTE rnd_picc[8])
 {
-  SPROX_RC rc = MI_OK;
-  BYTE buffer[64];
-  BYTE rnd_picc_e[8];
-  WORD rlen;
+	SPROX_RC rc = MI_OK;
+	BYTE buffer[64];
+	BYTE rnd_picc_e[8];
+	WORD rlen;
 
-  BYTE i;
- 
-  /* Send the command to the card */
-  /* ---------------------------- */
-  
-  buffer[0] = 0x1A;
-  buffer[1] = 0x00;
-  buffer[2] = 0xCC;
-  buffer[3] = 0xCC;  
+	BYTE i;
 
-  rlen = sizeof(buffer);
+	/* Send the command to the card */
+	/* ---------------------------- */
+
+	buffer[0] = 0x1A;
+	buffer[1] = 0x00;
+	buffer[2] = 0xCC;
+	buffer[3] = 0xCC;
+
+	rlen = sizeof(buffer);
 #ifndef _USE_PCSC
-  rc = MifUlC_Command(SPROX_PARAM_P  buffer, 2, buffer, &rlen);
+	rc = MifUlC_Command(SPROX_PARAM_P  buffer, 2, buffer, &rlen);
 #else
-  rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 2, buffer, sizeof(buffer), &rlen);
+	rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 2, buffer, sizeof(buffer), &rlen);
 #endif
 
-  if (rc != MI_OK)
-    goto done;
+	if (rc != MI_OK)
+		goto done;
 
-  /* Check that answer is acceptable */
-  /* ------------------------------- */
+	/* Check that answer is acceptable */
+	/* ------------------------------- */
 
-  if (rlen != 9)
-  {
-    rc = MI_BYTECOUNTERR;
-    goto done;
-  }
-  if (buffer[0] != 0xAF)
-  {
-    rc = MI_CODEERR;
-    goto done;
-  }
+	if (rlen != 9)
+	{
+		rc = MI_BYTECOUNTERR;
+		goto done;
+	}
+	if (buffer[0] != 0xAF)
+	{
+		rc = MI_CODEERR;
+		goto done;
+	}
 
-  /* Retrieve card's RndB */
-  /* -------------------- */
+	/* Retrieve card's RndB */
+	/* -------------------- */
 
-  memcpy(rnd_picc_e, &buffer[1], 8);
+	memcpy(rnd_picc_e, &buffer[1], 8);
 
-  TDES_Decrypt2(&ctx->cipher.tdes, rnd_picc, rnd_picc_e);
-  for (i=0; i<8; i++)
-    rnd_picc[i] ^= ctx->init_vector[i];
+	TDES_Decrypt2(&ctx->cipher.tdes, rnd_picc, rnd_picc_e);
+	for (i = 0; i < 8; i++)
+		rnd_picc[i] ^= ctx->init_vector[i];
 
-  /* Remember the received cryptogram: this is the next init vector */
-  memcpy(ctx->init_vector, rnd_picc_e, 8);
+	/* Remember the received cryptogram: this is the next init vector */
+	memcpy(ctx->init_vector, rnd_picc_e, 8);
 
 done:
-  return rc;
+	return rc;
 }
 
-SPROX_API_FUNC(MifUlC_AuthenticateStep2) (SPROX_PARAM  AUTH_CTX_ST *ctx, const BYTE rnd_picc[8], const BYTE rnd_pcd[8])
+SPROX_API_FUNC(MifUlC_AuthenticateStep2) (SPROX_PARAM  AUTH_CTX_ST* ctx, const BYTE rnd_picc[8], const BYTE rnd_pcd[8])
 {
-  SPROX_RC rc = MI_OK;
-  BYTE rnd_pcd_e[8];
-  BYTE rnd_picc_e[8];
+	SPROX_RC rc = MI_OK;
+	BYTE rnd_pcd_e[8];
+	BYTE rnd_picc_e[8];
 
-  BYTE buffer[24];
-  WORD rlen;
+	BYTE buffer[24];
+	WORD rlen;
 
-  BYTE i;
+	BYTE i;
 
-  /* Encrypt RnA */
-  /* ----------- */
-  for (i=0; i<8; i++)
-    rnd_pcd_e[i] = rnd_pcd[i] ^ ctx->init_vector[i];   /* P  <- P XOR IV  */
-  TDES_Encrypt(&ctx->cipher.tdes, rnd_pcd_e);  /* IV <- 3DES(P)   */
+	/* Encrypt RnA */
+	/* ----------- */
+	for (i = 0; i < 8; i++)
+		rnd_pcd_e[i] = rnd_pcd[i] ^ ctx->init_vector[i];   /* P  <- P XOR IV  */
+	TDES_Encrypt(&ctx->cipher.tdes, rnd_pcd_e);  /* IV <- 3DES(P)   */
 
-  /* Remember the computed cryptogram: this is the next init vector */
-  memcpy(ctx->init_vector, rnd_pcd_e, 8);               /* P  <- IV        */
-   
+	/* Remember the computed cryptogram: this is the next init vector */
+	memcpy(ctx->init_vector, rnd_pcd_e, 8);               /* P  <- IV        */
+
 	/* Compute RnB', rotating RndB to the right */
   /* ---------------------------------------- */
-  for (i=0; i<7; i++)
-    rnd_picc_e[i] = rnd_picc[i+1];
-  rnd_picc_e[7] = rnd_picc[0];
+	for (i = 0; i < 7; i++)
+		rnd_picc_e[i] = rnd_picc[i + 1];
+	rnd_picc_e[7] = rnd_picc[0];
 
 	/* Encrypt RnB' */
   /* ------------ */
-  for (i=0; i<8; i++)
-    rnd_picc_e[i] ^= ctx->init_vector[i];               /* P  <- P XOR IV  */
-  TDES_Encrypt(&ctx->cipher.tdes, rnd_picc_e);  /* IV <- 3DES(P)   */
+	for (i = 0; i < 8; i++)
+		rnd_picc_e[i] ^= ctx->init_vector[i];               /* P  <- P XOR IV  */
+	TDES_Encrypt(&ctx->cipher.tdes, rnd_picc_e);  /* IV <- 3DES(P)   */
 
-  /* Remember the computed cryptogram: this is the next init vector */
-  memcpy(ctx->init_vector, rnd_picc_e, 8);              /* P  <- IV        */
+	/* Remember the computed cryptogram: this is the next init vector */
+	memcpy(ctx->init_vector, rnd_picc_e, 8);              /* P  <- IV        */
 
-  /* Build the command buffer */
-  /* ------------------------ */
+	/* Build the command buffer */
+	/* ------------------------ */
 
-  buffer[0] = 0xAF;
-  memcpy(&buffer[1], rnd_pcd_e, 8);
-  memcpy(&buffer[9], rnd_picc_e, 8);
-  buffer[17] = 0xCC;
-  buffer[18] = 0xCC;  
+	buffer[0] = 0xAF;
+	memcpy(&buffer[1], rnd_pcd_e, 8);
+	memcpy(&buffer[9], rnd_picc_e, 8);
+	buffer[17] = 0xCC;
+	buffer[18] = 0xCC;
 
-  /* Do the exchange */
-  /* --------------- */
-  rlen = sizeof(buffer);
+	/* Do the exchange */
+	/* --------------- */
+	rlen = sizeof(buffer);
 #ifndef _USE_PCSC
-  rc = MifUlC_Command(SPROX_PARAM_P  buffer, 17, buffer, &rlen);
+	rc = MifUlC_Command(SPROX_PARAM_P  buffer, 17, buffer, &rlen);
 #else
-  rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 17, buffer, sizeof(buffer), &rlen);
+	rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 17, buffer, sizeof(buffer), &rlen);
 #endif
 
-  if (rc != MI_OK)
-  {
-    if (rc == MI_ACCESSERR)
-      rc = MI_AUTHERR;
-    goto done;
-  }
+	if (rc != MI_OK)
+	{
+		if (rc == MI_ACCESSERR)
+			rc = MI_AUTHERR;
+		goto done;
+	}
 
-  /* Check that answer is acceptable */
-  /* ------------------------------- */
+	/* Check that answer is acceptable */
+	/* ------------------------------- */
 
-  if (buffer[0] != 0x00)
-  {
-    rc = MI_AUTHERR;
-    goto done;
-  }
-  if (rlen != 9)
-  {
-    rc = MI_BYTECOUNTERR;
-    goto done;
-  }
+	if (buffer[0] != 0x00)
+	{
+		rc = MI_AUTHERR;
+		goto done;
+	}
+	if (rlen != 9)
+	{
+		rc = MI_BYTECOUNTERR;
+		goto done;
+	}
 
-  memcpy(rnd_pcd_e, &buffer[1], 8);
+	memcpy(rnd_pcd_e, &buffer[1], 8);
 
-  TDES_Decrypt2(&ctx->cipher.tdes, rnd_pcd_e, rnd_pcd_e);
-  for (i=0; i<8; i++)
-    rnd_pcd_e[i] ^= ctx->init_vector[i];
+	TDES_Decrypt2(&ctx->cipher.tdes, rnd_pcd_e, rnd_pcd_e);
+	for (i = 0; i < 8; i++)
+		rnd_pcd_e[i] ^= ctx->init_vector[i];
 
-  /* Compare RndA' with RndA */
-  /* ----------------------- */
+	/* Compare RndA' with RndA */
+	/* ----------------------- */
 
-  if (memcmp(&rnd_pcd_e[0], &rnd_pcd[1], 7) || (rnd_pcd_e[7] != rnd_pcd[0]))
-  {
-    rc = MI_NOTAUTHERR;
-    goto done;
-  }
+	if (memcmp(&rnd_pcd_e[0], &rnd_pcd[1], 7) || (rnd_pcd_e[7] != rnd_pcd[0]))
+	{
+		rc = MI_NOTAUTHERR;
+		goto done;
+	}
 
 
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifUlCAPI/ChangeKey
@@ -271,32 +271,32 @@ done:
  *
  * RETURNS
  *   MI_OK : authentication succeed
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  **/
 SPROX_API_FUNC(MifUlC_ChangeKey) (SPROX_PARAM  const BYTE key_value[16])
 {
-  SPROX_RC rc;
-  BYTE i, j;
-  BYTE addr;
-  BYTE data[16];
-  
-  for (i=0; i<16; i+=8)
-  {
-    for (j=0; j<8; j++)
-      data[i+j] = key_value[i+7-j];
-  }
-  
-  for (i=0; i<4; i++)
-  {
-    addr = 0x2C + i;
+	SPROX_RC rc;
+	BYTE i, j;
+	BYTE addr;
+	BYTE data[16];
 
-    rc = SPROX_API_CALL(MifUlC_Write4) (SPROX_PARAM_P  addr, &data[4 * i]);
-    if (rc != MI_OK)
-      break;
-  }
-  
-  return rc;
+	for (i = 0; i < 16; i += 8)
+	{
+		for (j = 0; j < 8; j++)
+			data[i + j] = key_value[i + 7 - j];
+	}
+
+	for (i = 0; i < 4; i++)
+	{
+		addr = 0x2C + i;
+
+		rc = SPROX_API_CALL(MifUlC_Write4) (SPROX_PARAM_P  addr, &data[4 * i]);
+		if (rc != MI_OK)
+			break;
+	}
+
+	return rc;
 }
 
 /**f* MifUlCAPI/Read
@@ -329,45 +329,45 @@ SPROX_API_FUNC(MifUlC_ChangeKey) (SPROX_PARAM  const BYTE key_value[16])
  *
  * RETURNS
  *   MI_OK : authentication succeed
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  **/
 SPROX_API_FUNC(MifUlC_Read) (SPROX_PARAM  BYTE address, BYTE data[16])
 {
-  SPROX_RC rc;
-  WORD rlen;
-  BYTE buffer[64];
+	SPROX_RC rc;
+	WORD rlen;
+	BYTE buffer[64];
 
-  /* Read binary */
-  buffer[0] = 0x30;
-  buffer[1] = address;
-  buffer[2] = 0xCC;
-  buffer[3] = 0xCC;  
+	/* Read binary */
+	buffer[0] = 0x30;
+	buffer[1] = address;
+	buffer[2] = 0xCC;
+	buffer[3] = 0xCC;
 
-  rlen = sizeof(buffer);
-  
+	rlen = sizeof(buffer);
+
 #ifndef _USE_PCSC
-  rc = MifUlC_Command(SPROX_PARAM_P  buffer, 2, buffer, &rlen);
+	rc = MifUlC_Command(SPROX_PARAM_P  buffer, 2, buffer, &rlen);
 #else
-  rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 2, buffer, sizeof(buffer), &rlen);
+	rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 2, buffer, sizeof(buffer), &rlen);
 #endif
 
-  if (rc != MI_OK)
-    goto done;
+	if (rc != MI_OK)
+		goto done;
 
-  if (rlen != 16)
-  {
-    rc = MI_BYTECOUNTERR;
-    goto done;
-  }
+	if (rlen != 16)
+	{
+		rc = MI_BYTECOUNTERR;
+		goto done;
+	}
 
-  if (data != NULL)
-  {
-    memcpy(data, buffer, rlen);
-  }
+	if (data != NULL)
+	{
+		memcpy(data, buffer, rlen);
+	}
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifUlCAPI/Write4
@@ -400,38 +400,38 @@ done:
  *
  * RETURNS
  *   MI_OK : authentication succeed
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  **/
 SPROX_API_FUNC(MifUlC_Write4) (SPROX_PARAM  BYTE address, const BYTE data[4])
 {
-  SPROX_RC rc;
-  WORD rlen;
-  BYTE buffer[64];
+	SPROX_RC rc;
+	WORD rlen;
+	BYTE buffer[64];
 
-  if (data == NULL)
-    return MI_LIB_CALL_ERROR;
+	if (data == NULL)
+		return MI_LIB_CALL_ERROR;
 
-  /* Write binary */
-  buffer[0] = 0xA2;
-  buffer[1] = address;
-  memcpy(&buffer[2], data, 4);
-  buffer[6] = 0xCC;
-  buffer[7] = 0xCC;
+	/* Write binary */
+	buffer[0] = 0xA2;
+	buffer[1] = address;
+	memcpy(&buffer[2], data, 4);
+	buffer[6] = 0xCC;
+	buffer[7] = 0xCC;
 
-  rlen = sizeof(buffer);
+	rlen = sizeof(buffer);
 #ifndef _USE_PCSC
-  rc = MifUlC_Command(SPROX_PARAM_P  buffer, 6, NULL, NULL);
+	rc = MifUlC_Command(SPROX_PARAM_P  buffer, 6, NULL, NULL);
 #else
-  rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 6, buffer, sizeof(buffer), &rlen);
+	rc = MifUlC_CommandEncapsulated(SPROX_PARAM_P  buffer, 6, buffer, sizeof(buffer), &rlen);
 #endif
 
-  if (rc == MI_CRCERR)
-    rc = MI_OK;
-    
-  (void) rlen;
+	if (rc == MI_CRCERR)
+		rc = MI_OK;
 
-  return rc;
+	(void)rlen;
+
+	return rc;
 }
 
 /**f* MifUlCAPI/Write
@@ -464,23 +464,23 @@ SPROX_API_FUNC(MifUlC_Write4) (SPROX_PARAM  BYTE address, const BYTE data[4])
  *
  * RETURNS
  *   MI_OK : authentication succeed
- *   Other code if internal or communication error has occured. 
+ *   Other code if internal or communication error has occured.
  *
  **/
 SPROX_API_FUNC(MifUlC_Write) (SPROX_PARAM  BYTE address, const BYTE data[16])
 {
-  SPROX_RC rc;
-  BYTE i;
+	SPROX_RC rc;
+	BYTE i;
 
-  for (i=0; i<4; i++)
-  {
-    rc = SPROX_API_CALL(MifUlC_Write4) (SPROX_PARAM_P  address, data);
-    if (rc != MI_OK)
-      break;
+	for (i = 0; i < 4; i++)
+	{
+		rc = SPROX_API_CALL(MifUlC_Write4) (SPROX_PARAM_P  address, data);
+		if (rc != MI_OK)
+			break;
 
-    address += 1;
-    if (data != NULL) data += 4;
-  }
+		address += 1;
+		if (data != NULL) data += 4;
+	}
 
-  return rc;
+	return rc;
 }

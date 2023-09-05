@@ -17,110 +17,110 @@
  **/
 #include "sprox_mifplus_i.h"
 
-/**f* MifPlusAPI/ReadEx
- *
- * NAME
- *   ReadEx
- *
- * DESCRIPTION
- *   Read data from a Mifare Plus card running at Level 3
- *
- * SYNOPSIS
- *
- *   [[sprox_milplus.dll]]
- *   SWORD SPROX_MifPlus_ReadEx(WORD address,
- *                              BYTE cmd_code,
- *                              BYTE count,
- *                              BYTE data[]);
- *
- *   [[sprox_milplus_ex.dll]]
- *   SWORD SPROXx_MifPlus_ReadEx(SPROX_INSTANCE rInst,
- *                               BYTE cmd_code,
- *                               WORD address,
- *                               BYTE count,
- *                               BYTE data[]);
- *
- *   [[pcsc_mifplus.dll]]
- *   LONG  SCardMifPlus_ReadEx(SCARDHANDLE hCard,
- *                             BYTE cmd_code,
- *                             WORD address,
- *                             BYTE count,
- *                             BYTE data[]);
- *
- * INPUTS
- *   BYTE cmd_code     : read command code. Valid values are
- *                       - Mifare Plus X : 0x30 to 0x37
- *                       - Mifare Plus S : 0x33 only (MFP_CMD_READ_PLAIN_MACED)
- *                       not every value may be used, depending on the access rights of the sector
- *   WORD address      : address of first block
- *   BYTE count        : number of blocks (max 15)
- *   BYTE data[]       : buffer to receive the data (size must be 16 * count)
- *
- * SEE ALSO
- *   Read
- *   ReadM
- *
- **/
+ /**f* MifPlusAPI/ReadEx
+  *
+  * NAME
+  *   ReadEx
+  *
+  * DESCRIPTION
+  *   Read data from a Mifare Plus card running at Level 3
+  *
+  * SYNOPSIS
+  *
+  *   [[sprox_milplus.dll]]
+  *   SWORD SPROX_MifPlus_ReadEx(WORD address,
+  *                              BYTE cmd_code,
+  *                              BYTE count,
+  *                              BYTE data[]);
+  *
+  *   [[sprox_milplus_ex.dll]]
+  *   SWORD SPROXx_MifPlus_ReadEx(SPROX_INSTANCE rInst,
+  *                               BYTE cmd_code,
+  *                               WORD address,
+  *                               BYTE count,
+  *                               BYTE data[]);
+  *
+  *   [[pcsc_mifplus.dll]]
+  *   LONG  SCardMifPlus_ReadEx(SCARDHANDLE hCard,
+  *                             BYTE cmd_code,
+  *                             WORD address,
+  *                             BYTE count,
+  *                             BYTE data[]);
+  *
+  * INPUTS
+  *   BYTE cmd_code     : read command code. Valid values are
+  *                       - Mifare Plus X : 0x30 to 0x37
+  *                       - Mifare Plus S : 0x33 only (MFP_CMD_READ_PLAIN_MACED)
+  *                       not every value may be used, depending on the access rights of the sector
+  *   WORD address      : address of first block
+  *   BYTE count        : number of blocks (max 15)
+  *   BYTE data[]       : buffer to receive the data (size must be 16 * count)
+  *
+  * SEE ALSO
+  *   Read
+  *   ReadM
+  *
+  **/
 SPROX_API_FUNC(MifPlus_ReadEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE count, BYTE data[])
 {
-  BYTE buffer[256];
-  WORD i, j;
+	BYTE buffer[256];
+	WORD i, j;
 	WORD datalen, slen, rlen;
 	SPROX_RC rc;
 	BOOL c_mac = FALSE, r_mac = FALSE, r_cipher = FALSE;
 	SPROX_MIFPLUS_GET_CTX();
 
-  /* We are limited to 15 blocks by the size of all our buffers */
+	/* We are limited to 15 blocks by the size of all our buffers */
 	if (count > 15)
-	  return MFP_TOO_MANY_BLOCKS;
+		return MFP_TOO_MANY_BLOCKS;
 
-  switch (cmd_code)
+	switch (cmd_code)
 	{
-    case MFP_CMD_READ_PLAIN_UNMACED : break;
-    case MFP_CMD_READ_PLAIN : c_mac = TRUE; break;
-    case MFP_CMD_READ_PLAIN_UNMACED_R_MACED : r_mac = TRUE; break;
-    case MFP_CMD_READ_PLAIN_MACED : c_mac = TRUE; r_mac = TRUE; break;
-    case MFP_CMD_READ_UNMACED : r_cipher = TRUE; break;
-		case MFP_CMD_READ : c_mac = TRUE; r_cipher = TRUE; break;
-		case MFP_CMD_READ_UNMACED_R_MACED : r_mac = TRUE; r_cipher = TRUE; break;
-		case MFP_CMD_READ_MACED : c_mac = TRUE; r_mac = TRUE; r_cipher = TRUE; break;
+	case MFP_CMD_READ_PLAIN_UNMACED: break;
+	case MFP_CMD_READ_PLAIN: c_mac = TRUE; break;
+	case MFP_CMD_READ_PLAIN_UNMACED_R_MACED: r_mac = TRUE; break;
+	case MFP_CMD_READ_PLAIN_MACED: c_mac = TRUE; r_mac = TRUE; break;
+	case MFP_CMD_READ_UNMACED: r_cipher = TRUE; break;
+	case MFP_CMD_READ: c_mac = TRUE; r_cipher = TRUE; break;
+	case MFP_CMD_READ_UNMACED_R_MACED: r_mac = TRUE; r_cipher = TRUE; break;
+	case MFP_CMD_READ_MACED: c_mac = TRUE; r_mac = TRUE; r_cipher = TRUE; break;
 
-    default : return MFP_INVALID_CMD_CODE;
+	default: return MFP_INVALID_CMD_CODE;
 	}
 
-  buffer[0] = cmd_code;
-	buffer[1] = (BYTE) (address);
-  buffer[2] = (BYTE) (address >> 8);
+	buffer[0] = cmd_code;
+	buffer[1] = (BYTE)(address);
+	buffer[2] = (BYTE)(address >> 8);
 	buffer[3] = count;
 
 	slen = 4;
 
 	if (c_mac)
 	{
-	  /* MAC the command */
-		/* --------------- */
+		/* MAC the command */
+		  /* --------------- */
 
-	  BYTE mac_buffer[10];
+		BYTE mac_buffer[10];
 
 		mac_buffer[0] = cmd_code;
-		mac_buffer[1] = (BYTE)  ctx->read_counter;
-		mac_buffer[2] = (BYTE) (ctx->read_counter >> 8);
+		mac_buffer[1] = (BYTE)ctx->read_counter;
+		mac_buffer[2] = (BYTE)(ctx->read_counter >> 8);
 		memcpy(&mac_buffer[3], ctx->transaction_id, 4);
-		mac_buffer[7] = (BYTE)  address;
-		mac_buffer[8] = (BYTE) (address >> 8);
+		mac_buffer[7] = (BYTE)address;
+		mac_buffer[8] = (BYTE)(address >> 8);
 		mac_buffer[9] = count;
 
-	  MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 10, &buffer[4]);
+		MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 10, &buffer[4]);
 
-    slen += 8;
+		slen += 8;
 	}
-	  
+
 	/* Command/response Xchange */
 	/* ------------------------ */
 
-  rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, slen, buffer, sizeof(buffer), &rlen);
+	rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, slen, buffer, sizeof(buffer), &rlen);
 	if (rc != MFP_SUCCESS)
-	  goto done;
+		goto done;
 
 	ctx->read_counter++;
 
@@ -131,37 +131,38 @@ SPROX_API_FUNC(MifPlus_ReadEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE c
 
 	if (r_mac)
 	{
-    /* Response is MACed */
-		/* ----------------- */
+		/* Response is MACed */
+			/* ----------------- */
 
-	  BYTE mac_buffer[256];
+		BYTE mac_buffer[256];
 		BYTE calc_mac[8];
 
-		rc = MifPlus_Result(buffer, rlen, (WORD) (datalen + 8));
+		rc = MifPlus_Result(buffer, rlen, (WORD)(datalen + 8));
 		if (rc != MFP_SUCCESS)
 			goto done;
 
 		mac_buffer[0] = MFP_ERR_SUCCESS;
-		mac_buffer[1] = (BYTE)  ctx->read_counter;
-		mac_buffer[2] = (BYTE) (ctx->read_counter >> 8);
+		mac_buffer[1] = (BYTE)ctx->read_counter;
+		mac_buffer[2] = (BYTE)(ctx->read_counter >> 8);
 		memcpy(&mac_buffer[3], ctx->transaction_id, 4);
-		mac_buffer[7] = (BYTE)  address;
-		mac_buffer[8] = (BYTE) (address >> 8);
+		mac_buffer[7] = (BYTE)address;
+		mac_buffer[8] = (BYTE)(address >> 8);
 		mac_buffer[9] = count;
 		memcpy(&mac_buffer[10], &buffer[1], datalen);
 
-	  MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 10 + datalen, calc_mac);
+		MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 10 + datalen, calc_mac);
 
-	  if (memcmp(calc_mac, &buffer[1 + datalen], 8))
+		if (memcmp(calc_mac, &buffer[1 + datalen], 8))
 		{
-	    rc = MFP_WRONG_CARD_MAC;
+			rc = MFP_WRONG_CARD_MAC;
 			goto done;
 		}
 
-	} else
+	}
+	else
 	{
-    /* Response is not MACed */
-		/* --------------------- */
+		/* Response is not MACed */
+			/* --------------------- */
 
 		rc = MifPlus_Result(buffer, rlen, datalen);
 		if (rc != MFP_SUCCESS)
@@ -170,27 +171,27 @@ SPROX_API_FUNC(MifPlus_ReadEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE c
 
 	if (r_cipher)
 	{
-	  /* Decipher the data */
-		/* ----------------- */
+		/* Decipher the data */
+		  /* ----------------- */
 
-	  BYTE cbc_vector[16];
+		BYTE cbc_vector[16];
 
-	  MifPlus_GetCbcVector_Response(SPROX_PARAM_P  cbc_vector);
+		MifPlus_GetCbcVector_Response(SPROX_PARAM_P  cbc_vector);
 
-    for (i=0; i<datalen; i+=16)
+		for (i = 0; i < datalen; i += 16)
 		{
-	    AES_Decrypt(&ctx->main_cipher, &buffer[1+i]);
-	    for (j=0; j<16; j++)
-	      buffer[1+i+j] ^= cbc_vector[j];
-			memcpy(cbc_vector, &buffer[1+i], 16);
+			AES_Decrypt(&ctx->main_cipher, &buffer[1 + i]);
+			for (j = 0; j < 16; j++)
+				buffer[1 + i + j] ^= cbc_vector[j];
+			memcpy(cbc_vector, &buffer[1 + i], 16);
 		}
 	}
 
 	if (data != NULL)
-	  memcpy(data, &buffer[1], datalen);
+		memcpy(data, &buffer[1], datalen);
 
-done:  
-  return rc;
+done:
+	return rc;
 }
 
 /**f* MifPlusAPI/ReadM
@@ -237,7 +238,7 @@ done:
  **/
 SPROX_API_FUNC(MifPlus_ReadM) (SPROX_PARAM  WORD address, BYTE count, BYTE data[])
 {
-  return SPROX_API_CALL(MifPlus_ReadEx) (SPROX_PARAM_P  MFP_CMD_READ_PLAIN_MACED, address, count, data);
+	return SPROX_API_CALL(MifPlus_ReadEx) (SPROX_PARAM_P  MFP_CMD_READ_PLAIN_MACED, address, count, data);
 }
 
 /**f* MifPlusAPI/Read
@@ -278,9 +279,9 @@ SPROX_API_FUNC(MifPlus_ReadM) (SPROX_PARAM  WORD address, BYTE count, BYTE data[
  *   ReadEx
  *
  **/
-SPROX_API_FUNC(MifPlus_Read) (SPROX_PARAM  WORD address, BYTE data[])
+SPROX_API_FUNC(MifPlus_Read) (SPROX_PARAM  WORD address, BYTE data[16])
 {
-  return SPROX_API_CALL(MifPlus_ReadEx) (SPROX_PARAM_P  MFP_CMD_READ_PLAIN_MACED, address, 1, data);
+	return SPROX_API_CALL(MifPlus_ReadEx) (SPROX_PARAM_P  MFP_CMD_READ_PLAIN_MACED, address, 1, data);
 }
 
 /**f* MifPlusAPI/WriteEx
@@ -327,70 +328,70 @@ SPROX_API_FUNC(MifPlus_Read) (SPROX_PARAM  WORD address, BYTE data[])
  *   WriteM
  *
  **/
-SPROX_API_FUNC(MifPlus_WriteEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE count, const BYTE data[16])
+SPROX_API_FUNC(MifPlus_WriteEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE count, const BYTE data[])
 {
-  BYTE buffer[256];
+	BYTE buffer[256];
 	WORD i, j;
 	WORD datalen, slen, rlen;
 	BOOL c_mac = FALSE, r_mac = FALSE, c_cipher = FALSE;
 	SPROX_RC rc;
 	SPROX_MIFPLUS_GET_CTX();
 
-  /* We are limited to 15 blocks by the size of all our buffers */
+	/* We are limited to 15 blocks by the size of all our buffers */
 	if (count > 15)
-	  return MFP_TOO_MANY_BLOCKS;
+		return MFP_TOO_MANY_BLOCKS;
 
-  switch (cmd_code)
+	switch (cmd_code)
 	{
-    case MFP_CMD_WRITE_PLAIN : c_mac = TRUE; break;
-    case MFP_CMD_WRITE : c_mac = TRUE; c_cipher = TRUE; break;
-    case MFP_CMD_WRITE_PLAIN_MACED : c_mac = TRUE; r_mac = TRUE; break;
-    case MFP_CMD_WRITE_MACED : c_mac = TRUE; c_cipher = TRUE; r_mac = TRUE; break;
-    default : return MFP_INVALID_CMD_CODE;
+	case MFP_CMD_WRITE_PLAIN: c_mac = TRUE; break;
+	case MFP_CMD_WRITE: c_mac = TRUE; c_cipher = TRUE; break;
+	case MFP_CMD_WRITE_PLAIN_MACED: c_mac = TRUE; r_mac = TRUE; break;
+	case MFP_CMD_WRITE_MACED: c_mac = TRUE; c_cipher = TRUE; r_mac = TRUE; break;
+	default: return MFP_INVALID_CMD_CODE;
 	}
 
 	datalen = 16 * count;
 
 	buffer[0] = cmd_code;
-	buffer[1] = (BYTE)  address;
-	buffer[2] = (BYTE) (address >> 8);
+	buffer[1] = (BYTE)address;
+	buffer[2] = (BYTE)(address >> 8);
 	memcpy(&buffer[3], data, datalen);
 
 	slen = 3 + datalen;
 
 	if (c_cipher)
 	{
-	  /* Cipher the data */
-		/* --------------- */
+		/* Cipher the data */
+		  /* --------------- */
 
-	  BYTE cbc_vector[16];
+		BYTE cbc_vector[16];
 
-	  MifPlus_GetCbcVector_Command(SPROX_PARAM_P  cbc_vector);
+		MifPlus_GetCbcVector_Command(SPROX_PARAM_P  cbc_vector);
 
-    for (i=0; i<datalen; i+=16)
+		for (i = 0; i < datalen; i += 16)
 		{
-	    for (j=0; j<16; j++)
-	      buffer[3+i+j] ^= cbc_vector[j];
-	    AES_Encrypt(&ctx->main_cipher, &buffer[3+i]);
+			for (j = 0; j < 16; j++)
+				buffer[3 + i + j] ^= cbc_vector[j];
+			AES_Encrypt(&ctx->main_cipher, &buffer[3 + i]);
 		}
 	}
 
 	if (c_mac)
 	{
-	  /* MAC the command */
-		/* --------------- */
+		/* MAC the command */
+		  /* --------------- */
 
-	  BYTE mac_buffer[256];
+		BYTE mac_buffer[256];
 
 		mac_buffer[0] = cmd_code;
-		mac_buffer[1] = (BYTE)  ctx->write_counter;
-		mac_buffer[2] = (BYTE) (ctx->write_counter >> 8);
+		mac_buffer[1] = (BYTE)ctx->write_counter;
+		mac_buffer[2] = (BYTE)(ctx->write_counter >> 8);
 		memcpy(&mac_buffer[3], ctx->transaction_id, 4);
-		mac_buffer[7] = (BYTE)  address;
-		mac_buffer[8] = (BYTE) (address >> 8);
+		mac_buffer[7] = (BYTE)address;
+		mac_buffer[8] = (BYTE)(address >> 8);
 		memcpy(&mac_buffer[9], &buffer[3], datalen);
 
-	  MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 9 + datalen, &buffer[3 + datalen]);
+		MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 9 + datalen, &buffer[3 + datalen]);
 
 		slen += 8;
 	}
@@ -398,9 +399,9 @@ SPROX_API_FUNC(MifPlus_WriteEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE 
 	/* Command/response Xchange */
 	/* ------------------------ */
 
-  rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, slen, buffer, sizeof(buffer), &rlen);
+	rc = SPROX_API_CALL(MifPlus_Command) (SPROX_PARAM_P  buffer, slen, buffer, sizeof(buffer), &rlen);
 	if (rc != MFP_SUCCESS)
-	  goto done;
+		goto done;
 
 	ctx->write_counter++;
 
@@ -409,41 +410,42 @@ SPROX_API_FUNC(MifPlus_WriteEx) (SPROX_PARAM  BYTE cmd_code, WORD address, BYTE 
 
 	if (r_mac)
 	{
-    /* Response is MACed */
-		/* ----------------- */
+		/* Response is MACed */
+			/* ----------------- */
 
 		BYTE mac_buffer[7];
 		BYTE calc_mac[8];
 
-    rc = MifPlus_Result(buffer, rlen, 8);
-	  if (rc != MFP_SUCCESS)
-      goto done;
+		rc = MifPlus_Result(buffer, rlen, 8);
+		if (rc != MFP_SUCCESS)
+			goto done;
 
-	  mac_buffer[0] = MFP_ERR_SUCCESS;
-	  mac_buffer[1] = (BYTE)  ctx->write_counter;
-	  mac_buffer[2] = (BYTE) (ctx->write_counter >> 8);
-	  memcpy(&mac_buffer[3], ctx->transaction_id, 4);
+		mac_buffer[0] = MFP_ERR_SUCCESS;
+		mac_buffer[1] = (BYTE)ctx->write_counter;
+		mac_buffer[2] = (BYTE)(ctx->write_counter >> 8);
+		memcpy(&mac_buffer[3], ctx->transaction_id, 4);
 
-	  MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 7, calc_mac);
+		MifPlus_ComputeCmac(SPROX_PARAM_P  mac_buffer, 7, calc_mac);
 
-	  if (memcmp(calc_mac, &buffer[1], 8))
+		if (memcmp(calc_mac, &buffer[1], 8))
 		{
-	    rc = MFP_WRONG_CARD_MAC;
+			rc = MFP_WRONG_CARD_MAC;
 			goto done;
 		}
 
-	} else
+	}
+	else
 	{
-	  /* Response is not MACed */
-		/* --------------------- */
+		/* Response is not MACed */
+		  /* --------------------- */
 
-    rc = MifPlus_Result(buffer, rlen, 0);
-	  if (rc != MFP_SUCCESS)
-      goto done;
+		rc = MifPlus_Result(buffer, rlen, 0);
+		if (rc != MFP_SUCCESS)
+			goto done;
 	}
 
 done:
-  return rc;
+	return rc;
 }
 
 /**f* MifPlusAPI/WriteM
@@ -490,7 +492,7 @@ done:
  **/
 SPROX_API_FUNC(MifPlus_WriteM) (SPROX_PARAM  WORD address, BYTE count, const BYTE data[])
 {
-  return SPROX_API_CALL(MifPlus_WriteEx) (SPROX_PARAM_P  MFP_CMD_WRITE_PLAIN_MACED, address, count, data);
+	return SPROX_API_CALL(MifPlus_WriteEx) (SPROX_PARAM_P  MFP_CMD_WRITE_PLAIN_MACED, address, count, data);
 }
 
 /**f* MifPlusAPI/Write
@@ -531,8 +533,8 @@ SPROX_API_FUNC(MifPlus_WriteM) (SPROX_PARAM  WORD address, BYTE count, const BYT
  *   WriteEx
  *
  **/
-SPROX_API_FUNC(MifPlus_Write) (SPROX_PARAM  WORD address, const BYTE data[])
+SPROX_API_FUNC(MifPlus_Write) (SPROX_PARAM  WORD address, const BYTE data[16])
 {
-  return SPROX_API_CALL(MifPlus_WriteEx) (SPROX_PARAM_P  MFP_CMD_WRITE_PLAIN_MACED, address, 1, data);
+	return SPROX_API_CALL(MifPlus_WriteEx) (SPROX_PARAM_P  MFP_CMD_WRITE_PLAIN_MACED, address, 1, data);
 }
 

@@ -15,35 +15,35 @@
  **/
 #include "../calypso_api_i.h"
 
-/**f* CSB6_Calypso/CalypsoCreateContext
- *
- * NAME
- *   CalypsoCreateContext
- *
- * DESCRIPTION
- *   Instanciate a new context for the library
- *
- * INPUTS
- *   none
- *
- * RETURNS
- *   a pointer on the allocated context, NULL upon error
- *
- * SEE ALSO
- *   CalypsoDestroyContext
- *
- **/
-CALYPSO_LIB CALYPSO_CTX_ST * CALYPSO_API CalypsoCreateContext(void)
+ /**f* CSB6_Calypso/CalypsoCreateContext
+  *
+  * NAME
+  *   CalypsoCreateContext
+  *
+  * DESCRIPTION
+  *   Instanciate a new context for the library
+  *
+  * INPUTS
+  *   none
+  *
+  * RETURNS
+  *   a pointer on the allocated context, NULL upon error
+  *
+  * SEE ALSO
+  *   CalypsoDestroyContext
+  *
+  **/
+CALYPSO_LIB CALYPSO_CTX_ST* CALYPSO_API CalypsoCreateContext(void)
 {
-  CALYPSO_CTX_ST *ctx;
+	CALYPSO_CTX_ST* ctx;
 
-  ctx = malloc(sizeof(CALYPSO_CTX_ST));
-  if (ctx != NULL)
-  {
-    memset(ctx, 0, sizeof(CALYPSO_CTX_ST));
-  }
+	ctx = malloc(sizeof(CALYPSO_CTX_ST));
+	if (ctx != NULL)
+	{
+		memset(ctx, 0, sizeof(CALYPSO_CTX_ST));
+	}
 
-  return ctx;
+	return ctx;
 }
 
 /**f* CSB6_Calypso/CalypsoDestroyContext
@@ -61,19 +61,19 @@ CALYPSO_LIB CALYPSO_CTX_ST * CALYPSO_API CalypsoCreateContext(void)
  *   none
  *
  **/
-CALYPSO_LIB void CALYPSO_API CalypsoDestroyContext(CALYPSO_CTX_ST *ctx)
+CALYPSO_LIB void CALYPSO_API CalypsoDestroyContext(CALYPSO_CTX_ST* ctx)
 {
-  if (ctx != NULL)
-  {
+	if (ctx != NULL)
+	{
 #if (CALYPSO_WITH_XML)
-    CalypsoClearOutput(ctx);
+		CalypsoClearOutput(ctx);
 #endif
-    CalypsoCardDispose(ctx);
+		CalypsoCardDispose(ctx);
 #if (CALYPSO_WITH_SAM)
-    CalypsoSamDispose(ctx);
+		CalypsoSamDispose(ctx);
 #endif
-    free(ctx);
-  }
+		free(ctx);
+	}
 }
 
 /**f* CSB6_Calypso/CalypsoCleanupContext
@@ -93,19 +93,19 @@ CALYPSO_LIB void CALYPSO_API CalypsoDestroyContext(CALYPSO_CTX_ST *ctx)
  **/
 CALYPSO_PROC CalypsoCleanupContext(P_CALYPSO_CTX ctx)
 {
-  if (ctx == NULL)
-    return CALYPSO_ERR_INVALID_CONTEXT;
+	if (ctx == NULL)
+		return CALYPSO_ERR_INVALID_CONTEXT;
 
 #if (CALYPSO_WITH_XML)
-  CalypsoClearOutput(ctx);
+	CalypsoClearOutput(ctx);
 #endif
-  CalypsoCardDispose(ctx);
+	CalypsoCardDispose(ctx);
 #if (CALYPSO_WITH_SAM)
-  CalypsoSamDispose(ctx);
+	CalypsoSamDispose(ctx);
 #endif
-  memset(ctx, 0, sizeof(CALYPSO_CTX_ST));
-  
-  return CALYPSO_SUCCESS;
+	memset(ctx, 0, sizeof(CALYPSO_CTX_ST));
+
+	return CALYPSO_SUCCESS;
 }
 
 /**f* CSB6_Calypso/CalypsoCardDispose
@@ -125,10 +125,10 @@ CALYPSO_PROC CalypsoCleanupContext(P_CALYPSO_CTX ctx)
  *   DWORD                             : S_SUCCESS or an error code
  *
  **/
-CALYPSO_PROC CalypsoCardDispose(CALYPSO_CTX_ST *ctx)
-{ 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;  
-  return 0;
+CALYPSO_PROC CalypsoCardDispose(CALYPSO_CTX_ST* ctx)
+{
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	return 0;
 }
 
 /**f* CSB6_Calypso/CalypsoSamDispose
@@ -149,9 +149,9 @@ CALYPSO_PROC CalypsoCardDispose(CALYPSO_CTX_ST *ctx)
  *
  **/
 #if (CALYPSO_WITH_SAM)
-CALYPSO_PROC CalypsoSamDispose(CALYPSO_CTX_ST *ctx)
-{ 
-  if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;  
-  return 0;
+CALYPSO_PROC CalypsoSamDispose(CALYPSO_CTX_ST* ctx)
+{
+	if (ctx == NULL) return CALYPSO_ERR_INVALID_CONTEXT;
+	return 0;
 }
 #endif

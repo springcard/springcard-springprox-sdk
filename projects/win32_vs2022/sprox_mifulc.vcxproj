@@ -83,11 +83,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\_output\win32_vs2022\</OutDir>
+    <OutDir>bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\_output\win32_vs2022\</OutDir>
+    <OutDir>bin\</OutDir>
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
     <IncludePath>..\..\src\common;$(IncludePath)</IncludePath>
   </PropertyGroup>

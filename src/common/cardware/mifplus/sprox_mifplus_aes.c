@@ -10,17 +10,17 @@
  *   Implementation of AES ciphering scheme.
  *
  **/
- 
-/*
- * This file is derivated from a public domain implementation of AES (Rijndael) written by
- * Philip J. Erdelsky <pje@efgh.com> . His implementation itself is a modified version of
- * an implementation placed in the public domain by the following persons:
- * Vincent Rijmen <vincent.rijmen@esat.kuleuven.ac.be>
- * Antoon Bosselaers <antoon.bosselaers@esat.kuleuven.ac.be>
- * Paulo Barreto <paulo.barreto@terra.com.br>
- *
- * This code is in public domain - no restriction on use
- */
+
+ /*
+  * This file is derivated from a public domain implementation of AES (Rijndael) written by
+  * Philip J. Erdelsky <pje@efgh.com> . His implementation itself is a modified version of
+  * an implementation placed in the public domain by the following persons:
+  * Vincent Rijmen <vincent.rijmen@esat.kuleuven.ac.be>
+  * Antoon Bosselaers <antoon.bosselaers@esat.kuleuven.ac.be>
+  * Paulo Barreto <paulo.barreto@terra.com.br>
+  *
+  * This code is in public domain - no restriction on use
+  */
 #include "sprox_mifplus_i.h"
 
 #include <stdio.h>
@@ -30,37 +30,37 @@
 static DWORD AES_ExpandKey(DWORD key_schd[60], const BYTE key_data[], DWORD key_bits);
 static void  AES_InvertKey(DWORD key_schd[60], DWORD rounds);
 
-void AES_InitEx(AES_CTX_ST *aes_ctx, const BYTE key_data[], DWORD key_bits)
+void AES_InitEx(AES_CTX_ST* aes_ctx, const BYTE key_data[], DWORD key_bits)
 {
-  if (aes_ctx == NULL) return;
+	if (aes_ctx == NULL) return;
 
-  /* Remember size of key */
-  aes_ctx->key_bits = key_bits;
+	/* Remember size of key */
+	aes_ctx->key_bits = key_bits;
 
-  /* Expand the key into the ciphering context */
-  aes_ctx->rounds = AES_ExpandKey(aes_ctx->enc_schd, key_data, key_bits);
-  if (!aes_ctx->rounds) return;
+	/* Expand the key into the ciphering context */
+	aes_ctx->rounds = AES_ExpandKey(aes_ctx->enc_schd, key_data, key_bits);
+	if (!aes_ctx->rounds) return;
 
-  /* Invert the ciphering context to get the deciphering one */
-  memcpy(aes_ctx->dec_schd, aes_ctx->enc_schd, 60 * sizeof(DWORD));
-  AES_InvertKey(aes_ctx->dec_schd, aes_ctx->rounds);
+	/* Invert the ciphering context to get the deciphering one */
+	memcpy(aes_ctx->dec_schd, aes_ctx->enc_schd, 60 * sizeof(DWORD));
+	AES_InvertKey(aes_ctx->dec_schd, aes_ctx->rounds);
 }
 
-void AES_Init(AES_CTX_ST *aes_ctx, const BYTE key_data[16])
+void AES_Init(AES_CTX_ST* aes_ctx, const BYTE key_data[16])
 {
-  AES_InitEx(aes_ctx, key_data, 128);
+	AES_InitEx(aes_ctx, key_data, 128);
 }
 
-void AES_Encrypt2(AES_CTX_ST *context, BYTE outbuf[16], BYTE inbuf[16])
+void AES_Encrypt2(AES_CTX_ST* context, BYTE outbuf[16], BYTE inbuf[16])
 {
-  memcpy(outbuf, inbuf, 16);
-  AES_Encrypt(context, outbuf);
+	memcpy(outbuf, inbuf, 16);
+	AES_Encrypt(context, outbuf);
 }
 
-void AES_Decrypt2(AES_CTX_ST *context, BYTE outbuf[16], BYTE inbuf[16])
+void AES_Decrypt2(AES_CTX_ST* context, BYTE outbuf[16], BYTE inbuf[16])
 {
-  memcpy(outbuf, inbuf, 16);
-  AES_Decrypt(context, outbuf);
+	memcpy(outbuf, inbuf, 16);
+	AES_Decrypt(context, outbuf);
 }
 
 
@@ -73,9 +73,9 @@ void AES_Decrypt2(AES_CTX_ST *context, BYTE outbuf[16], BYTE inbuf[16])
  *
  */
 
-/*
- * Enciphering boxes
- */
+ /*
+  * Enciphering boxes
+  */
 static const DWORD AES_TE0[256] =
 {
 	0xc66363a5U, 0xf87c7c84U, 0xee777799U, 0xf67b7b8dU, 0xfff2f20dU, 0xd66b6bbdU, 0xde6f6fb1U, 0x91c5c554U,
@@ -450,29 +450,29 @@ static const DWORD AES_RCON[] =
 
 DWORD SWAP_DW(DWORD x)
 {
-  return ( ((x <<  8) & 0x00FF0000) |
-           ((x >> 24) & 0x000000FF) |
-           ((x >>  8) & 0x0000FF00) |
-           ((x << 24) & 0xFF000000) );
+	return (((x << 8) & 0x00FF0000) |
+		((x >> 24) & 0x000000FF) |
+		((x >> 8) & 0x0000FF00) |
+		((x << 24) & 0xFF000000));
 }
 
 static DWORD AES_ExpandKey(DWORD key_schd[60], const BYTE key_data[], DWORD key_bits)
 {
-  register int k;
-  register int i;
-  register DWORD t;
+	register int k;
+	register int i;
+	register DWORD t;
 
-  if (key_schd == NULL) return 0;
-  if (key_data == NULL) return 0;
+	if (key_schd == NULL) return 0;
+	if (key_data == NULL) return 0;
 
-  switch (key_bits)
-  {
-    case 128 :
-    case 192 :
-    case 256 :
-               break;
-    default  : return 0;
-  }
+	switch (key_bits)
+	{
+	case 128:
+	case 192:
+	case 256:
+		break;
+	default: return 0;
+	}
 
 	key_schd[0] = GET_DW(key_data);
 	key_schd[1] = GET_DW(key_data + 4);
@@ -489,9 +489,9 @@ static DWORD AES_ExpandKey(DWORD key_schd[60], const BYTE key_data[], DWORD key_
 			t = key_schd[k + 3];
 			key_schd[k + 4] = key_schd[k + 0] ^
 				(AES_TE4[(t >> 16) & 0xff] & 0xff000000) ^
-				(AES_TE4[(t >>  8) & 0xff] & 0x00ff0000) ^
-				(AES_TE4[(t      ) & 0xff] & 0x0000ff00) ^
-				(AES_TE4[(t >> 24)       ] & 0x000000ff) ^
+				(AES_TE4[(t >> 8) & 0xff] & 0x00ff0000) ^
+				(AES_TE4[(t) & 0xff] & 0x0000ff00) ^
+				(AES_TE4[(t >> 24)] & 0x000000ff) ^
 				AES_RCON[i];
 			key_schd[k + 5] = key_schd[k + 1] ^ key_schd[k + 4];
 			key_schd[k + 6] = key_schd[k + 2] ^ key_schd[k + 5];
@@ -516,16 +516,16 @@ static DWORD AES_ExpandKey(DWORD key_schd[60], const BYTE key_data[], DWORD key_
 			t = key_schd[k + 5];
 			key_schd[k + 6] = key_schd[k + 0] ^
 				(AES_TE4[(t >> 16) & 0xff] & 0xff000000) ^
-				(AES_TE4[(t >>  8) & 0xff] & 0x00ff0000) ^
-				(AES_TE4[(t      ) & 0xff] & 0x0000ff00) ^
-				(AES_TE4[(t >> 24)       ] & 0x000000ff) ^
+				(AES_TE4[(t >> 8) & 0xff] & 0x00ff0000) ^
+				(AES_TE4[(t) & 0xff] & 0x0000ff00) ^
+				(AES_TE4[(t >> 24)] & 0x000000ff) ^
 				AES_RCON[i];
-			key_schd[k +  7] = key_schd[k + 1] ^ key_schd[k + 6];
-			key_schd[k +  8] = key_schd[k + 2] ^ key_schd[k + 7];
-			key_schd[k +  9] = key_schd[k + 3] ^ key_schd[k + 8];
+			key_schd[k + 7] = key_schd[k + 1] ^ key_schd[k + 6];
+			key_schd[k + 8] = key_schd[k + 2] ^ key_schd[k + 7];
+			key_schd[k + 9] = key_schd[k + 3] ^ key_schd[k + 8];
 			if (++i == 8)
 				return 12;
-			key_schd[k + 10] = key_schd[k + 4] ^ key_schd[k +  9];
+			key_schd[k + 10] = key_schd[k + 4] ^ key_schd[k + 9];
 			key_schd[k + 11] = key_schd[k + 5] ^ key_schd[k + 10];
 			k += 6;
 		}
@@ -544,22 +544,22 @@ static DWORD AES_ExpandKey(DWORD key_schd[60], const BYTE key_data[], DWORD key_
 			t = key_schd[k + 7];
 			key_schd[k + 8] = key_schd[k + 0] ^
 				(AES_TE4[(t >> 16) & 0xff] & 0xff000000) ^
-				(AES_TE4[(t >>  8) & 0xff] & 0x00ff0000) ^
-				(AES_TE4[(t      ) & 0xff] & 0x0000ff00) ^
-				(AES_TE4[(t >> 24)       ] & 0x000000ff) ^
+				(AES_TE4[(t >> 8) & 0xff] & 0x00ff0000) ^
+				(AES_TE4[(t) & 0xff] & 0x0000ff00) ^
+				(AES_TE4[(t >> 24)] & 0x000000ff) ^
 				AES_RCON[i];
-			key_schd[k +  9] = key_schd[k + 1] ^ key_schd[k +  8];
-			key_schd[k + 10] = key_schd[k + 2] ^ key_schd[k +  9];
+			key_schd[k + 9] = key_schd[k + 1] ^ key_schd[k + 8];
+			key_schd[k + 10] = key_schd[k + 2] ^ key_schd[k + 9];
 			key_schd[k + 11] = key_schd[k + 3] ^ key_schd[k + 10];
 			if (++i == 7)
 				return 14;
 
 			t = key_schd[k + 11];
 			key_schd[k + 12] = key_schd[k + 4] ^
-				(AES_TE4[(t >> 24)       ] & 0xff000000) ^
+				(AES_TE4[(t >> 24)] & 0xff000000) ^
 				(AES_TE4[(t >> 16) & 0xff] & 0x00ff0000) ^
-				(AES_TE4[(t >>  8) & 0xff] & 0x0000ff00) ^
-				(AES_TE4[(t      ) & 0xff] & 0x000000ff);
+				(AES_TE4[(t >> 8) & 0xff] & 0x0000ff00) ^
+				(AES_TE4[(t) & 0xff] & 0x000000ff);
 			key_schd[k + 13] = key_schd[k + 5] ^ key_schd[k + 12];
 			key_schd[k + 14] = key_schd[k + 6] ^ key_schd[k + 13];
 			key_schd[k + 15] = key_schd[k + 7] ^ key_schd[k + 14];
@@ -574,287 +574,287 @@ static DWORD AES_ExpandKey(DWORD key_schd[60], const BYTE key_data[], DWORD key_
 
 static void  AES_InvertKey(DWORD key_schd[60], DWORD rounds)
 {
-  register DWORD t;
-  register DWORD i;
-  DWORD j = rounds << 2;
+	register DWORD t;
+	register DWORD i;
+	DWORD j = rounds << 2;
 
-//	invert the order of the round keys:
+	//	invert the order of the round keys:
 
 	for (i = 0; i < j; i += 4, j -= 4)
 	{
-		t = key_schd[i    ]; key_schd[i    ] = key_schd[j    ]; key_schd[j    ] = t;
+		t = key_schd[i]; key_schd[i] = key_schd[j]; key_schd[j] = t;
 		t = key_schd[i + 1]; key_schd[i + 1] = key_schd[j + 1]; key_schd[j + 1] = t;
 		t = key_schd[i + 2]; key_schd[i + 2] = key_schd[j + 2]; key_schd[j + 2] = t;
 		t = key_schd[i + 3]; key_schd[i + 3] = key_schd[j + 3]; key_schd[j + 3] = t;
 	}
 
-//	apply the inverse MixColumn transform to all round keys but the first and the last:
+	//	apply the inverse MixColumn transform to all round keys but the first and the last:
 	for (i = 1; i < rounds; i++)
 	{
 		key_schd += 4;
 		key_schd[0] =
-			AES_TD0[AES_TE4[(key_schd[0] >> 24)       ] & 0xff] ^
+			AES_TD0[AES_TE4[(key_schd[0] >> 24)] & 0xff] ^
 			AES_TD1[AES_TE4[(key_schd[0] >> 16) & 0xff] & 0xff] ^
-			AES_TD2[AES_TE4[(key_schd[0] >>  8) & 0xff] & 0xff] ^
-			AES_TD3[AES_TE4[(key_schd[0]      ) & 0xff] & 0xff];
+			AES_TD2[AES_TE4[(key_schd[0] >> 8) & 0xff] & 0xff] ^
+			AES_TD3[AES_TE4[(key_schd[0]) & 0xff] & 0xff];
 		key_schd[1] =
-			AES_TD0[AES_TE4[(key_schd[1] >> 24)       ] & 0xff] ^
+			AES_TD0[AES_TE4[(key_schd[1] >> 24)] & 0xff] ^
 			AES_TD1[AES_TE4[(key_schd[1] >> 16) & 0xff] & 0xff] ^
-			AES_TD2[AES_TE4[(key_schd[1] >>  8) & 0xff] & 0xff] ^
-			AES_TD3[AES_TE4[(key_schd[1]      ) & 0xff] & 0xff];
+			AES_TD2[AES_TE4[(key_schd[1] >> 8) & 0xff] & 0xff] ^
+			AES_TD3[AES_TE4[(key_schd[1]) & 0xff] & 0xff];
 		key_schd[2] =
-			AES_TD0[AES_TE4[(key_schd[2] >> 24)       ] & 0xff] ^
+			AES_TD0[AES_TE4[(key_schd[2] >> 24)] & 0xff] ^
 			AES_TD1[AES_TE4[(key_schd[2] >> 16) & 0xff] & 0xff] ^
-			AES_TD2[AES_TE4[(key_schd[2] >>  8) & 0xff] & 0xff] ^
-			AES_TD3[AES_TE4[(key_schd[2]      ) & 0xff] & 0xff];
+			AES_TD2[AES_TE4[(key_schd[2] >> 8) & 0xff] & 0xff] ^
+			AES_TD3[AES_TE4[(key_schd[2]) & 0xff] & 0xff];
 		key_schd[3] =
-			AES_TD0[AES_TE4[(key_schd[3] >> 24)       ] & 0xff] ^
+			AES_TD0[AES_TE4[(key_schd[3] >> 24)] & 0xff] ^
 			AES_TD1[AES_TE4[(key_schd[3] >> 16) & 0xff] & 0xff] ^
-			AES_TD2[AES_TE4[(key_schd[3] >>  8) & 0xff] & 0xff] ^
-			AES_TD3[AES_TE4[(key_schd[3]      ) & 0xff] & 0xff];
+			AES_TD2[AES_TE4[(key_schd[3] >> 8) & 0xff] & 0xff] ^
+			AES_TD3[AES_TE4[(key_schd[3]) & 0xff] & 0xff];
 	}
 }
 
 // ---------------------------------
 
 
-void AES_Encrypt(AES_CTX_ST *aes_ctx, BYTE data[16])
+void AES_Encrypt(AES_CTX_ST* aes_ctx, BYTE data[16])
 {
 	DWORD t0, t1, t2, t3;
 	DWORD s0, s1, s2, s3;
 	DWORD k;
 
-//	map byte array block to cipher state and add initial round key:
-	s0 = GET_DW(data     ) ^ aes_ctx->enc_schd[0];
-	s1 = GET_DW(data +  4) ^ aes_ctx->enc_schd[1];
-	s2 = GET_DW(data +  8) ^ aes_ctx->enc_schd[2];
+	//	map byte array block to cipher state and add initial round key:
+	s0 = GET_DW(data) ^ aes_ctx->enc_schd[0];
+	s1 = GET_DW(data + 4) ^ aes_ctx->enc_schd[1];
+	s2 = GET_DW(data + 8) ^ aes_ctx->enc_schd[2];
 	s3 = GET_DW(data + 12) ^ aes_ctx->enc_schd[3];
 
-//	round 1:
-	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[ 4];
-	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[ 5];
-	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[ 6];
-	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[ 7];
-//	round 2:
-	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >>  8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[ 8];
-	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >>  8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[ 9];
-	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >>  8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[10];
-	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >>  8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[11];
-//	round 3:
-	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[12];
-	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[13];
-	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[14];
-	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[15];
-//	round 4:
-	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >>  8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[16];
-	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >>  8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[17];
-	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >>  8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[18];
-	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >>  8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[19];
-//	round 5:
-	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[20];
-	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[21];
-	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[22];
-	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[23];
-//	round 6:
-	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >>  8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[24];
-	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >>  8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[25];
-	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >>  8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[26];
-	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >>  8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[27];
-//	round 7:
-	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[28];
-	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[29];
-	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[30];
-	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[31];
-//	round 8:
-	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >>  8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[32];
-	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >>  8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[33];
-	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >>  8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[34];
-	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >>  8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[35];
-//	round 9:
-	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[36];
-	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[37];
-	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[38];
-	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[39];
+	//	round 1:
+	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[4];
+	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[5];
+	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[6];
+	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[7];
+	//	round 2:
+	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >> 8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[8];
+	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >> 8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[9];
+	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >> 8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[10];
+	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >> 8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[11];
+	//	round 3:
+	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[12];
+	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[13];
+	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[14];
+	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[15];
+	//	round 4:
+	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >> 8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[16];
+	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >> 8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[17];
+	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >> 8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[18];
+	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >> 8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[19];
+	//	round 5:
+	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[20];
+	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[21];
+	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[22];
+	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[23];
+	//	round 6:
+	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >> 8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[24];
+	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >> 8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[25];
+	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >> 8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[26];
+	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >> 8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[27];
+	//	round 7:
+	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[28];
+	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[29];
+	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[30];
+	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[31];
+	//	round 8:
+	s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >> 8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[32];
+	s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >> 8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[33];
+	s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >> 8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[34];
+	s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >> 8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[35];
+	//	round 9:
+	t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[36];
+	t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[37];
+	t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[38];
+	t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[39];
 
 	if (aes_ctx->rounds > 10)
-  {
-	//	round 10:
-		s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >>  8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[40];
-		s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >>  8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[41];
-		s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >>  8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[42];
-		s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >>  8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[43];
-	//	round 11:
-		t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[44];
-		t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[45];
-		t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[46];
-		t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[47];
+	{
+		//	round 10:
+		s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >> 8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[40];
+		s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >> 8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[41];
+		s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >> 8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[42];
+		s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >> 8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[43];
+		//	round 11:
+		t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[44];
+		t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[45];
+		t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[46];
+		t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[47];
 
 		if (aes_ctx->rounds > 12)
-    {
-		//	round 12:
-			s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >>  8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[48];
-			s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >>  8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[49];
-			s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >>  8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[50];
-			s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >>  8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[51];
-		//	round 13:
-			t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >>  8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[52];
-			t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >>  8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[53];
-			t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >>  8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[54];
-			t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >>  8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[55];
+		{
+			//	round 12:
+			s0 = AES_TE0[t0 >> 24] ^ AES_TE1[(t1 >> 16) & 0xff] ^ AES_TE2[(t2 >> 8) & 0xff] ^ AES_TE3[t3 & 0xff] ^ aes_ctx->enc_schd[48];
+			s1 = AES_TE0[t1 >> 24] ^ AES_TE1[(t2 >> 16) & 0xff] ^ AES_TE2[(t3 >> 8) & 0xff] ^ AES_TE3[t0 & 0xff] ^ aes_ctx->enc_schd[49];
+			s2 = AES_TE0[t2 >> 24] ^ AES_TE1[(t3 >> 16) & 0xff] ^ AES_TE2[(t0 >> 8) & 0xff] ^ AES_TE3[t1 & 0xff] ^ aes_ctx->enc_schd[50];
+			s3 = AES_TE0[t3 >> 24] ^ AES_TE1[(t0 >> 16) & 0xff] ^ AES_TE2[(t1 >> 8) & 0xff] ^ AES_TE3[t2 & 0xff] ^ aes_ctx->enc_schd[51];
+			//	round 13:
+			t0 = AES_TE0[s0 >> 24] ^ AES_TE1[(s1 >> 16) & 0xff] ^ AES_TE2[(s2 >> 8) & 0xff] ^ AES_TE3[s3 & 0xff] ^ aes_ctx->enc_schd[52];
+			t1 = AES_TE0[s1 >> 24] ^ AES_TE1[(s2 >> 16) & 0xff] ^ AES_TE2[(s3 >> 8) & 0xff] ^ AES_TE3[s0 & 0xff] ^ aes_ctx->enc_schd[53];
+			t2 = AES_TE0[s2 >> 24] ^ AES_TE1[(s3 >> 16) & 0xff] ^ AES_TE2[(s0 >> 8) & 0xff] ^ AES_TE3[s1 & 0xff] ^ aes_ctx->enc_schd[54];
+			t3 = AES_TE0[s3 >> 24] ^ AES_TE1[(s0 >> 16) & 0xff] ^ AES_TE2[(s1 >> 8) & 0xff] ^ AES_TE3[s2 & 0xff] ^ aes_ctx->enc_schd[55];
 		}
 	}
 
-//	apply last round and map cipher state to byte array block:
+	//	apply last round and map cipher state to byte array block:
 	k = (aes_ctx->rounds << 2);
 	s0 =
-		(AES_TE4[(t0 >> 24)       ] & 0xff000000) ^
+		(AES_TE4[(t0 >> 24)] & 0xff000000) ^
 		(AES_TE4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TE4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TE4[(t3      ) & 0xff] & 0x000000ff) ^
+		(AES_TE4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TE4[(t3) & 0xff] & 0x000000ff) ^
 		aes_ctx->enc_schd[k + 0];
 	s1 =
-		(AES_TE4[(t1 >> 24)       ] & 0xff000000) ^
+		(AES_TE4[(t1 >> 24)] & 0xff000000) ^
 		(AES_TE4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TE4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TE4[(t0      ) & 0xff] & 0x000000ff) ^
+		(AES_TE4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TE4[(t0) & 0xff] & 0x000000ff) ^
 		aes_ctx->enc_schd[k + 1];
 	s2 =
-		(AES_TE4[(t2 >> 24)       ] & 0xff000000) ^
+		(AES_TE4[(t2 >> 24)] & 0xff000000) ^
 		(AES_TE4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TE4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TE4[(t1      ) & 0xff] & 0x000000ff) ^
+		(AES_TE4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TE4[(t1) & 0xff] & 0x000000ff) ^
 		aes_ctx->enc_schd[k + 2];
 	s3 =
-		(AES_TE4[(t3 >> 24)       ] & 0xff000000) ^
+		(AES_TE4[(t3 >> 24)] & 0xff000000) ^
 		(AES_TE4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TE4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TE4[(t2      ) & 0xff] & 0x000000ff) ^
+		(AES_TE4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TE4[(t2) & 0xff] & 0x000000ff) ^
 		aes_ctx->enc_schd[k + 3];
 
-	SET_DW(data     , s0);
-	SET_DW(data +  4, s1);
-	SET_DW(data +  8, s2);
+	SET_DW(data, s0);
+	SET_DW(data + 4, s1);
+	SET_DW(data + 8, s2);
 	SET_DW(data + 12, s3);
 }
 
 // ---------------------------------
 
-void AES_Decrypt(AES_CTX_ST *aes_ctx, BYTE data[16])
+void AES_Decrypt(AES_CTX_ST* aes_ctx, BYTE data[16])
 {
 	DWORD t0, t1, t2, t3;
 	DWORD s0, s1, s2, s3;
 	DWORD k;
 
-//	map byte array block to cipher state and add initial round key:
-	s0 = GET_DW(data     ) ^ aes_ctx->dec_schd[0];
-	s1 = GET_DW(data +  4) ^ aes_ctx->dec_schd[1];
-	s2 = GET_DW(data +  8) ^ aes_ctx->dec_schd[2];
+	//	map byte array block to cipher state and add initial round key:
+	s0 = GET_DW(data) ^ aes_ctx->dec_schd[0];
+	s1 = GET_DW(data + 4) ^ aes_ctx->dec_schd[1];
+	s2 = GET_DW(data + 8) ^ aes_ctx->dec_schd[2];
 	s3 = GET_DW(data + 12) ^ aes_ctx->dec_schd[3];
 
-//	round 1:
-	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[ 4];
-	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[ 5];
-	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[ 6];
-	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[ 7];
-//	round 2:
-	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >>  8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[ 8];
-	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >>  8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[ 9];
-	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >>  8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[10];
-	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >>  8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[11];
-//	round 3:
-	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[12];
-	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[13];
-	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[14];
-	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[15];
-//	round 4:
-	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >>  8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[16];
-	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >>  8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[17];
-	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >>  8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[18];
-	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >>  8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[19];
-//	round 5:
-	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[20];
-	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[21];
-	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[22];
-	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[23];
-//	round 6:
-	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >>  8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[24];
-	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >>  8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[25];
-	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >>  8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[26];
-	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >>  8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[27];
-//	round 7:
-	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[28];
-	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[29];
-	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[30];
-	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[31];
-//	round 8:
-	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >>  8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[32];
-	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >>  8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[33];
-	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >>  8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[34];
-	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >>  8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[35];
-//	round 9:
-	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[36];
-	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[37];
-	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[38];
-	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[39];
+	//	round 1:
+	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[4];
+	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[5];
+	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[6];
+	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[7];
+	//	round 2:
+	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >> 8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[8];
+	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >> 8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[9];
+	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >> 8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[10];
+	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >> 8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[11];
+	//	round 3:
+	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[12];
+	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[13];
+	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[14];
+	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[15];
+	//	round 4:
+	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >> 8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[16];
+	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >> 8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[17];
+	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >> 8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[18];
+	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >> 8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[19];
+	//	round 5:
+	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[20];
+	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[21];
+	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[22];
+	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[23];
+	//	round 6:
+	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >> 8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[24];
+	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >> 8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[25];
+	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >> 8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[26];
+	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >> 8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[27];
+	//	round 7:
+	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[28];
+	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[29];
+	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[30];
+	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[31];
+	//	round 8:
+	s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >> 8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[32];
+	s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >> 8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[33];
+	s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >> 8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[34];
+	s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >> 8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[35];
+	//	round 9:
+	t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[36];
+	t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[37];
+	t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[38];
+	t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[39];
 
 	if (aes_ctx->rounds > 10)
-  {
-	//	round 10:
-		s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >>  8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[40];
-		s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >>  8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[41];
-		s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >>  8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[42];
-		s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >>  8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[43];
-	//	round 11:
-		t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[44];
-		t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[45];
-		t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[46];
-		t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[47];
+	{
+		//	round 10:
+		s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >> 8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[40];
+		s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >> 8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[41];
+		s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >> 8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[42];
+		s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >> 8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[43];
+		//	round 11:
+		t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[44];
+		t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[45];
+		t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[46];
+		t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[47];
 
 		if (aes_ctx->rounds > 12)
-    {
-		//	round 12:
-			s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >>  8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[48];
-			s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >>  8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[49];
-			s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >>  8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[50];
-			s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >>  8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[51];
-		//	round 13:
-			t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >>  8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[52];
-			t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >>  8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[53];
-			t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >>  8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[54];
-			t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >>  8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[55];
+		{
+			//	round 12:
+			s0 = AES_TD0[t0 >> 24] ^ AES_TD1[(t3 >> 16) & 0xff] ^ AES_TD2[(t2 >> 8) & 0xff] ^ AES_TD3[t1 & 0xff] ^ aes_ctx->dec_schd[48];
+			s1 = AES_TD0[t1 >> 24] ^ AES_TD1[(t0 >> 16) & 0xff] ^ AES_TD2[(t3 >> 8) & 0xff] ^ AES_TD3[t2 & 0xff] ^ aes_ctx->dec_schd[49];
+			s2 = AES_TD0[t2 >> 24] ^ AES_TD1[(t1 >> 16) & 0xff] ^ AES_TD2[(t0 >> 8) & 0xff] ^ AES_TD3[t3 & 0xff] ^ aes_ctx->dec_schd[50];
+			s3 = AES_TD0[t3 >> 24] ^ AES_TD1[(t2 >> 16) & 0xff] ^ AES_TD2[(t1 >> 8) & 0xff] ^ AES_TD3[t0 & 0xff] ^ aes_ctx->dec_schd[51];
+			//	round 13:
+			t0 = AES_TD0[s0 >> 24] ^ AES_TD1[(s3 >> 16) & 0xff] ^ AES_TD2[(s2 >> 8) & 0xff] ^ AES_TD3[s1 & 0xff] ^ aes_ctx->dec_schd[52];
+			t1 = AES_TD0[s1 >> 24] ^ AES_TD1[(s0 >> 16) & 0xff] ^ AES_TD2[(s3 >> 8) & 0xff] ^ AES_TD3[s2 & 0xff] ^ aes_ctx->dec_schd[53];
+			t2 = AES_TD0[s2 >> 24] ^ AES_TD1[(s1 >> 16) & 0xff] ^ AES_TD2[(s0 >> 8) & 0xff] ^ AES_TD3[s3 & 0xff] ^ aes_ctx->dec_schd[54];
+			t3 = AES_TD0[s3 >> 24] ^ AES_TD1[(s2 >> 16) & 0xff] ^ AES_TD2[(s1 >> 8) & 0xff] ^ AES_TD3[s0 & 0xff] ^ aes_ctx->dec_schd[55];
 		}
 	}
 
-//	apply last round and map cipher state to byte array block:
+	//	apply last round and map cipher state to byte array block:
 	k = (aes_ctx->rounds << 2);
 	s0 =
-		(AES_TD4[(t0 >> 24)       ] & 0xff000000) ^
+		(AES_TD4[(t0 >> 24)] & 0xff000000) ^
 		(AES_TD4[(t3 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TD4[(t2 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TD4[(t1      ) & 0xff] & 0x000000ff) ^
+		(AES_TD4[(t2 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TD4[(t1) & 0xff] & 0x000000ff) ^
 		aes_ctx->dec_schd[k + 0];
 	s1 =
-		(AES_TD4[(t1 >> 24)       ] & 0xff000000) ^
+		(AES_TD4[(t1 >> 24)] & 0xff000000) ^
 		(AES_TD4[(t0 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TD4[(t3 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TD4[(t2      ) & 0xff] & 0x000000ff) ^
+		(AES_TD4[(t3 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TD4[(t2) & 0xff] & 0x000000ff) ^
 		aes_ctx->dec_schd[k + 1];
 	s2 =
-		(AES_TD4[(t2 >> 24)       ] & 0xff000000) ^
+		(AES_TD4[(t2 >> 24)] & 0xff000000) ^
 		(AES_TD4[(t1 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TD4[(t0 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TD4[(t3      ) & 0xff] & 0x000000ff) ^
+		(AES_TD4[(t0 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TD4[(t3) & 0xff] & 0x000000ff) ^
 		aes_ctx->dec_schd[k + 2];
 	s3 =
-		(AES_TD4[(t3 >> 24)       ] & 0xff000000) ^
+		(AES_TD4[(t3 >> 24)] & 0xff000000) ^
 		(AES_TD4[(t2 >> 16) & 0xff] & 0x00ff0000) ^
-		(AES_TD4[(t1 >>  8) & 0xff] & 0x0000ff00) ^
-		(AES_TD4[(t0      ) & 0xff] & 0x000000ff) ^
+		(AES_TD4[(t1 >> 8) & 0xff] & 0x0000ff00) ^
+		(AES_TD4[(t0) & 0xff] & 0x000000ff) ^
 		aes_ctx->dec_schd[k + 3];
 
-	SET_DW(data     , s0);
-	SET_DW(data +  4, s1);
-	SET_DW(data +  8, s2);
+	SET_DW(data, s0);
+	SET_DW(data + 4, s1);
+	SET_DW(data + 8, s2);
 	SET_DW(data + 12, s3);
 }
 
@@ -871,7 +871,7 @@ void AES_Decrypt(AES_CTX_ST *aes_ctx, BYTE data[16])
 static BYTE c2b(char c)
 {
 	if (c >= '0' && c <= '9')
-		return (BYTE) (c - '0');
+		return (BYTE)(c - '0');
 	if (c >= 'a' && c <= 'f')
 		return (BYTE)(c - 'a' + 10);
 	if (c >= 'A' && c <= 'F')
@@ -879,93 +879,93 @@ static BYTE c2b(char c)
 	return 0;
 }
 
-static DWORD s2b(BYTE dst[], const char *src)
+static DWORD s2b(BYTE dst[], const char* src)
 {
-  DWORD i;
+	DWORD i;
 	DWORD l = strlen(src) / 2;
 
-	for (i=0; i<l; i++)
-		dst[i] = (BYTE) ((c2b(src[2*i])<<4) + c2b(src[2*i+1]));
+	for (i = 0; i < l; i++)
+		dst[i] = (BYTE)((c2b(src[2 * i]) << 4) + c2b(src[2 * i + 1]));
 
 	return l;
 }
 
 typedef struct
 {
-	char *plain;
-	char *cipher;
-	char *key;
+	char* plain;
+	char* cipher;
+	char* key;
 } TEST_VECTOR_ST;
 
 static const TEST_VECTOR_ST AES_TestVectors[] = {
-//	Crypto 4.1 test vectors
-	{ "000102030405060708090A0B0C0D0E0F", "0A940BB5416EF045F1C39458C653EA5A", "000102030405060708090A0B0C0D0E0F" },
-	{ "506812A45F08C889B97F5980038B8359", "D8F532538289EF7D06B506A4FD5BE9C9", "00010203050607080A0B0C0D0F101112" },
-	{ "5C6D71CA30DE8B8B00549984D2EC7D4B", "59AB30F4D4EE6E4FF9907EF65B1FB68C", "14151617191A1B1C1E1F202123242526" },
-	{ "53F3F4C64F8616E4E7C56199F48F21F6", "BF1ED2FCB2AF3FD41443B56D85025CB1", "28292A2B2D2E2F30323334353738393A" },
-	{ "2D33EEF2C0430A8A9EBF45E809C40BB6", "DFF4945E0336DF4C1C56BC700EFF837F", "00010203050607080A0B0C0D0F10111214151617191A1B1C" },
-	{ "6AA375D1FA155A61FB72353E0A5A8756", "B6FDDEF4752765E347D5D2DC196D1252", "1E1F20212324252628292A2B2D2E2F30323334353738393A" },
-	{ "BC3736518B9490DCB8ED60EB26758ED4", "D23684E3D963B3AFCF1A114ACA90CBD6", "3C3D3E3F41424344464748494B4C4D4E5051525355565758" },
-	{ "834EADFCCAC7E1B30664B1ABA44815AB", "1946DABF6A03A2A2C3D0B05080AED6FC", "00010203050607080A0B0C0D0F10111214151617191A1B1C1E1F202123242526" },
-	{ "D9DC4DBA3021B05D67C0518F72B62BF1", "5ED301D747D3CC715445EBDEC62F2FB4", "28292A2B2D2E2F30323334353738393A3C3D3E3F41424344464748494B4C4D4E" },
+	//	Crypto 4.1 test vectors
+		{ "000102030405060708090A0B0C0D0E0F", "0A940BB5416EF045F1C39458C653EA5A", "000102030405060708090A0B0C0D0E0F" },
+		{ "506812A45F08C889B97F5980038B8359", "D8F532538289EF7D06B506A4FD5BE9C9", "00010203050607080A0B0C0D0F101112" },
+		{ "5C6D71CA30DE8B8B00549984D2EC7D4B", "59AB30F4D4EE6E4FF9907EF65B1FB68C", "14151617191A1B1C1E1F202123242526" },
+		{ "53F3F4C64F8616E4E7C56199F48F21F6", "BF1ED2FCB2AF3FD41443B56D85025CB1", "28292A2B2D2E2F30323334353738393A" },
+		{ "2D33EEF2C0430A8A9EBF45E809C40BB6", "DFF4945E0336DF4C1C56BC700EFF837F", "00010203050607080A0B0C0D0F10111214151617191A1B1C" },
+		{ "6AA375D1FA155A61FB72353E0A5A8756", "B6FDDEF4752765E347D5D2DC196D1252", "1E1F20212324252628292A2B2D2E2F30323334353738393A" },
+		{ "BC3736518B9490DCB8ED60EB26758ED4", "D23684E3D963B3AFCF1A114ACA90CBD6", "3C3D3E3F41424344464748494B4C4D4E5051525355565758" },
+		{ "834EADFCCAC7E1B30664B1ABA44815AB", "1946DABF6A03A2A2C3D0B05080AED6FC", "00010203050607080A0B0C0D0F10111214151617191A1B1C1E1F202123242526" },
+		{ "D9DC4DBA3021B05D67C0518F72B62BF1", "5ED301D747D3CC715445EBDEC62F2FB4", "28292A2B2D2E2F30323334353738393A3C3D3E3F41424344464748494B4C4D4E" },
 
-//	FIPS tests
-	{ "00112233445566778899AABBCCDDEEFF", "69C4E0D86A7B0430D8CDB78070B4C55A", "000102030405060708090A0B0C0D0E0F" },
-	{ "00112233445566778899AABBCCDDEEFF", "DDA97CA4864CDFE06EAF70A0EC0D7191", "000102030405060708090A0B0C0D0E0F1011121314151617" },
-	{ "00112233445566778899AABBCCDDEEFF", "8EA2B7CA516745BFEAFC49904B496089", "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F" },
+		//	FIPS tests
+			{ "00112233445566778899AABBCCDDEEFF", "69C4E0D86A7B0430D8CDB78070B4C55A", "000102030405060708090A0B0C0D0E0F" },
+			{ "00112233445566778899AABBCCDDEEFF", "DDA97CA4864CDFE06EAF70A0EC0D7191", "000102030405060708090A0B0C0D0E0F1011121314151617" },
+			{ "00112233445566778899AABBCCDDEEFF", "8EA2B7CA516745BFEAFC49904B496089", "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F" },
 
-// Nessie
+			// Nessie
 
-	{ NULL, NULL, NULL, }
+				{ NULL, NULL, NULL, }
 };
 
 BOOL AES_SelfTest(void)
 {
-  AES_CTX_ST aes_ctx;
-  BYTE key_data[32];
-  DWORD key_bits;
-  BYTE plain[16], cipher[16], buffer[16];
-  const TEST_VECTOR_ST *vect;
-  int i;
+	AES_CTX_ST aes_ctx;
+	BYTE key_data[32];
+	DWORD key_bits;
+	BYTE plain[16], cipher[16], buffer[16];
+	const TEST_VECTOR_ST* vect;
+	int i;
 
-  printf("AES_SelfTest\n");
+	printf("AES_SelfTest\n");
 
 	for (i = 0;; i++)
-  {
-    /* Get next vector */
+	{
+		/* Get next vector */
 		vect = &AES_TestVectors[i];
 		if (vect->key == NULL)
 			break;
 
-    /* Retrieve the key */
+		/* Retrieve the key */
 		key_bits = 8 * s2b(key_data, vect->key);
 
-    /* Init encryption context */
-    AES_InitEx(&aes_ctx, key_data, key_bits);
+		/* Init encryption context */
+		AES_InitEx(&aes_ctx, key_data, key_bits);
 
-    /* Retrieve the datagrams */
-    s2b(plain, vect->plain);
-    s2b(cipher, vect->cipher);
+		/* Retrieve the datagrams */
+		s2b(plain, vect->plain);
+		s2b(cipher, vect->cipher);
 
-    /* Encrypt */
-    memcpy(buffer, plain, 16);
-    AES_Encrypt(&aes_ctx, buffer);
-	  if (memcmp(buffer, cipher, 16))
-    {
-      printf("Fail to encrypt AES vector {%s, %s, %s}\n", vect->key, vect->plain, vect->cipher);
-      return FALSE;
-    }
+		/* Encrypt */
+		memcpy(buffer, plain, 16);
+		AES_Encrypt(&aes_ctx, buffer);
+		if (memcmp(buffer, cipher, 16))
+		{
+			printf("Fail to encrypt AES vector {%s, %s, %s}\n", vect->key, vect->plain, vect->cipher);
+			return FALSE;
+		}
 
-    /* Decrypt */
-    AES_Decrypt(&aes_ctx, buffer);
-    if (memcmp(buffer, plain, 16))
-    {
-      printf("Fail to decrypt AES vector {%s, %s, %s}\r\n", vect->key, vect->plain, vect->cipher);
-      return FALSE;
-    }
-  }
+		/* Decrypt */
+		AES_Decrypt(&aes_ctx, buffer);
+		if (memcmp(buffer, plain, 16))
+		{
+			printf("Fail to decrypt AES vector {%s, %s, %s}\r\n", vect->key, vect->plain, vect->cipher);
+			return FALSE;
+		}
+	}
 
-  return TRUE;
+	return TRUE;
 }
 
 

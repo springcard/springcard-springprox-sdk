@@ -28,23 +28,23 @@
  * to the same serial device, this function can be only an alias to
  * SerialOpen + ReaderConnect
  */
-BOOL SerialLookup(SPROX_CTX_ST *sprox_ctx)
+BOOL SerialLookup(SPROX_CTX_ST* sprox_ctx)
 {
-  /* Sample sequence can be something like that : */
-  if (SerialOpen(sprox_ctx, "DEVICE0"))
-  {
-    if (ReaderConnect(sprox_ctx) == MI_OK)
-      return TRUE;
-    SerialClose(sprox_ctx);
-  }
-  if (SerialOpen(sprox_ctx, "DEVICE1"))
-  {
-    if (ReaderConnect(sprox_ctx) == MI_OK)
-      return TRUE;
-    SerialClose(sprox_ctx);
-  }
-  /* ... */
-  return FALSE;
+	/* Sample sequence can be something like that : */
+	if (SerialOpen(sprox_ctx, "DEVICE0"))
+	{
+		if (ReaderConnect(sprox_ctx) == MI_OK)
+			return TRUE;
+		SerialClose(sprox_ctx);
+	}
+	if (SerialOpen(sprox_ctx, "DEVICE1"))
+	{
+		if (ReaderConnect(sprox_ctx) == MI_OK)
+			return TRUE;
+		SerialClose(sprox_ctx);
+	}
+	/* ... */
+	return FALSE;
 }
 
 /*
@@ -55,10 +55,10 @@ BOOL SerialLookup(SPROX_CTX_ST *sprox_ctx)
  * If host doesn't support serial device naming, the device parameter
  * can be ignored
  */
-BOOL SerialOpen(SPROX_CTX_ST * sprox_ctx, const TCHAR *device)
+BOOL SerialOpen(SPROX_CTX_ST* sprox_ctx, const TCHAR* device)
 {
-  /* TODO : open the device and perform the 1st-time initialization */
-  return TRUE;
+	/* TODO : open the device and perform the 1st-time initialization */
+	return TRUE;
 }
 
 /*
@@ -67,9 +67,9 @@ BOOL SerialOpen(SPROX_CTX_ST * sprox_ctx, const TCHAR *device)
  * Close the serial device
  * (if possible also power-down the SpringProx device)
  */
-void SerialClose(SPROX_CTX_ST * sprox_ctx)
+void SerialClose(SPROX_CTX_ST* sprox_ctx)
 {
-  /* TODO : close the device */
+	/* TODO : close the device */
 }
 
 /*
@@ -87,7 +87,7 @@ void SerialClose(SPROX_CTX_ST * sprox_ctx)
  *   no parity, no flow control/
  * - if the UART doesn't support 115200bps, the SPROX_HIGH_BAUDRATE must be #undef
  */
-BOOL SerialSetBaudrate(SPROX_CTX_ST * sprox_ctx, DWORD baudrate)
+BOOL SerialSetBaudrate(SPROX_CTX_ST* sprox_ctx, DWORD baudrate)
 {
 
 }
@@ -100,7 +100,7 @@ BOOL SerialSetBaudrate(SPROX_CTX_ST * sprox_ctx, DWORD baudrate)
  * - resp_tmo : time to wait for SpringProx answer (timeout between last byte sent, and first answer byte)
  * - byte_tmo : inter-byte timeout (timeout between two consecutive bytes of the answer)
  */
-BOOL SerialSetTimeouts(SPROX_CTX_ST * sprox_ctx, DWORD resp_tmo, DWORD byte_tmo)
+BOOL SerialSetTimeouts(SPROX_CTX_ST* sprox_ctx, DWORD resp_tmo, DWORD byte_tmo)
 {
 
 }
@@ -113,7 +113,7 @@ BOOL SerialSetTimeouts(SPROX_CTX_ST * sprox_ctx, DWORD resp_tmo, DWORD byte_tmo)
  * - TRUE  if byte has been sent
  * - FALSE if byte has not been sent (whatever the reason is)
  */
-BOOL SendByte(SPROX_CTX_ST * sprox_ctx, BYTE b)
+BOOL SendByte(SPROX_CTX_ST* sprox_ctx, BYTE b)
 {
 
 }
@@ -126,7 +126,7 @@ BOOL SendByte(SPROX_CTX_ST * sprox_ctx, BYTE b)
  * - TRUE  if one byte has been received
  * - FALSE if no byte has been received (whatever the reason is)
  */
-BOOL RecvByte(SPROX_CTX_ST * sprox_ctx, BYTE * b)
+BOOL RecvByte(SPROX_CTX_ST* sprox_ctx, BYTE* b)
 {
 
 }
@@ -139,7 +139,7 @@ BOOL RecvByte(SPROX_CTX_ST * sprox_ctx, BYTE * b)
  * - TRUE  if ALL bytes has been sent
  * - FALSE if AT LEAST ONE byte has not been sent (whatever the reason is)
  */
-BOOL SendBurst(SPROX_CTX_ST * sprox_ctx, const BYTE *b, WORD len)
+BOOL SendBurst(SPROX_CTX_ST* sprox_ctx, const BYTE* b, WORD len)
 {
 
 }
@@ -152,22 +152,22 @@ BOOL SendBurst(SPROX_CTX_ST * sprox_ctx, const BYTE *b, WORD len)
  * - TRUE  if ALL expected bytes have been received (received length == len parameter)
  * - FALSE if AT LEAST ONE byte has not been received (received length < len parameter)
  */
-BOOL RecvBurst(SPROX_CTX_ST * sprox_ctx, BYTE * b, WORD len)
+BOOL RecvBurst(SPROX_CTX_ST* sprox_ctx, BYTE* b, WORD len)
 {
 
 }
 
-BOOL SerialPowerUp(SPROX_CTX_ST * sprox_ctx)
+BOOL SerialPowerUp(SPROX_CTX_ST* sprox_ctx)
 {
 
 }
 
-BOOL SerialPowerDown(SPROX_CTX_ST * sprox_ctx)
+BOOL SerialPowerDown(SPROX_CTX_ST* sprox_ctx)
 {
 
 }
 
-BOOL SerialReset(SPROX_CTX_ST * sprox_ctx)
+BOOL SerialReset(SPROX_CTX_ST* sprox_ctx)
 {
 
 }

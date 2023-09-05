@@ -12,7 +12,7 @@
  * Byte 0 : supported ISO RF protocols
  */
 
-//#define SPROX_NOT_A_SPRINGPROX       0x80000000
+ //#define SPROX_NOT_A_SPRINGPROX       0x80000000
 
 #define SPROX_WITH_NORALSY_SPECIFIC  0x02000000
 #define SPROX_WITH_HUMAN_CONSOLE     0x01000000

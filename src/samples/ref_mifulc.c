@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	rc = SPROX_GetLibraryA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_GetLibrary(s_buffer, sizeof(s_buffer));
 	if (rc != MI_OK)
 	{
 		printf("Failed to get API version\n");
@@ -67,18 +67,18 @@ int main(int argc, char** argv)
 	/* Open reader */
 	/* ----------- */
 
-	rc = SPROX_ReaderOpenA(szCommDevice);
+	rc = SPROX_ReaderOpen(szCommDevice);
 	if (rc != MI_OK)
 	{
 		printf("Reader not found\n");
 		goto done;
 	}
 
-	rc = SPROX_ReaderGetDeviceA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetDevice(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader found on %s\n", s_buffer);
 
-	rc = SPROX_ReaderGetFirmwareA(s_buffer, sizeof(s_buffer));
+	rc = SPROX_ReaderGetFirmware(s_buffer, sizeof(s_buffer));
 	if (rc == MI_OK)
 		printf("Reader firwmare is %s\n", s_buffer);
 

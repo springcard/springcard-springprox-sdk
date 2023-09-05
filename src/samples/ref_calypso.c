@@ -24,6 +24,8 @@
 
 #ifdef WIN32
 #include <conio.h>              /* For kbhit and getch */
+#else
+#include <errno.h>
 #endif
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,14 +51,14 @@ int main(int argc, char** argv)
 	int i;
 	char s_buffer[64];
 
-	BYTE uid[12];  /* Serial number of the found card */
+	BYTE uid[32];  /* Serial number of the found card */
 	BYTE uidlen;
 
 	BYTE info[64]; /* Protocol-related information of the found card (mandatory for Innovatron protocol) */
 	BYTE infolen;
 
 	WORD proto;
-	DWORD rc = MI_OK;
+	LONG rc = MI_OK;
 
 	printf("SpringCard SpringProx 'Legacy' SDK\n");
 	printf("\n");
@@ -147,7 +149,7 @@ int main(int argc, char** argv)
 	rc = CalypsoCardBindLegacyEx(pCalypsoCtx, proto, info, infolen);
 	if (rc)
 	{
-		printf("CalypsoCardBindLegacy failed, error %04X.\n", rc);
+		printf("CalypsoCardBindLegacy failed, error %lX\n", rc);
 		goto close;
 	}
 
@@ -158,7 +160,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		rc = CalypsoCardActivate(pCalypsoCtx, szApplicationID, strlen(szApplicationID));
+		rc = CalypsoCardActivateHex(pCalypsoCtx, szApplicationID);
 	}
 	if (rc)
 	{
@@ -168,7 +170,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			printf("CalypsoCardActivate failed, error %04X.\n", rc);
+			printf("CalypsoCardActivate failed, error %lX\n", rc);
 		}
 		goto close;
 	}
@@ -184,7 +186,7 @@ int main(int argc, char** argv)
 		rc = CalypsoCardGetChallenge(pCalypsoCtx, chal);
 		if (rc)
 		{
-			printf("CalypsoCardGetChallenge failed, error %04X.\n", rc);
+			printf("CalypsoCardGetChallenge failed, error %lX\n", rc);
 			goto close;
 		}
 
@@ -205,14 +207,14 @@ int main(int argc, char** argv)
 
 		if (rc)
 		{
-			printf("CalypsoCardOpenSecureSession failed, error %04X.\n", rc);
+			printf("CalypsoCardOpenSecureSession failed, error %lX\n", rc);
 			goto close;
 		}
 
 		rc = CalypsoCardCloseSecureSession(pCalypsoCtx, FALSE, NULL, NULL, NULL);
 		if (rc)
 		{
-			printf("CalypsoCardCloseSecureSession failed, error %04X.\n", rc);
+			printf("CalypsoCardCloseSecureSession failed, error %lX\n", rc);
 			goto close;
 		}
 
@@ -233,7 +235,7 @@ int main(int argc, char** argv)
 	rc = CalypsoExploreAndParse(pCalypsoCtx);
 	if (rc)
 	{
-		printf("CalypsoExploreAndParse failed, error %04X.\n", rc);
+		printf("CalypsoExploreAndParse failed, error %lX\n", rc);
 		goto close;
 	}
 
@@ -253,13 +255,23 @@ int main(int argc, char** argv)
 	{
 		FILE* fp;
 
-		errno_t err = _tfopen_s(&fp, szXmlOutputFileName, _T("wt"));
+#ifdef WIN32		
+		int err = _tfopen_s(&fp, szXmlOutputFileName, _T("wt"));
 		if (err)
 		{
 			printf("Failed to open output file '%s'\n", szXmlOutputFileName);
 			printf("Err. %d\n", err);
 			goto done;
 		}
+#else
+		fp = fopen(szXmlOutputFileName, "wt");
+		if (fp == NULL)
+		{
+			printf("Failed to open output file '%s'\n", szXmlOutputFileName);
+			printf("Err. %d\n", errno);
+			goto done;
+		}
+#endif
 
 		fprintf(fp, "<calypso_explorer>\n");
 

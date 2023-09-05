@@ -41,7 +41,11 @@ void SPROX_TraceSetFile(const TCHAR* filename)
 	if (filename != NULL)
 	{
 		SPROX_Trace(trace_level, "Trace file set to %s", filename);
+#ifdef WIN32		
 		_tcscpy_s(trace_file, sizeof(trace_file) / sizeof(TCHAR), filename);
+#else
+		strlcpy(trace_file, filename, sizeof(trace_file));
+#endif
 		SPROX_Trace(trace_level, "Trace file set to %s", trace_file);
 	}
 	else
@@ -63,36 +67,34 @@ void SPROX_Trace(BYTE level, const char* fmt, ...)
 #endif
 
 	if (!(level & trace_level)) return; /* No need to trace this */
-	if (trace_file == NULL)
+	if (!strlen(trace_file)) return;
+	if (!_tcsncmp(trace_file, _T("DLG"), 3))
+	{
+		/* Output to message box */
+		file_out = NULL;
+	}
+	else if (!_tcsncmp(trace_file, _T("CON"), 3) || !_tcsncmp(trace_file, _T("stdout"), 6))
 	{
 		/* Output to console */
 		file_out = stdout;
 	}
+	else if (!_tcsncmp(trace_file, _T("ERR"), 3) || !_tcsncmp(trace_file, _T("stderr"), 6))
+	{
+		/* Output to console */
+		file_out = stderr;
+	}
 	else
 	{
-		if (!strlen(trace_file)) return;
-		if (!_tcsncmp(trace_file, _T("DLG"), 3))
-		{
-			/* Output to message box */
-			file_out = NULL;
-		}
-		else if (!_tcsncmp(trace_file, _T("CON"), 3) || !_tcsncmp(trace_file, _T("stdout"), 6))
-		{
-			/* Output to console */
-			file_out = stdout;
-		}
-		else if (!_tcsncmp(trace_file, _T("ERR"), 3) || !_tcsncmp(trace_file, _T("stderr"), 6))
-		{
-			/* Output to console */
-			file_out = stderr;
-		}
-		else
-		{
-			/* Output to file */
-			errno_t err = _tfopen_s(&file_out, trace_file, _T("at+"));
-			if (err)
-				return;
-		}
+		/* Output to file */
+#ifdef WIN32		
+		int err = _tfopen_s(&file_out, trace_file, _T("at+"));
+		if (err)
+			return;
+#else
+		file_out = _tfopen(trace_file, _T("at+"));
+		if (file_out == NULL)
+			return;
+#endif
 	}
 
 	/* Prepare the line */

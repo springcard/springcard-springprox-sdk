@@ -1,8 +1,8 @@
 #ifdef EXPAND_STRINGS
-  #undef ADD_STRING
-  #define ADD_STRING(a, b) const char a[] = b;
+#undef ADD_STRING
+#define ADD_STRING(a, b) const char a[] = b;
 #else
-  #define ADD_STRING(a, b) extern const char a[]
+#define ADD_STRING(a, b) extern const char a[]
 #endif
 
 ADD_STRING(strAtr, "ATR");

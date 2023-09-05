@@ -264,12 +264,25 @@ void ParserOut_Str(CALYPSO_CTX_ST* ctx, const char* varname, const char* value)
 
 #ifndef CALYPSO_NO_TIME_T
 
+static BOOL get_localtime(time_t value, struct tm* t)
+{
+#ifdef WIN32
+	int err = localtime_s(t, &value);
+	if (err)
+		return FALSE;
+#else
+	struct tm* r = localtime_r(&value, t);
+	if (r == NULL)
+		return FALSE;
+#endif
+	return TRUE;
+}
+
 void ParserOut_Date(CALYPSO_CTX_ST* ctx, const char* varname, time_t value)
 {
 	char temp[64];
 	struct tm t;
-	errno_t err = localtime_s(&t, &value);
-	if (err)
+	if (!get_localtime(value, &t))
 		snprintf(temp, sizeof(temp), "%s", DUMMY_DATE);
 	else
 		strftime(temp, sizeof(temp), "%d/%m/%Y", &t);
@@ -280,8 +293,7 @@ void ParserOut_DateId(CALYPSO_CTX_ST* ctx, const char* varname, DWORD varid, tim
 {
 	char temp[64];
 	struct tm t;
-	errno_t err = localtime_s(&t, &value);
-	if (err)
+	if (!get_localtime(value, &t))
 		snprintf(temp, sizeof(temp), "%s", DUMMY_DATE);
 	else
 		strftime(temp, sizeof(temp), "%d/%m/%Y", &t);
@@ -292,8 +304,7 @@ void ParserOut_Time(CALYPSO_CTX_ST* ctx, const char* varname, time_t value)
 {
 	char temp[64];
 	struct tm t;
-	errno_t err = localtime_s(&t, &value);
-	if (err)
+	if (!get_localtime(value, &t))
 		snprintf(temp, sizeof(temp), "%s", DUMMY_TIME);
 	else
 		strftime(temp, sizeof(temp), "%H:%M:%S", &t);
@@ -304,8 +315,7 @@ void ParserOut_TimeReal(CALYPSO_CTX_ST* ctx, const char* varname, time_t value)
 {
 	char temp[64];
 	struct tm t;
-	errno_t err = localtime_s(&t, &value);
-	if (err)
+	if (!get_localtime(value, &t))
 		snprintf(temp, sizeof(temp), "%s %s", DUMMY_DATE, DUMMY_TIME);
 	else
 		strftime(temp, sizeof(temp), "%d/%m/%Y %H:%M:%S", &t);
@@ -485,9 +495,15 @@ CALYPSO_PROC CalypsoSetXmlOutput(CALYPSO_CTX_ST* ctx, const char* filename)
 
 	if (filename != NULL)
 	{
-		errno_t err = fopen_s(&ctx->Parser.TargetFile, filename, "wt");
+#ifdef WIN32
+		int err = fopen_s(&ctx->Parser.TargetFile, filename, "wt");
 		if (err)
 			return CALYPSO_ERR_INVALID_PARAM;
+#else
+		ctx->Parser.TargetFile = fopen(filename, "wt");
+		if (ctx->Parser.TargetFile == NULL)
+			return CALYPSO_ERR_INVALID_PARAM;
+#endif
 	}
 	ctx->Parser.OutputXml = TRUE;
 
@@ -563,9 +579,15 @@ CALYPSO_PROC CalypsoSetIniOutput(CALYPSO_CTX_ST* ctx, const char* filename)
 
 	if (filename != NULL)
 	{
-		errno_t err = fopen_s(&ctx->Parser.TargetFile, filename, "wt");
+#ifdef WIN32
+		int err = fopen_s(&ctx->Parser.TargetFile, filename, "wt");
 		if (err)
 			return CALYPSO_ERR_INVALID_PARAM;
+#else
+		ctx->Parser.TargetFile = fopen(filename, "wt");
+		if (ctx->Parser.TargetFile == NULL)
+			return CALYPSO_ERR_INVALID_PARAM;
+#endif
 	}
 	ctx->Parser.OutputIni = TRUE;
 

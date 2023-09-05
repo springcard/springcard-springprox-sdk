@@ -37,7 +37,7 @@
 #define SPROX_CONTROL_I2C_WRITE         0x13
 
 #define SPROX_CONTROL_GET_TAMPERS       0x17
-                                          
+
 #define SPROX_CONTROL_HARD_TEST         0x18
 #define SPROX_CONTROL_RF_TEST           0x19
 
